@@ -1,0 +1,53 @@
+{
+  "name": "material-management",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "start": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "chart.js": "^2.9.4",
+    "core-js": "^3.11.1",
+    "mitt": "^2.1.0",
+    "moment": "^2.24.0",
+    "primeflex": "^2.0.0",
+    "primeicons": "^4.1.0",
+    "primevue": "^3.4.0",
+    "rxjs": "^7.1.0",
+    "vue": "^3.0.11",
+    "vue-i18n": "^9.1.6",
+    "vue-router": "^4.0.6",
+    "vue-rx": "^6.2.0",
+    "vue2-datepicker": "^3.9.1",
+    "vue3-datepicker": "^0.2.4",
+    "vuejs-datepicker": "^1.6.0",
+    "vuelidate": "^0.7.6",
+    "vuex": "^4.0.0",
+    "vuex-persistedstate": "^4.0.0-beta.3"
+  },
+  "devDependencies": {
+    "@types/vue2-datepicker": "^3.3.0",
+    "@types/vuelidate": "^0.7.14",
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
+    "@vue/cli-plugin-babel": "~4.5.12",
+    "@vue/cli-plugin-router": "~4.5.12",
+    "@vue/cli-plugin-typescript": "~4.5.12",
+    "@vue/cli-plugin-vuex": "~4.5.12",
+    "@vue/cli-service": "~4.5.12",
+    "@vue/compiler-sfc": "^3.0.11",
+    "@vue/eslint-config-airbnb": "^5.0.2",
+    "@vue/eslint-config-typescript": "^7.0.0",
+    "eslint": "^7.25.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-vue": "^7.9.0",
+    "sass": "^1.32.12",
+    "sass-loader": "^10.1.1",
+    "typescript": "~4.2.4",
+    "vue-slideout-panel": "^3.0.0"
+  }
+}

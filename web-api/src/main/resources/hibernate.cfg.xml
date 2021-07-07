@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+<session-factory>
+    <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+    <property name="connection.url">jdbc:mysql://localhost:3306/material_management</property>
+    <property name="hibernate.connection.username">root</property>
+    <property name="hibernate.connection.password">123456a@</property>
+    <property name="hibernate.connection.characterEncoding">utf8</property>
+    <property name="hibernate.connection.useUnicode">yes</property>
+    <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
+    <property name="connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
+    <property name="hibernate.connection.defaultNChar">true</property>
+    <property name="show_sql">true</property>
+    <property name="hibernate.connection.autocommit">false</property>
+    <property name="hibernate.format_sql">true</property>
+    <property name="c3p0.acquire_increment">1</property>
+    <property name="c3p0.idle_test_period">100</property>
+    <property name="c3p0.max_size">150</property>
+    <property name="c3p0.max_statements">25</property>
+    <property name="c3p0.min_size">5</property>
+    <property name="c3p0.timeout">1000</property>
+
+    <!-- Mappings -->
+    <mapping class="com.app.model.user.UserModel"/>
+    <mapping class="com.app.model.user.UserViewModel"/>
+    <mapping class="com.app.model.employee.EmployeeModel"/>
+    <mapping class="com.app.model.employee.EmployeeUserModel"/>
+    <mapping class="com.app.model.customer.CustomerModel"/>
+    <mapping class="com.app.model.customer.CustomerUserModel"/>
+    <mapping class="com.app.model.product.ProductModel"/>
+    <mapping class="com.app.model.order.OrderModel"/>
+    <mapping class="com.app.model.order.OrderItemModel"/>
+    <mapping class="com.app.model.order.OrderInfoModel"/>
+    <mapping class="com.app.model.cart.CartModel"/>
+    <mapping class="com.app.model.cart.CartViewModel"/>
+    <mapping class="com.app.model.category.DeliveryBillFlowModel"/>
+    <mapping class="com.app.model.category.DeliveryBillModel"/>
+    <mapping class="com.app.model.category.FactoryModel"/>
+    <mapping class="com.app.model.category.PositionModel"/>
+    <mapping class="com.app.model.category.QualityModel"/>
+    <mapping class="com.app.model.category.ReceiptFlowModel"/>
+    <mapping class="com.app.model.category.ReceiptModel"/>
+    <mapping class="com.app.model.category.RoleModel"/>
+    <mapping class="com.app.model.category.SpeciesModel"/>
+    <mapping class="com.app.model.category.SupplierModel"/>
+    <mapping class="com.app.model.category.SuppliesModel"/>
+    <mapping class="com.app.model.category.UnitModel"/>
+    <mapping class="com.app.model.category.WarehouseCardFlowModel"/>
+    <mapping class="com.app.model.category.WarehouseCardModel"/>
+    <mapping class="com.app.model.category.WarehouseModel"/>
+    <mapping class="com.app.model.category.DepartmentModel"/>
+</session-factory>
+</hibernate-configuration>
