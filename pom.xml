@@ -25,7 +25,7 @@
     <commons-lang-version>3.12.0</commons-lang-version>
     <commons-text-version>1.9</commons-text-version>
     <h2-database-version>1.4.200</h2-database-version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <!-- Check dependency updates using:
       mvn versions:display-dependency-updates
