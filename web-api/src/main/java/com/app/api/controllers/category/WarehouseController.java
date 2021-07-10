@@ -41,6 +41,9 @@ public class WarehouseController extends BaseController {
     public Response getWarehouseList(
             @Parameter(description="Warehouse Id") @QueryParam("warehouseId") int warehouseId,
             @Parameter(description="Name", example="nikon%") @QueryParam("name") String name,
+            @Parameter(description="code", example="nikon%") @QueryParam("code") String code,
+            @Parameter(description="email", example="nikon%") @QueryParam("email") String email,
+            @Parameter(description="phone", example="nikon%") @QueryParam("phone") String phone,
             @Parameter(description="Page No, Starts from 1 ", example="1") @DefaultValue("1") @QueryParam("page") int page,
             @Parameter(description="Items in each page", example="20") @DefaultValue("20") @QueryParam("page-size") int pageSize
     ) {
@@ -51,7 +54,16 @@ public class WarehouseController extends BaseController {
             criteria.add(Restrictions.eq("warehouseId",  warehouseId ));
         }
         if (StringUtils.isNotBlank(name)){
-            criteria.add(Restrictions.like("name, Use % for wildcard ", name ).ignoreCase());
+            criteria.add(Restrictions.like("name", "%"+name+"%" ).ignoreCase());
+        }
+        if (StringUtils.isNotBlank(code)){
+            criteria.add(Restrictions.like("code", "%"+code+"%" ).ignoreCase());
+        }
+        if (StringUtils.isNotBlank(email)){
+            criteria.add(Restrictions.like("email", "%"+email+"%" ).ignoreCase());
+        }
+        if (StringUtils.isNotBlank(phone)){
+            criteria.add(Restrictions.like("phone", "%"+phone+"%" ).ignoreCase());
         }
         if (page<=0){ page = 1; }
         if (pageSize <= 0 || pageSize > 1000){ pageSize = 20; }

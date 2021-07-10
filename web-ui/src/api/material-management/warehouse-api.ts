@@ -2,7 +2,7 @@ import api from '@/api/api-service';
 import { AxiosResponse } from 'axios';
 
 export default {
-  async getWarehouses(page = 1, pageSize = 20, warehouseId = ''): Promise<AxiosResponse> {
+  async getWarehouses(page = 1, pageSize = 20, warehouseId = '', code='', name='', email='', phone='' ): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
     if (page) {
       qsParams.page = page;
@@ -14,6 +14,19 @@ export default {
       qsParams.id = warehouseId;
     }
 
+    if (code) {
+      qsParams.code = code;
+    }
+
+    if (name) {
+      qsParams.name = name;
+    }
+    if (email) {
+      qsParams.email = email;
+    }
+    if (phone) {
+      qsParams.phone = phone;
+    }
     return api.get('/warehouses', { params: qsParams });
   },
 

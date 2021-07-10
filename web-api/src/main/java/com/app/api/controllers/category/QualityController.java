@@ -54,10 +54,10 @@ public class QualityController extends BaseController {
             criteria.add(Restrictions.eq("qualityId",  qualityId ));
         }
         if (StringUtils.isNotBlank(name)){
-            criteria.add(Restrictions.like("name", "%"+name+"%" ).ignoreCase());
+            criteria.add(Restrictions.like("qualityName", "%"+name+"%" ).ignoreCase());
         }
         if (StringUtils.isNotBlank(code)){
-            criteria.add(Restrictions.like("code", "%"+code+"%" ).ignoreCase());
+            criteria.add(Restrictions.like("qualityCode", "%"+code+"%" ).ignoreCase());
         }
         if (page<=0){ page = 1; }
         if (pageSize <= 0 || pageSize > 1000){ pageSize = 20; }

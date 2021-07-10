@@ -1,45 +1,180 @@
 <template>
   <div>
     <ConfirmDialog position="top"></ConfirmDialog>
-    <Toast/>
-    <Sidebar v-model:visible="showSlideOut" position="right" style="width:800px">
-      <FactoryDetails :rec="selectedRec" @cancel="showSlideOut = false" @changed="getData()"
-                   :arr="arr" :itemById="itemById"  :isNew="isNewRec"></FactoryDetails>
+    <Toast />
+    <Sidebar
+      v-model:visible="showSlideOut"
+      position="right"
+      style="width: 800px"
+    >
+      <FactoryDetails
+        :rec="selectedRec"
+        @cancel="showSlideOut = false"
+        @changed="getData()"
+        :arr="arr"
+        :itemById="itemById"
+        :isNew="isNewRec"
+      ></FactoryDetails>
     </Sidebar>
-    <h3> Quản lý phân xưởng </h3>
-    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width:1100px">
-      <span class="p-input-icon-left">
-        <i class="pi pi-search"  style="margin: -6px 10px 0px;"/>
-        <InputText type="text" v-model="searchCode" class="p-inputtext-sm" placeholder="Search by code" style="width:180px;margin:1px 10px 0 10px"/>
-      </span>
-      <span class="p-input-icon-left">
-        <i class="pi pi-search" style="margin: -6px 10px 0px;" />
-        <InputText type="date" v-model="searchFormDate" class="p-inputtext-sm" placeholder="dd/mm/yyyy" style="width:180px; height: 31px; margin:1px 10px 0 10px"/>
-      </span>
-      <span class="p-input-icon-left">
-        <i class="pi pi-search" style="margin: -6px 10px 0px;" />
-        <InputText type="date" v-model="searchToDate" class="p-inputtext-sm" placeholder="dd/mm/yyyy" style="width:180px; height: 31px; margin:1px 10px 0 10px"/>
-      </span>
+    <h3>Quản lý phân xưởng</h3>
+    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width: 1350px">
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Mã PX
+        </label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search" style="margin: -6px 10px 0px" />
+          <InputText
+            type="text"
+            v-model="searchCode"
+            class="p-inputtext-sm"
+            placeholder="Search by code"
+            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+          />
+        </span>
+      </div>
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Tên PX
+        </label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search" style="margin: -6px 10px 0px" />
+          <InputText
+            type="text"
+            v-model="searchName"
+            class="p-inputtext-sm"
+            placeholder="Search by name"
+            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+          />
+        </span>
+      </div>
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Email
+        </label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search" style="margin: -6px 10px 0px" />
+          <InputText
+            type="text"
+            v-model="searchName"
+            class="p-inputtext-sm"
+            placeholder="Search by name"
+            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+          />
+        </span>
+      </div>
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Nhân viên
+        </label>
+        <Dropdown
+          class="p-inputtext-sm"
+          style="width: 200px"
+          v-model="searchSupplier"
+          :options="[]"
+          :filter="true"
+          :showClear="true"
+          optionLabel="name"
+          optionValue="supplierId"
+        />
+      </div>
     </div>
-    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width:1100px">
-      <span class="p-input-icon-left">
-        <i class="pi pi-search" style="margin: -6px 10px 0px;" />
-        <InputText type="text" v-model="searchName" class="p-inputtext-sm" placeholder="Search by name" style="width:180px;margin:1px 10px 0 10px"/>
-      </span>
-      <span class="p-input-icon-left">
-        <i class="pi pi-search" style="margin: -6px 10px 0px;" />
-        <InputText type="date" v-model="searchFormDate" class="p-inputtext-sm" placeholder="dd/mm/yyyy" style="width:180px; height: 31px; margin:1px 10px 0 10px"/>
-      </span>
-      <span class="p-input-icon-left">
-        <i class="pi pi-search" style="margin: -6px 10px 0px;" />
-        <InputText type="date" v-model="searchToDate" class="p-inputtext-sm" placeholder="dd/mm/yyyy" style="width:180px; height: 31px; margin:1px 10px 0 10px"/>
-      </span>
+    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width: 1350px">
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Thi công từ
+        </label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search" style="margin: -6px 10px 0px" />
+          <InputText
+            type="date"
+            v-model="searchFormDate"
+            class="p-inputtext-sm"
+            placeholder="dd/mm/yyyy"
+            style="width: 200px; height: 30px"
+          />
+        </span>
+      </div>
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Đến ngày 
+        </label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search" style="margin: -6px 10px 0px" />
+          <InputText
+            type="date"
+            v-model="searchToDate"
+            class="p-inputtext-sm"
+            placeholder="dd/mm/yyyy"
+            style="width: 200px; height: 30px"
+          />
+        </span>
+      </div>
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Hoàn thành từ
+        </label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search" style="margin: -6px 10px 0px" />
+          <InputText
+            type="date"
+            v-model="searchFormDate"
+            class="p-inputtext-sm"
+            placeholder="dd/mm/yyyy"
+            style="width: 200px; height: 30px"
+          />
+        </span>
+      </div>
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Đến ngày
+        </label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search" style="margin: -6px 10px 0px" />
+          <InputText
+            type="date"
+            v-model="searchToDate"
+            class="p-inputtext-sm"
+            placeholder="dd/mm/yyyy"
+            style="width: 200px; height: 30px"
+          />
+        </span>
+      </div>
     </div>
-    <div class="p-d-flex p-flex-row p-mb-1 p-jc-center" style="width:1100px">
-      <Button icon="pi pi-search" iconPos="right" label="Tìm kiếm" @click="onSearchKeyup()"
-              class="p-ml-1 p-button-sm"></Button>
-      <Button icon="pi pi-user" iconPos="right" label="ADD" @click="onAddClick()"
-              class="p-ml-1 p-button-sm"></Button>
+    <div
+      class="p-d-flex p-flex-row p-mb-1 p-jc-center"
+      style="width: 1350px; margin: 20px 0"
+    >
+      <Button
+        icon="pi pi-search"
+        iconPos="right"
+        label="Tìm kiếm"
+        @click="onSearchKeyup()"
+        class="p-ml-1 p-button-sm"
+      ></Button>
+      <Button
+        icon="pi pi-user"
+        iconPos="right"
+        label="ADD"
+        @click="onAddClick()"
+        class="p-ml-1 p-button-sm"
+      ></Button>
     </div>
     <DataTable
       :value="list"
@@ -49,21 +184,55 @@
       :totalRecords="totalRecs"
       :loading="isLoading"
       @page="onPageChange($event)"
-      class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4" style="width:1100px">
-      <Column field="factoryId" header="ID phân xưởng" headerStyle="width:90px;"></Column>
-      <Column field="code" header="Mã phân xưởng" headerStyle="width:90px"></Column>
-      <Column field="name" header="Tên phân xưởng" headerStyle="width:160px"></Column>
+      class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4"
+      style="width: 1350px"
+    >
+      <Column
+        field="factoryId"
+        header="ID phân xưởng"
+        headerStyle="width:90px;"
+      ></Column>
+      <Column
+        field="code"
+        header="Mã phân xưởng"
+        headerStyle="width:90px"
+      ></Column>
+      <Column
+        field="name"
+        header="Tên phân xưởng"
+        headerStyle="width:160px"
+      ></Column>
       <Column field="email" header="Email" headerStyle="width:160px"></Column>
-<!--      <Column field="address" header="Địa chỉ" headerStyle="width:160px"></Column>-->
-      <Column field="employeeName" header="Người phụ trách" headerStyle="width:160px"></Column>
-      <Column field="strDateConstruction" header="Ngày thi công" headerStyle="width:160px"></Column>
-      <Column field="strDateFinish" header="Ngày hoàn thành" headerStyle="width:160px"></Column>
+      <!--      <Column field="address" header="Địa chỉ" headerStyle="width:160px"></Column>-->
+      <Column
+        field="employeeName"
+        header="Người phụ trách"
+        headerStyle="width:160px"
+      ></Column>
+      <Column
+        field="strDateConstruction"
+        header="Ngày thi công"
+        headerStyle="width:160px"
+      ></Column>
+      <Column
+        field="strDateFinish"
+        header="Ngày hoàn thành"
+        headerStyle="width:160px"
+      ></Column>
       <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px">
         <template #body="slotProps">
-          <Button icon="pi pi-pencil" @click="onEditClick(slotProps.data)"
-                  class="p-button-sm p-button-rounded p-button-secondary p-button-text"/>
-          <Button icon="pi pi-trash" @click="onDeleteClick(slotProps.data)"
-                  class="p-button-sm p-button-rounded p-button-danger p-button-text"/>
+          <Button
+            icon="pi pi-pencil"
+            @click="onEditClick(slotProps.data)"
+            class="
+              p-button-sm p-button-rounded p-button-secondary p-button-text
+            "
+          />
+          <Button
+            icon="pi pi-trash"
+            @click="onDeleteClick(slotProps.data)"
+            class="p-button-sm p-button-rounded p-button-danger p-button-text"
+          />
         </template>
       </Column>
     </DataTable>
@@ -72,12 +241,12 @@
 
 
 <script lang='ts'>
-import { ref, onMounted, defineComponent } from 'vue';
-import FactoryApi from '@/api/material-management/factory-api'; // eslint-disable-line import/no-cycle
-import FactoryDetails from '@/views/material-management/factory/FactoryDetails.vue';
-import { useConfirm } from 'primevue/useconfirm';
-import { useToast } from 'primevue/usetoast';
-import EmployeeApi from '@/api/employee-api';
+import { ref, onMounted, defineComponent } from "vue";
+import FactoryApi from "@/api/material-management/factory-api"; // eslint-disable-line import/no-cycle
+import FactoryDetails from "@/views/material-management/factory/FactoryDetails.vue";
+import { useConfirm } from "primevue/useconfirm";
+import { useToast } from "primevue/usetoast";
+import EmployeeApi from "@/api/employee-api";
 
 export default defineComponent({
   setup(): unknown {
@@ -96,17 +265,33 @@ export default defineComponent({
     const toast = useToast();
     let currentPage = 1;
 
-    const getData = async (page: number, requestedPageSize: number, factoryId = '') => {
+    const getData = async (
+      page: number,
+      requestedPageSize: number,
+      factoryId = ""
+    ) => {
       // isLoading.value = true;
       try {
-        debugger
-        const resp = await FactoryApi.getFactorys(page, requestedPageSize, factoryId);
-        debugger
-        list.value = resp.data.list.map((v:Record<string, unknown>) => {
+        debugger;
+        const resp = await FactoryApi.getFactorys(
+          page,
+          requestedPageSize,
+          factoryId
+        );
+        debugger;
+        list.value = resp.data.list.map((v: Record<string, unknown>) => {
           const dt1 = new Date(v.dateConstruction as string);
           const dt2 = new Date(v.dateFinish as string);
-          const strDateConstruction = new Intl.DateTimeFormat(['ban', 'id'], { year: 'numeric', month: '2-digit', day: '2-digit' }).format(dt1);
-          const strDateFinish = new Intl.DateTimeFormat(['ban', 'id'], { year: 'numeric', month: '2-digit', day: '2-digit' }).format(dt2);
+          const strDateConstruction = new Intl.DateTimeFormat(["ban", "id"], {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          }).format(dt1);
+          const strDateFinish = new Intl.DateTimeFormat(["ban", "id"], {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          }).format(dt2);
           return {
             ...v,
             strDateConstruction,
@@ -118,7 +303,7 @@ export default defineComponent({
         totalPages.value = resp.data.totalPages;
         totalRecs.value = resp.data.total;
       } catch (err) {
-        console.log('REST ERROR: %O', err.response ? err.response : err);
+        console.log("REST ERROR: %O", err.response ? err.response : err);
         isLoading.value = false;
       }
     };
@@ -152,51 +337,53 @@ export default defineComponent({
       debugger;
       confirm.require({
         message: `Do you want to remove ${rec.name} from product catalog ?`,
-        header: 'Remove',
-        icon: 'pi pi-question-circle',
-        acceptIcon: 'pi pi-check',
+        header: "Remove",
+        icon: "pi pi-question-circle",
+        acceptIcon: "pi pi-check",
         accept: async () => {
           try {
-            const resp = await FactoryApi.deleteFactory(rec.factoryId as string);
-            if (resp.data.msgType === 'SUCCESS') {
+            const resp = await FactoryApi.deleteFactory(
+              rec.factoryId as string
+            );
+            if (resp.data.msgType === "SUCCESS") {
               getData(currentPage, pageSize.value);
               toast.add({
-                severity: 'success',
-                summary: 'Successfully Deleted',
-                life: 3000
+                severity: "success",
+                summary: "Successfully Deleted",
+                life: 3000,
               });
             } else {
               toast.add({
-                severity: 'error',
-                summary: 'Access Denied',
+                severity: "error",
+                summary: "Access Denied",
                 detail: resp.data.msg,
-                life: 3000
+                life: 3000,
               });
             }
           } catch (e) {
             toast.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Unable to connect to server',
-              life: 3000
+              severity: "error",
+              summary: "Error",
+              detail: "Unable to connect to server",
+              life: 3000,
             });
           }
         },
         reject: () => {
-          console.log('NO');
+          console.log("NO");
         },
       });
     };
 
     const onPageChange = (event: Record<string, unknown>) => {
-      if (currentPage !== (event.page as number + 1)) {
-        currentPage = event.page as number + 1;
+      if (currentPage !== (event.page as number) + 1) {
+        currentPage = (event.page as number) + 1;
         getData(currentPage, pageSize.value);
       }
     };
 
     const onAddClick = async () => {
-      debugger
+      debugger;
       const resp = await EmployeeApi.getAll();
       let arrEmp: any;
       if (resp.data) {
@@ -204,9 +391,8 @@ export default defineComponent({
       }
       arr.value = arrEmp;
       isNewRec.value = true;
-      selectedRec.value = { factoryId: '' };
+      selectedRec.value = { factoryId: "" };
       showSlideOut.value = true;
-
     };
 
     const onDeleteClick = (rec: Record<string, unknown>) => {
@@ -252,7 +438,7 @@ export default defineComponent({
       onPageChange,
       getData,
       arr,
-      itemById
+      itemById,
     };
   },
   components: {

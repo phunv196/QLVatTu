@@ -8,29 +8,156 @@
                            :isNew="isNewRec"></DeliveryBillDetails>
     </Sidebar>
     <h3> Quản lý phiếu xuất kho </h3>
-    <div class="p-d-flex p-flex-row p-mb-1" style="width:1150px">
-      <span class="p-input-icon-left">
-        <i class="pi pi-search"  style="margin: -6px 10px 0px;"/>
-        <InputText type="text" v-model="searchCode" class="p-inputtext-sm" placeholder="Search by code" style="width:180px;margin:1px 10px 0 10px"/>
-      </span>
-      <span class="p-input-icon-left">
-        <i class="pi pi-search" style="margin: -6px 10px 0px;" />
-        <InputText type="text" v-model="searchName" class="p-inputtext-sm" placeholder="Search by name" style="width:180px;margin:1px 10px 0 10px"/>
-      </span>
-      <span class="p-input-icon-left">
-        <i class="pi pi-search" style="margin: -6px 10px 0px;" />
-        <InputText type="date" v-model="searchFormDate" class="p-inputtext-sm" placeholder="dd/mm/yyyy" style="width:180px; height: 31px; margin:1px 10px 0 10px"/>
-      </span>
-      <span class="p-input-icon-left">
-        <i class="pi pi-search" style="margin: -6px 10px 0px;" />
-        <InputText type="date" v-model="searchToDate" class="p-inputtext-sm" placeholder="dd/mm/yyyy" style="width:180px; height: 31px; margin:1px 10px 0 10px"/>
-      </span>
-
-      <div style="display:inline-block; flex:1"></div>
-      <Button icon="pi pi-search" iconPos="right" label="Tìm kiếm" @click="onSearchKeyup()"
-              class="p-ml-1 p-button-sm"></Button>
-      <Button icon="pi pi-user" iconPos="right" label="ADD" @click="onAddClick()"
-              class="p-ml-1 p-button-sm"></Button>
+    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width: 1350px">
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Mã phiếu xuất
+        </label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search" style="margin: -6px 10px 0px" />
+          <InputText
+            type="text"
+            v-model="searchCode"
+            class="p-inputtext-sm"
+            placeholder="Search by code"
+            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+          />
+        </span>
+      </div>
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Tên phiếu xuất
+        </label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search" style="margin: -6px 10px 0px" />
+          <InputText
+            type="text"
+            v-model="searchName"
+            class="p-inputtext-sm"
+            placeholder="Search by name"
+            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+          />
+        </span>
+      </div>
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Nhân viên
+        </label>
+        <Dropdown
+          class="p-inputtext-sm"
+          style="width: 200px"
+          v-model="searchSupplier"
+          :options="[]"
+          :filter="true"
+          :showClear="true"
+          optionLabel="name"
+          optionValue="supplierId"
+        />
+      </div>
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Kho
+        </label>
+        <Dropdown
+          class="p-inputtext-sm"
+          style="width: 200px"
+          v-model="searchSupplier"
+          :options="[]"
+          :filter="true"
+          :showClear="true"
+          optionLabel="name"
+          optionValue="supplierId"
+        />
+      </div>
+    </div>
+    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width: 1350px">
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Ngày lập từ
+        </label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search" style="margin: -6px 10px 0px" />
+          <InputText
+            type="date"
+            v-model="searchFormDate"
+            class="p-inputtext-sm"
+            placeholder="dd/mm/yyyy"
+            style="width: 200px; height: 30px"
+          />
+        </span>
+      </div>
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Đến ngày
+        </label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search" style="margin: -6px 10px 0px" />
+          <InputText
+            type="date"
+            v-model="searchToDate"
+            class="p-inputtext-sm"
+            placeholder="dd/mm/yyyy"
+            style="width: 200px; height: 30px"
+          />
+        </span>
+      </div>
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Phân xưởng
+        </label>
+        <Dropdown
+          class="p-inputtext-sm"
+          style="width: 200px"
+          v-model="searchSupplier"
+          :options="[]"
+          :filter="true"
+          :showClear="true"
+          optionLabel="name"
+          optionValue="supplierId"
+        />
+      </div>
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >
+        </label>
+        <span class="p-input-icon-left" style="width: 200px; height: 30px">
+        </span>
+      </div>
+    </div>
+    <div
+      class="p-d-flex p-flex-row p-mb-1 p-jc-center"
+      style="width: 1350px; margin: 20px 0"
+    >
+      <Button
+        icon="pi pi-search"
+        iconPos="right"
+        label="Tìm kiếm"
+        @click="onSearchKeyup()"
+        class="p-ml-1 p-button-sm"
+      ></Button>
+      <Button
+        icon="pi pi-user"
+        iconPos="right"
+        label="ADD"
+        @click="onAddClick()"
+        class="p-ml-1 p-button-sm"
+      ></Button>
     </div>
     <DataTable
       :value="list"
@@ -40,7 +167,7 @@
       :totalRecords="totalRecs"
       :loading="isLoading"
       @page="onPageChange($event)"
-      class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4" style="width:1150px">
+      class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4" style="width:1350px">
       <Column field="deliveryBillId" header="ID phiếu xuất" headerStyle="width:90px;"></Column>
       <Column field="code" header="Mã phiếu xuất" headerStyle="width:90px"></Column>
       <Column field="name" header="Tên phiếu xuất" headerStyle="width:160px"></Column>

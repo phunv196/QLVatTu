@@ -64,7 +64,7 @@ const routes: Array<RouteRecordRaw> = [
           { path: 'supplier', component: Supplier },
           { path: 'supplies', component: Supplies },
           { path: 'warehouse', component: Warehouse },
-          { path: 'WarehouseCard', component: WarehouseCard },
+          { path: 'Warehouse-card', component: WarehouseCard },
           { path: 'department', component: Department },
         ],
       },

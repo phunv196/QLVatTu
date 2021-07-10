@@ -18,11 +18,11 @@
       </span>
       <span class="p-input-icon-left">
         <i class="pi pi-search"  style="margin: -6px 10px 0px;"/>
-        <InputText type="text" v-model="searchCode" class="p-inputtext-sm" placeholder="Search by code" style="width:180px;margin:1px 10px 0 10px"/>
+        <InputText type="text" v-model="searchEmail" class="p-inputtext-sm" placeholder="Search by email" style="width:180px;margin:1px 10px 0 10px"/>
       </span>
       <span class="p-input-icon-left">
         <i class="pi pi-search" style="margin: -6px 10px 0px;" />
-        <InputText type="text" v-model="searchName" class="p-inputtext-sm" placeholder="Search by name" style="width:180px;margin:1px 10px 0 10px"/>
+        <InputText type="text" v-model="searchPhone" class="p-inputtext-sm" placeholder="Search by phone" style="width:180px;margin:1px 10px 0 10px"/>
       </span>
       <div style="display:inline-block; flex:1"></div>
       <Button icon="pi pi-search" iconPos="right" label="Tìm kiếm" @click="onSearchKeyup()"
@@ -64,9 +64,14 @@ import WarehouseApi from '@/api/material-management/warehouse-api'; // eslint-di
 import WarehouseDetails from '@/views/material-management/warehouse/WarehouseDetails.vue';
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
+import { debounce } from '@/shared/utils';
 
 export default defineComponent({
   setup(): unknown {
+    const searchName = ref('');
+    const searchCode = ref('');
+    const searchEmail = ref('');
+    const searchPhone = ref('');
     const isLoading = ref(false);
     const showSlideOut = ref(false);
     const pageSize = ref(10);
@@ -80,11 +85,11 @@ export default defineComponent({
     const toast = useToast();
     let currentPage = 1;
 
-    const getData = async (page: number, requestedPageSize: number, warehouseId = '') => {
+    const getData = async (page: number, requestedPageSize: number, warehouseId = '', code='', name='', email='', phone='') => {
       // isLoading.value = true;
       try {
         debugger
-        const resp = await WarehouseApi.getWarehouses(page, requestedPageSize, warehouseId);
+        const resp = await WarehouseApi.getWarehouses(page, requestedPageSize, warehouseId,code,name,email,phone);
         list.value = resp.data.list;
         // isLoading.value = false;
         currentPage = resp.data.currentPage;
@@ -163,6 +168,10 @@ export default defineComponent({
       getData(0, pageSize.value);
     });
 
+    const onSearchKeyup = debounce(() => getData(
+      1, pageSize.value, '', `${searchCode.value}`,
+      `${searchName.value}`, `${searchEmail.value}`, `${searchPhone.value}` ), 400);
+
     return {
       list,
       isLoading,
@@ -178,6 +187,11 @@ export default defineComponent({
       onEditClick,
       onPageChange,
       getData,
+      searchName,
+      searchCode,
+      searchEmail,
+      searchPhone,
+      onSearchKeyup
     };
   },
   components: {
