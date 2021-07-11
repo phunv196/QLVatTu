@@ -43,7 +43,12 @@ public class ReceiptController extends BaseController {
     )
     public Response getReceiptList(
             @Parameter(description="Receipt Id") @QueryParam("receiptId") Long receiptId,
-            @Parameter(description="Name", example="nikon%") @QueryParam("name") String name,
+            @Parameter(description = "Order Id") @QueryParam("searchCode") String searchCode,
+            @Parameter(description = "Order Id") @QueryParam("searchName") String searchName,
+            @Parameter(description = "Order Id") @QueryParam("searchEmployee") Long searchEmployee,
+            @Parameter(description = "Order Id") @QueryParam("searchWarehouse") Long searchWarehouse,
+            @Parameter(description = "Order Id") @QueryParam("searchFormDate") String searchFormDate,
+            @Parameter(description = "Order Id") @QueryParam("searchToDate") String searchToDate,
             @Parameter(description="Page No, Starts from 1 ", example="1") @DefaultValue("1") @QueryParam("page") int page,
             @Parameter(description="Items in each page", example="20") @DefaultValue("20") @QueryParam("page-size") int pageSize
     ) {
@@ -52,8 +57,25 @@ public class ReceiptController extends BaseController {
             if (receiptId == null) {
                 receiptId = 0l;
             }
-            List<ReceiptModel> billModelList = receiptDao.getList(page, pageSize, receiptId);
-            BigInteger total = receiptDao.getReceiptCount(receiptId);
+            if (searchEmployee == null) {
+                searchEmployee = 0l;
+            }
+
+            if (searchWarehouse == null) {
+                searchWarehouse = 0l;
+            }
+            List<ReceiptModel> billModelList = receiptDao.getList(page, pageSize, receiptId,searchCode,
+                    searchName,
+                    searchEmployee,
+                    searchWarehouse,
+                    searchFormDate,
+                    searchToDate);
+            BigInteger total = receiptDao.getReceiptCount(receiptId, searchCode,
+                    searchName,
+                    searchEmployee,
+                    searchWarehouse,
+                    searchFormDate,
+                    searchToDate);
             resp.setList(billModelList);
             resp.setTotal(total.intValue());
             resp.setPageStats(total.intValue(),pageSize, page,"");

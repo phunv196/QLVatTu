@@ -40,32 +40,57 @@ public class DeliveryBillController extends BaseController {
     @RolesAllowed({"ADMIN"})
     @Operation(
             summary = "Get list of deliveryBills",
-            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = DeliveryBillResponse.class)))}
+            responses = {@ApiResponse(content = @Content(schema = @Schema(implementation = DeliveryBillResponse.class)))}
     )
-    public Response getList(@Parameter(description="DeliveryBill Id") @QueryParam("deliveryBillId") Long deliveryBillId,
-            @Parameter(description="Name", example="nikon%") @QueryParam("name") String name,
-            @Parameter(description="Name", example="nikon%") @QueryParam("code") String code,
-            @Parameter(description="Name", example="nikon%") @QueryParam("formDate") String formDate, @Parameter(description="Name", example="nikon%") @QueryParam("toDate") String toDate,
-            @Parameter(description="Page No, Starts from 1 ", example="1") @DefaultValue("1") @QueryParam("page") int page,
-            @Parameter(description="Items in each page", example="20") @DefaultValue("20") @QueryParam("page-size") int pageSize
+    public Response getList(@Parameter(description = "DeliveryBill Id") @QueryParam("deliveryBillId") Long deliveryBillId,
+                            @Parameter(description = "Order Id") @QueryParam("searchCode") String searchCode,
+                            @Parameter(description = "Order Id") @QueryParam("searchName") String searchName,
+                            @Parameter(description = "Order Id") @QueryParam("searchEmployee") Long searchEmployee,
+                            @Parameter(description = "Order Id") @QueryParam("searchWarehouse") Long searchWarehouse,
+                            @Parameter(description = "Order Id") @QueryParam("searchFormDate") String searchFormDate,
+                            @Parameter(description = "Order Id") @QueryParam("searchToDate") String searchToDate,
+                            @Parameter(description = "Order Id") @QueryParam("searchFactory") Long searchFactory,
+                            @Parameter(description = "Page No, Starts from 1 ", example = "1") @DefaultValue("1") @QueryParam("page") int page,
+                            @Parameter(description = "Items in each page", example = "20") @DefaultValue("20") @QueryParam("page-size") int pageSize
     ) throws Exception {
         DeliveryBillResponse resp = new DeliveryBillResponse();
         try {
             if (deliveryBillId == null) {
                 deliveryBillId = 0l;
             }
-            java.sql.Date formDateSQL = CommonUtils.convertStringToSQLDate(formDate);
-            java.sql.Date toDateSQL = CommonUtils.convertStringToSQLDate(toDate);
 
-            List<DeliveryBillModel> billModelList = deliveryBillDao.getList( page, pageSize, deliveryBillId, name, code , formDateSQL, toDateSQL);
-            BigInteger total = deliveryBillDao.getDeliveryBillCount(deliveryBillId, name, code , formDateSQL, toDateSQL);
+            if (searchEmployee == null) {
+                searchEmployee = 0l;
+            }
+
+            if (searchWarehouse == null) {
+                searchWarehouse = 0l;
+            }
+
+            if (searchFactory == null) {
+                searchFactory = 0l;
+            }
+            List<DeliveryBillModel> billModelList = deliveryBillDao.getList(page, pageSize, deliveryBillId, searchCode,
+                    searchName,
+                    searchEmployee,
+                    searchWarehouse,
+                    searchFormDate,
+                    searchToDate,
+                    searchFactory);
+            BigInteger total = deliveryBillDao.getDeliveryBillCount(deliveryBillId, searchCode,
+                    searchName,
+                    searchEmployee,
+                    searchWarehouse,
+                    searchFormDate,
+                    searchToDate,
+                    searchFactory);
             resp.setList(billModelList);
             resp.setTotal(total.intValue());
-            resp.setPageStats(total.intValue(),pageSize, page,"");
-            resp.setSuccessMessage("List of Orders and nested details " + (deliveryBillId>0 ? "- Customer:"+deliveryBillId:""));
+            resp.setPageStats(total.intValue(), pageSize, page, "");
+            resp.setSuccessMessage("List of Orders and nested details " + (deliveryBillId > 0 ? "- Customer:" + deliveryBillId : ""));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Order - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Cannot delete Order - " + e.getMessage() + ", " + (e.getCause() != null ? e.getCause().getMessage() : ""));
             return Response.ok(resp).build();
         }
     }
@@ -76,10 +101,10 @@ public class DeliveryBillController extends BaseController {
     @RolesAllowed({"ADMIN"})
     @Operation(
             summary = "Get all deliveryBills",
-            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = DeliveryBillResponse.class)))}
+            responses = {@ApiResponse(content = @Content(schema = @Schema(implementation = DeliveryBillResponse.class)))}
     )
     public Response getAll(
-            @Parameter(description="DeliveryBill Id", example="601") @PathParam("suppliesId") Integer suppliesId
+            @Parameter(description = "DeliveryBill Id", example = "601") @PathParam("suppliesId") Integer suppliesId
     ) {
         DeliveryBillResponse resp = new DeliveryBillResponse();
         try {
@@ -92,7 +117,7 @@ public class DeliveryBillController extends BaseController {
             resp.setList(billModelList);
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Order - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Cannot delete Order - " + e.getMessage() + ", " + (e.getCause() != null ? e.getCause().getMessage() : ""));
             return Response.ok(resp).build();
         }
     }
@@ -101,7 +126,7 @@ public class DeliveryBillController extends BaseController {
     @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Add a deliveryBill",
-            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+            responses = {@ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
     public Response addDeliveryBill(DeliveryBillModel deliveryBill) {
         BaseResponse resp = new BaseResponse();
@@ -112,7 +137,7 @@ public class DeliveryBillController extends BaseController {
             resp.setSuccessMessage(String.format("DeliveryBill Added - New DeliveryBill ID : %s ", deliveryBill.getDeliveryBillId()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot add DeliveryBill - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Cannot add DeliveryBill - " + e.getMessage() + ", " + (e.getCause() != null ? e.getCause().getMessage() : ""));
             return Response.ok(resp).build();
         }
     }
@@ -121,12 +146,12 @@ public class DeliveryBillController extends BaseController {
     @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Update a DeliveryBill",
-            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+            responses = {@ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
     public Response updateDeliveryBill(DeliveryBillModel deliveryBill) {
         BaseResponse resp = new BaseResponse();
         try {
-            DeliveryBillModel foundProd  = deliveryBillDao.getById( deliveryBill.getDeliveryBillId());
+            DeliveryBillModel foundProd = deliveryBillDao.getById(deliveryBill.getDeliveryBillId());
             if (foundProd != null) {
                 deliveryBillDao.beginTransaction();
                 deliveryBillDao.update(deliveryBill);
@@ -138,7 +163,7 @@ public class DeliveryBillController extends BaseController {
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot update DeliveryBill - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Cannot update DeliveryBill - " + e.getMessage() + ", " + (e.getCause() != null ? e.getCause().getMessage() : ""));
             return Response.ok(resp).build();
         }
     }
@@ -148,13 +173,13 @@ public class DeliveryBillController extends BaseController {
     @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Delete a deliveryBill",
-            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+            responses = {@ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
-    public Response deleteDeliveryBill(@Parameter(description="DeliveryBill Id", example="601") @PathParam("deliveryBillId") Long deliveryBillId) {
+    public Response deleteDeliveryBill(@Parameter(description = "DeliveryBill Id", example = "601") @PathParam("deliveryBillId") Long deliveryBillId) {
         BaseResponse resp = new BaseResponse();
         try {
-            DeliveryBillModel foundProd  = deliveryBillDao.getById(deliveryBillId);
-            if (foundProd==null) {
+            DeliveryBillModel foundProd = deliveryBillDao.getById(deliveryBillId);
+            if (foundProd == null) {
                 resp.setErrorMessage(String.format("Cannot delete DeliveryBill - Customer do not exist (id:%s)", deliveryBillId));
                 return Response.ok(resp).build();
             } else {
@@ -165,7 +190,7 @@ public class DeliveryBillController extends BaseController {
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete DeliveryBill - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Cannot delete DeliveryBill - " + e.getMessage() + ", " + (e.getCause() != null ? e.getCause().getMessage() : ""));
             return Response.ok(resp).build();
         }
     }
@@ -175,7 +200,7 @@ public class DeliveryBillController extends BaseController {
     @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "get sequenceId a deliveryBill",
-            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+            responses = {@ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
     public Response getSequence() throws Exception {
         Long id = deliveryBillDao.getSequence();
@@ -187,14 +212,14 @@ public class DeliveryBillController extends BaseController {
     @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "get sequenceId a deliveryBill",
-            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+            responses = {@ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
-    public Response getEqualId(@Parameter(description="DeliveryBill Id", example="601") @PathParam("deliveryBillId") Long deliveryBillId) {
+    public Response getEqualId(@Parameter(description = "DeliveryBill Id", example = "601") @PathParam("deliveryBillId") Long deliveryBillId) {
         boolean check = false;
         Criteria criteria = deliveryBillDao.getSession().createCriteria(DeliveryBillModel.class);
         // Execute the Main Query
-        if (deliveryBillId > 0){
-            criteria.add(Restrictions.eq("deliveryBillId",  deliveryBillId ));
+        if (deliveryBillId > 0) {
+            criteria.add(Restrictions.eq("deliveryBillId", deliveryBillId));
         }
         criteria.setProjection(null);
         List<DeliveryBillModel> deliveryBillList = criteria.list();
@@ -223,7 +248,7 @@ public class DeliveryBillController extends BaseController {
     @DELETE
     @Path("delete_by_id/{deliveryBillId}")
     @RolesAllowed({"ADMIN", "SUPPORT"})
-    public void deleteByRreceiptId(@Parameter(description="Receipt Id", example="601") @PathParam("deliveryBillId") Long deliveryBillId) {
+    public void deleteByRreceiptId(@Parameter(description = "Receipt Id", example = "601") @PathParam("deliveryBillId") Long deliveryBillId) {
         deliveryBillId = deliveryBillId == null ? 0 : deliveryBillId;
         deliveryBillFlowDao.beginTransaction();
         deliveryBillFlowDao.deleteByDeliveryBillId(deliveryBillId);

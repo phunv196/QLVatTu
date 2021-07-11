@@ -50,6 +50,9 @@ public class WarehouseCardModel {
     @Transient
     private Long amountReceipt;
 
+    @Transient
+    private String fullName;
+
     public Long getWarehouseCardId() {
         return warehouseCardId;
     }
@@ -184,6 +187,14 @@ public class WarehouseCardModel {
 
     public void setAmountReceipt(Long amountReceipt) {
         this.amountReceipt = amountReceipt;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public static class WarehouseCardResponse extends PageResponse {

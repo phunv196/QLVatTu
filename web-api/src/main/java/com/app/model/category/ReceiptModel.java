@@ -19,6 +19,7 @@ public class ReceiptModel {
     @Column(name = "description")       private String  description;
     @Column(name = "date_warehousing")       private Date dateWarehousing;
     @Column(name = "warehouse_id")       private Long  warehouseId;
+    @Column(name = "employee_id")       private Long  employeeId;
 
     @Transient
     private String warehouseCode;
@@ -26,8 +27,27 @@ public class ReceiptModel {
     @Transient
     private Long sumMoney;
 
+    @Transient
+    private String fullName;
+
     //Getters and Setters
 
+
+    public Long getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(Long employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
     public Long getReceiptId() {
         return receiptId;

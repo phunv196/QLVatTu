@@ -1,13 +1,23 @@
 <template>
   <div>
     <ConfirmDialog position="top"></ConfirmDialog>
-    <Toast/>
-    <Sidebar v-model:visible="showSlideOut" position="right" style="width:1100px">
-      <WarehouseCardDetails :rec="selectedRec" @cancel="showSlideOut = false" @changed="getData()"
-                        :arrSupplies="arrSupplies" :arrWarehouse="arrWarehouse" :isNew="isNewRec"></WarehouseCardDetails>
+    <Toast />
+    <Sidebar
+      v-model:visible="showSlideOut"
+      position="right"
+      style="width: 1100px"
+    >
+      <WarehouseCardDetails
+        :rec="selectedRec"
+        @cancel="showSlideOut = false"
+        @changed="getData()"
+        :arrSupplies="arrSupplies"
+        :arrWarehouse="arrWarehouse"
+        :isNew="isNewRec"
+      ></WarehouseCardDetails>
     </Sidebar>
-    <h3> Quản lý thẻ kho </h3>
-    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width: 1350px">
+    <h3>Quản lý thẻ kho</h3>
+    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width: 1500px">
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
@@ -51,12 +61,12 @@
         <Dropdown
           class="p-inputtext-sm"
           style="width: 200px"
-          v-model="searchSupplier"
-          :options="[]"
+          v-model="searchSupplies"
+          :options="supplies"
           :filter="true"
           :showClear="true"
           optionLabel="name"
-          optionValue="supplierId"
+          optionValue="suppliesId"
         />
       </div>
       <div>
@@ -68,16 +78,16 @@
         <Dropdown
           class="p-inputtext-sm"
           style="width: 200px"
-          v-model="searchSupplier"
-          :options="[]"
+          v-model="searchWarehouse"
+          :options="warehouse"
           :filter="true"
           :showClear="true"
           optionLabel="name"
-          optionValue="supplierId"
+          optionValue="warehouseId"
         />
       </div>
     </div>
-    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width: 1350px">
+    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width: 1500px">
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
@@ -121,19 +131,19 @@
         <Dropdown
           class="p-inputtext-sm"
           style="width: 200px"
-          v-model="searchSupplier"
-          :options="[]"
+          v-model="searchEmployee"
+          :options="emp"
           :filter="true"
           :showClear="true"
-          optionLabel="name"
-          optionValue="supplierId"
+          optionLabel="fullName"
+          optionValue="id"
         />
       </div>
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
-          >
+        >{{ $store.getters }}
         </label>
         <span class="p-input-icon-left" style="width: 200px; height: 30px">
         </span>
@@ -141,7 +151,7 @@
     </div>
     <div
       class="p-d-flex p-flex-row p-mb-1 p-jc-center"
-      style="width: 1350px; margin: 20px 0"
+      style="width: 1500px; margin: 20px 0"
     >
       <Button
         icon="pi pi-search"
@@ -166,25 +176,88 @@
       :totalRecords="totalRecs"
       :loading="isLoading"
       @page="onPageChange($event)"
-      class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4" style="width:1350px">
-      <Column field="warehouseCardId" header="ID thẻ kho" headerStyle="width:70px;"></Column>
-      <Column field="code" header="Mã thẻ kho" headerStyle="width:70px"></Column>
-      <Column field="name" header="Tên thẻ kho" headerStyle="width:160px"></Column>
-      <Column field="dateCreated" header="Ngày tạo thẻ" headerStyle="width:120px"></Column>
-      <Column field="suppliesCode" header="Mã vật tư" headerStyle="width:120px"></Column>
-      <Column field="suppliesName" header="Tên vật tư" headerStyle="width:120px"></Column>
-      <Column field="warehouseCode" header="Mã kho hàng" headerStyle="width:120px"></Column>
-      <Column field="countDeliveryBill" header="Số phiếu xuất" headerStyle="width:90px"></Column>
-      <Column field="countReceipt" header="Số phiếu nhập" headerStyle="width:90px"></Column>
-      <Column field="amountDeliveryBill" header="Số lượng xuất" headerStyle="width:90px"></Column>
-      <Column field="amountReceipt" header="Số lượng nhập" headerStyle="width:90px"></Column>
-      <Column field="amountInventory" header="Số lượng tồn" headerStyle="width:90px"></Column>
+      class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4"
+      style="width: 1500px"
+    >
+      <Column
+        field="warehouseCardId"
+        header="ID thẻ kho"
+        headerStyle="width:70px;"
+      ></Column>
+      <Column
+        field="code"
+        header="Mã thẻ kho"
+        headerStyle="width:70px"
+      ></Column>
+      <Column
+        field="name"
+        header="Tên thẻ kho"
+        headerStyle="width:160px"
+      ></Column>
+      <Column
+        field="strDateCreated"
+        header="Ngày tạo thẻ"
+        headerStyle="width:120px"
+      ></Column>
+      <Column
+        field="fullName"
+        header="Nhân viên"
+        headerStyle="width:150px"
+      ></Column>
+      <Column
+        field="suppliesCode"
+        header="Mã vật tư"
+        headerStyle="width:120px"
+      ></Column>
+      <Column
+        field="suppliesName"
+        header="Tên vật tư"
+        headerStyle="width:120px"
+      ></Column>
+      <Column
+        field="warehouseCode"
+        header="Mã kho hàng"
+        headerStyle="width:100px"
+      ></Column>
+      <Column
+        field="countDeliveryBill"
+        header="Số phiếu xuất"
+        headerStyle="width:90px"
+      ></Column>
+      <Column
+        field="countReceipt"
+        header="Số phiếu nhập"
+        headerStyle="width:90px"
+      ></Column>
+      <Column
+        field="amountDeliveryBill"
+        header="Số lượng xuất"
+        headerStyle="width:90px"
+      ></Column>
+      <Column
+        field="amountReceipt"
+        header="Số lượng nhập"
+        headerStyle="width:90px"
+      ></Column>
+      <Column
+        field="amountInventory"
+        header="Số lượng tồn"
+        headerStyle="width:90px"
+      ></Column>
       <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px">
         <template #body="slotProps">
-          <Button icon="pi pi-pencil" @click="onEditClick(slotProps.data)"
-                  class="p-button-sm p-button-rounded p-button-secondary p-button-text"/>
-          <Button icon="pi pi-trash" @click="onDeleteClick(slotProps.data)"
-                  class="p-button-sm p-button-rounded p-button-danger p-button-text"/>
+          <Button
+            icon="pi pi-pencil"
+            @click="onEditClick(slotProps.data)"
+            class="
+              p-button-sm p-button-rounded p-button-secondary p-button-text
+            "
+          />
+          <Button
+            icon="pi pi-trash"
+            @click="onDeleteClick(slotProps.data)"
+            class="p-button-sm p-button-rounded p-button-danger p-button-text"
+          />
         </template>
       </Column>
     </DataTable>
@@ -193,14 +266,16 @@
 
 
 <script lang='ts'>
-import { ref, onMounted, defineComponent } from 'vue';
-import WarehouseCardApi from '@/api/material-management/warehouse-card-api'; // eslint-disable-line import/no-cycle
-import WarehouseCardDetails from '@/views/material-management/warehouse-card/WarehouseCardDetails.vue';
-import { useConfirm } from 'primevue/useconfirm';
-import { useToast } from 'primevue/usetoast';
-import SuppliesApi from '@/api/material-management/supplies-api';
-import WarehouseApi from '@/api/material-management/warehouse-api';
-export default defineComponent ({
+import { ref, onMounted, defineComponent } from "vue";
+import WarehouseCardApi from "@/api/material-management/warehouse-card-api"; // eslint-disable-line import/no-cycle
+import WarehouseCardDetails from "@/views/material-management/warehouse-card/WarehouseCardDetails.vue";
+import { useConfirm } from "primevue/useconfirm";
+import { useToast } from "primevue/usetoast";
+import SuppliesApi from "@/api/material-management/supplies-api";
+import WarehouseApi from "@/api/material-management/warehouse-api";
+import EmployeeApi from "@/api/employee-api";
+import { debounce } from "@/shared/utils";
+export default defineComponent({
   setup(): unknown {
     const isLoading = ref(false);
     const showSlideOut = ref(false);
@@ -216,23 +291,68 @@ export default defineComponent ({
     const confirm = useConfirm();
     const toast = useToast();
     let currentPage = 1;
-
-    const getData = async (page: number, requestedPageSize: number, warehouseCardId = '') => {
-      // isLoading.value = true;
+    let emp = ref([]);
+    let supplies = ref([]);
+    let warehouse = ref([]);
+    let searchFormDate = ref("");
+    let searchToDate = ref("");
+    let searchName = ref("");
+    let searchCode = ref("");
+    let searchEmployee = ref("");
+    let searchWarehouse = ref("");
+    let searchSupplies = ref("");
+    
+    const getData = async (
+      page: number,
+      requestedPageSize: number,
+      warehouseCardId = "",
+      searchCode = "",
+      searchName = "",
+      searchEmployee = "",
+      searchWarehouse = "",
+      searchFormDate = "",
+      searchToDate = "",
+      searchSupplies = ""
+    ) => {
+      searchEmployee = searchEmployee === "null" ? "0" : searchEmployee;
+      searchWarehouse = searchWarehouse === "null" ? "0" : searchWarehouse;
+      searchSupplies = searchSupplies === "null" ? "0" : searchSupplies;
       try {
         // debugger
         // subscribe('id', (page:number) =>{
         //   return page;
         // })
-        debugger
-        const resp = await WarehouseCardApi.getWarehouseCards(page, requestedPageSize, warehouseCardId);
-        list.value = resp.data.list;
+        debugger;
+        const resp = await WarehouseCardApi.getWarehouseCards(
+          page,
+          requestedPageSize,
+          warehouseCardId,
+          searchCode,
+          searchName,
+          searchEmployee,
+          searchWarehouse,
+          searchFormDate,
+          searchToDate,
+          searchSupplies
+        );
+        list.value = resp.data.list.map((v: Record<string, unknown>) => {
+          const dt = new Date(v.dateCreated as string);
+          const strDateCreated = new Intl.DateTimeFormat(["ban", "id"], {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          }).format(dt);
+          return {
+            ...v,
+            strDateCreated,
+          };
+        });
         // isLoading.value = false;
         currentPage = resp.data.currentPage;
         totalPages.value = resp.data.totalPages;
         totalRecs.value = resp.data.total;
       } catch (err) {
-        console.log('REST ERROR: %O', err.response ? err.response : err);
+        console.log("REST ERROR: %O", err.response ? err.response : err);
         isLoading.value = false;
       }
     };
@@ -241,73 +361,81 @@ export default defineComponent ({
       debugger;
       confirm.require({
         message: `Do you want to remove ${rec.name} from product catalog ?`,
-        header: 'Remove',
-        icon: 'pi pi-question-circle',
-        acceptIcon: 'pi pi-check',
+        header: "Remove",
+        icon: "pi pi-question-circle",
+        acceptIcon: "pi pi-check",
         accept: async () => {
           try {
-            const resp = await WarehouseCardApi.deleteWarehouseCard(rec.warehouseCardId as string);
-            if (resp.data.msgType === 'SUCCESS') {
+            const resp = await WarehouseCardApi.deleteWarehouseCard(
+              rec.warehouseCardId as string
+            );
+            if (resp.data.msgType === "SUCCESS") {
               getData(currentPage, pageSize.value);
               toast.add({
-                severity: 'success',
-                summary: 'Successfully Deleted',
-                life: 3000
+                severity: "success",
+                summary: "Successfully Deleted",
+                life: 3000,
               });
             } else {
               toast.add({
-                severity: 'error',
-                summary: 'Access Denied',
+                severity: "error",
+                summary: "Access Denied",
                 detail: resp.data.msg,
-                life: 3000
+                life: 3000,
               });
             }
           } catch (e) {
             toast.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Unable to connect to server',
-              life: 3000
+              severity: "error",
+              summary: "Error",
+              detail: "Unable to connect to server",
+              life: 3000,
             });
           }
         },
         reject: () => {
-          console.log('NO');
+          console.log("NO");
         },
       });
     };
 
     const onPageChange = (event: Record<string, unknown>) => {
-      if (currentPage !== (event.page as number + 1)) {
-        currentPage = event.page as number + 1;
-        getData(currentPage, pageSize.value);
+      if (currentPage !== (event.page as number) + 1) {
+        currentPage = (event.page as number) + 1;
+        getData(currentPage, pageSize.value, `${searchName.value}`,
+          `${searchCode.value}`,
+          `${searchEmployee.value}`,
+          `${searchWarehouse.value}`,
+          `${searchFormDate.value.toString()}`,
+          `${searchToDate.value.toString()}`,
+          `${searchSupplies.value}`,);
       }
     };
 
     const onAddClick = async () => {
-      debugger
+      debugger;
       const today = new Date().getTime();
-      const resp = await WarehouseApi.getAll()
-      let warehouseItem:any;
-      if (resp.data.list){
+      const resp = await WarehouseApi.getAll();
+      let warehouseItem: any;
+      if (resp.data.list) {
         warehouseItem = resp.data.list;
       }
       arrWarehouse.value = warehouseItem;
 
-      const supp = await SuppliesApi.getAll()
+      const supp = await SuppliesApi.getAll();
       let itemSupplies: any;
-      if(supp.data.list){
+      if (supp.data.list) {
         itemSupplies = supp.data.list;
       }
       arrSupplies.value = itemSupplies;
       const sequence = await WarehouseCardApi.getSequence();
       let sequenceId: any;
-      if(sequence.data) {
+      if (sequence.data) {
         sequenceId = sequence.data;
       }
       await WarehouseCardApi.deleteByWarehouseCardId(sequenceId);
       isNewRec.value = true;
-      selectedRec.value = { warehouseCardId: sequenceId , dateCreated: today};
+      selectedRec.value = { warehouseCardId: sequenceId, dateCreated: today };
       showSlideOut.value = true;
     };
 
@@ -316,19 +444,17 @@ export default defineComponent ({
       confirmDialog(rec);
     };
 
-
-
     const onEditClick = async (rec: Record<string, unknown>) => {
-      const resp = await WarehouseApi.getAll()
-      let warehouseItem:any;
-      if (resp.data.list){
+      const resp = await WarehouseApi.getAll();
+      let warehouseItem: any;
+      if (resp.data.list) {
         warehouseItem = resp.data.list;
       }
       arrWarehouse.value = warehouseItem;
 
-      const supp = await SuppliesApi.getAll()
+      const supp = await SuppliesApi.getAll();
       let itemSupplies: any;
-      if(supp.data.list){
+      if (supp.data.list) {
         itemSupplies = supp.data.list;
       }
       arrSupplies.value = itemSupplies;
@@ -336,9 +462,62 @@ export default defineComponent ({
       selectedRec.value = rec;
     };
 
+    const onSearchKeyup = debounce(
+      () =>
+        getData(
+          1,
+          pageSize.value,
+          "",
+          `${searchName.value}`,
+          `${searchCode.value}`,
+          `${searchEmployee.value}`,
+          `${searchWarehouse.value}`,
+          `${searchFormDate.value.toString()}`,
+          `${searchToDate.value.toString()}`,
+          `${searchSupplies.value}`,
+        ),
+      400
+    );
+
     onMounted(() => {
       getData(0, pageSize.value);
+      lstEmp();
+      lstWarehouse();
+      lstSupplies();
     });
+
+    const lstEmp = async () => {
+      debugger;
+      const resp = await EmployeeApi.getAll();
+      debugger;
+      let lstEmps = [];
+      if (resp.data) {
+        lstEmps = resp.data.list;
+      }
+      emp.value = lstEmps;
+    };
+
+    const lstWarehouse = async () => {
+      debugger;
+      const resp = await WarehouseApi.getAll();
+      debugger;
+      let lstWarehouses = [];
+      if (resp.data) {
+        lstWarehouses = resp.data.list;
+      }
+      warehouse.value = lstWarehouses;
+    };
+
+    const lstSupplies = async () => {
+      debugger;
+      const resp = await SuppliesApi.getAll();
+      debugger;
+      let lstSuppliess = [];
+      if (resp.data) {
+        lstSuppliess = resp.data.list;
+      }
+      supplies.value = lstSuppliess;
+    };
 
     return {
       list,
@@ -357,6 +536,17 @@ export default defineComponent ({
       onEditClick,
       onPageChange,
       getData,
+      emp,
+      warehouse,
+      supplies,
+      searchCode,
+      searchName,
+      searchEmployee,
+      searchWarehouse,
+      searchFormDate,
+      searchToDate,
+      searchSupplies,
+      onSearchKeyup,
     };
   },
   components: {

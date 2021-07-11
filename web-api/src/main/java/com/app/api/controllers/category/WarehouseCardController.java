@@ -7,6 +7,8 @@ import com.app.model.BaseResponse;
 import com.app.model.category.ReceiptModel;
 import com.app.model.category.WarehouseCardModel;
 import com.app.model.category.WarehouseCardModel.WarehouseCardResponse;
+import com.app.model.user.UserViewModel;
+import com.app.util.TokenUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,6 +20,7 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.catalina.User;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Restrictions;
@@ -41,7 +44,13 @@ public class WarehouseCardController extends BaseController {
     )
     public Response getWarehouseCardList(
             @Parameter(description="WarehouseCard Id") @QueryParam("warehouseCardId") Long warehouseCardId,
-            @Parameter(description="Name", example="nikon%") @QueryParam("name") String name,
+            @Parameter(description = "Order Id") @QueryParam("searchCode") String searchCode,
+            @Parameter(description = "Order Id") @QueryParam("searchName") String searchName,
+            @Parameter(description = "Order Id") @QueryParam("searchEmployee") Long searchEmployee,
+            @Parameter(description = "Order Id") @QueryParam("searchWarehouse") Long searchWarehouse,
+            @Parameter(description = "Order Id") @QueryParam("searchFormDate") String searchFormDate,
+            @Parameter(description = "Order Id") @QueryParam("searchToDate") String searchToDate,
+            @Parameter(description = "Order Id") @QueryParam("searchSupplies") Long searchSupplies,
             @Parameter(description="Page No, Starts from 1 ", example="1") @DefaultValue("1") @QueryParam("page") int page,
             @Parameter(description="Items in each page", example="20") @DefaultValue("20") @QueryParam("page-size") int pageSize
     ) {
@@ -50,8 +59,29 @@ public class WarehouseCardController extends BaseController {
             if (warehouseCardId == null) {
                 warehouseCardId = 0l;
             }
-            List<WarehouseCardModel> cardModels = warehouseCardDao.getList(page, pageSize, warehouseCardId);
-            BigInteger total = warehouseCardDao.getWarehouseCardCount(warehouseCardId);
+            if (searchEmployee == null) {
+                searchEmployee = 0l;
+            }
+
+            if (searchWarehouse == null) {
+                searchWarehouse = 0l;
+            }
+            if (searchSupplies == null) {
+                searchSupplies = 0l;
+            }
+
+            List<WarehouseCardModel> cardModels = warehouseCardDao.getList(page, pageSize, warehouseCardId, searchCode,
+                    searchName,
+                    searchEmployee,
+                    searchWarehouse,
+                    searchFormDate,
+                    searchToDate, searchSupplies);
+            BigInteger total = warehouseCardDao.getWarehouseCardCount(warehouseCardId,  searchCode,
+                    searchName,
+                    searchEmployee,
+                    searchWarehouse,
+                    searchFormDate,
+                    searchToDate, searchSupplies);
             resp.setList(cardModels);
             resp.setTotal(total.intValue());
             resp.setPageStats(total.intValue(),pageSize, page,"");

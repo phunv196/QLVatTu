@@ -2,7 +2,12 @@ import api from '@/api/api-service';
 import { AxiosResponse } from 'axios';
 
 export default {
-  async getReceipts(page = 1, pageSize = 20, receiptId = ''): Promise<AxiosResponse> {
+  async getReceipts(page = 1, pageSize = 20, receiptId = '', searchCode = "",
+  searchName = "",
+  searchEmployee = "",
+  searchWarehouse = "",
+  searchFormDate = "",
+  searchToDate = ""): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
     if (page) {
       qsParams.page = page;
@@ -12,6 +17,24 @@ export default {
     }
     if (receiptId) {
       qsParams.id = receiptId;
+    }
+    if (searchCode) {
+      qsParams.searchCode = searchCode;
+    }
+    if (searchName) {
+      qsParams.searchName = searchName;
+    }
+    if (searchEmployee) {
+      qsParams.searchEmployee = searchEmployee;
+    }
+    if (searchWarehouse) {
+      qsParams.searchWarehouse = searchWarehouse;
+    }
+    if (searchFormDate) {
+      qsParams.searchFormDate = searchFormDate;
+    }
+    if (searchToDate) {
+      qsParams.searchToDate = searchToDate;
     }
 
     return api.get('/receipts', { params: qsParams });

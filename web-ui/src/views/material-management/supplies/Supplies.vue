@@ -11,10 +11,6 @@
         :rec="selectedRec"
         @cancel="showSlideOut = false"
         @changed="getData()"
-        :arrQuality="arrQuality"
-        :arrSpecies="arrSpecies"
-        :arrSupplier="arrSupplier"
-        :item="item"
         :isNew="isNewRec"
       ></SuppliesDetails>
     </Sidebar>
@@ -24,7 +20,7 @@
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
-          >Tên vật tư
+          >Mã vật tư
         </label>
         <span class="p-input-icon-left">
           <i class="pi pi-search" style="margin: -6px 10px 0px" />
@@ -41,7 +37,7 @@
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
-          >Mã vật tư
+          >Tên vật tư
         </label>
         <span class="p-input-icon-left">
           <i class="pi pi-search" style="margin: -6px 10px 0px" />
@@ -64,7 +60,7 @@
           class="p-inputtext-sm"
           style="width: 200px"
           v-model="searchSupplier"
-          :options="[]"
+          :options="supplier"
           :filter="true"
           :showClear="true"
           optionLabel="name"
@@ -80,12 +76,12 @@
         <Dropdown
           class="p-inputtext-sm"
           style="width: 200px"
-          v-model="searchSupplier"
-          :options="[]"
+          v-model="searchSpecies"
+          :options="species"
           :filter="true"
           :showClear="true"
           optionLabel="name"
-          optionValue="supplierId"
+          optionValue="speciesId"
         />
       </div>
     </div>
@@ -98,7 +94,7 @@
         </label>
         <span class="p-input-icon-left">
           <i class="pi pi-search" style="margin: -6px 10px 0px" />
-          <InputText
+          <InputNumber
             type="text"
             v-model="searchFormPrice"
             class="p-inputtext-sm"
@@ -114,7 +110,7 @@
         </label>
         <span class="p-input-icon-left">
           <i class="pi pi-search" style="margin: -6px 10px 0px" />
-          <InputText
+          <InputNumber
             type="text"
             v-model="searchToPrice"
             class="p-inputtext-sm"
@@ -131,12 +127,12 @@
         <Dropdown
           class="p-inputtext-sm"
           style="width: 200px"
-          v-model="searchSupplier"
-          :options="[]"
+          v-model="searchQuality"
+          :options="quality"
           :filter="true"
           :showClear="true"
-          optionLabel="name"
-          optionValue="supplierId"
+          optionLabel="qualityName"
+          optionValue="qualityId"
         />
       </div>
       <div>
@@ -148,12 +144,10 @@
         <Dropdown
           class="p-inputtext-sm"
           style="width: 200px"
-          v-model="searchSupplier"
-          :options="[]"
+          v-model="searchUnit"
+          :options="['Cái', 'Kg', 'Cân', 'Lít', 'Mét', 'Dm', 'Cm']"
           :filter="true"
           :showClear="true"
-          optionLabel="name"
-          optionValue="supplierId"
         />
       </div>
     </div>
@@ -253,6 +247,7 @@ import { useToast } from "primevue/usetoast";
 import SupplierApi from "@/api/material-management/supplier-api";
 import QualityApi from "@/api/material-management/quality-api";
 import SpeciesApi from "@/api/material-management/species-api";
+import { debounce } from "@/shared/utils";
 
 export default defineComponent({
   setup(): unknown {
@@ -262,45 +257,55 @@ export default defineComponent({
     const totalPages = ref(0);
     const totalRecs = ref(0);
     const selectedRec = ref({});
-    const item = ref({});
     const isNewRec = ref(false);
     const isCustomer = ref(false);
     const list = ref([]);
-    const arrQuality = ref([]);
-    const arrSpecies = ref([]);
-    const arrSupplier = ref([]);
     const confirm = useConfirm();
     const toast = useToast();
     let currentPage = 1;
+    let quality = ref([]);
+    let species = ref([]);
+    let supplier = ref([]);
+    let searchName = ref("");
+    let searchCode = ref("");
+    let searchSupplier = ref("");
+    let searchSpecies = ref("");
+    let searchFormPrice = ref("");
+    let searchToPrice = ref("");
+    let searchQuality = ref("");
+    let searchUnit = ref("");
 
     const getData = async (
       page: number,
       requestedPageSize: number,
       suppliesId = "",
-      qualityId = ""
+      searchCode = "",
+      searchName = "",
+      searchSupplier = "",
+      searchSpecies = "",
+      searchFormPrice = "",
+      searchToPrice = "",
+      searchQuality = "",
+      searchUnit = ""
     ) => {
-      // isLoading.value = true;
+      searchFormPrice = searchFormPrice === "null" ? "0" : searchFormPrice;
+      searchToPrice = searchToPrice === "null" ? "0" : searchToPrice;
       try {
         debugger;
         const resp = await SuppliesApi.getSupplies(
           page,
           requestedPageSize,
-          suppliesId
+          suppliesId,
+          searchCode,
+          searchName,
+          searchSupplier,
+          searchSpecies,
+          searchFormPrice,
+          searchToPrice,
+          searchQuality,
+          searchUnit
         );
         list.value = resp.data.list;
-        // list.value = resp.data.list.map((v:Record<string, unknown>) => {
-        //   const dt1 = new Date(v.dateConstruction as string);
-        //   const dt2 = new Date(v.dateFinish as string);
-        //   const strDateConstruction = new Intl.DateTimeFormat(['ban', 'id'], { year: 'numeric', month: '2-digit', day: '2-digit' }).format(dt1);
-        //   const strDateFinish = new Intl.DateTimeFormat(['ban', 'id'], { year: 'numeric', month: '2-digit', day: '2-digit' }).format(dt2);
-        //   return {
-        //     ...v,
-        //     strDateConstruction,
-        //     strDateFinish,
-        //   };
-        // });
-        debugger;
-        // isLoading.value = false;
         currentPage = resp.data.currentPage;
         totalPages.value = resp.data.totalPages;
         totalRecs.value = resp.data.total;
@@ -355,32 +360,24 @@ export default defineComponent({
     const onPageChange = (event: Record<string, unknown>) => {
       if (currentPage !== (event.page as number) + 1) {
         currentPage = (event.page as number) + 1;
-        getData(currentPage, pageSize.value);
+        getData(
+          currentPage,
+          pageSize.value,
+          "",
+          `${searchCode.value}`,
+          `${searchName.value}`,
+          `${searchSupplier.value}`,
+          `${searchSpecies.value}`,
+          `${searchFormPrice.value}`,
+          `${searchToPrice.value}`,
+          `${searchQuality.value}`,
+          `${searchUnit.value}`
+        );
       }
     };
 
     const onAddClick = async () => {
       debugger;
-      const resQulity = await QualityApi.getAll();
-      let qualityItem: any;
-      if (resQulity.data) {
-        qualityItem = resQulity.data.list;
-      }
-      arrQuality.value = qualityItem;
-
-      const resSpecies = await SpeciesApi.getAll();
-      let speciesItem: any;
-      if (resSpecies.data) {
-        speciesItem = resSpecies.data.list;
-      }
-      arrSpecies.value = speciesItem;
-
-      const Supplier = await SupplierApi.getAll();
-      let supplierItem: any;
-      if (Supplier.data) {
-        supplierItem = Supplier.data.list;
-      }
-      arrSupplier.value = supplierItem;
 
       isNewRec.value = true;
       selectedRec.value = { suppliesId: "" };
@@ -394,40 +391,70 @@ export default defineComponent({
 
     const onEditClick = async (rec: Record<string, unknown>) => {
       debugger;
-      const resQulity = await QualityApi.getAll();
-      let qualityItem: any;
-      if (resQulity.data) {
-        qualityItem = resQulity.data.list;
-      }
-      arrQuality.value = qualityItem;
-
-      const resSpecies = await SpeciesApi.getAll();
-      let speciesItem: any;
-      if (resSpecies.data) {
-        speciesItem = resSpecies.data.list;
-      }
-      arrSpecies.value = speciesItem;
-
-      const Supplier = await SupplierApi.getAll();
-      let supplierItem: any;
-      if (Supplier.data) {
-        supplierItem = Supplier.data.list;
-      }
-      arrSupplier.value = supplierItem;
       showSlideOut.value = true;
       selectedRec.value = rec;
     };
 
     onMounted(() => {
       getData(0, pageSize.value);
+      lstSupplier();
+      lstQuality();
+      lstSpecies();
     });
+
+    const lstSupplier = async () => {
+      debugger;
+      const resp = await SupplierApi.getAll();
+      debugger;
+      let lstSuppliers = [];
+      if (resp.data) {
+        lstSuppliers = resp.data.list;
+      }
+      supplier.value = lstSuppliers;
+    };
+
+    const lstQuality = async () => {
+      debugger;
+      const resp = await QualityApi.getAll();
+      debugger;
+      let lstQualitys = [];
+      if (resp.data) {
+        lstQualitys = resp.data.list;
+      }
+      quality.value = lstQualitys;
+    };
+
+    const lstSpecies = async () => {
+      debugger;
+      const resp = await SpeciesApi.getAll();
+      debugger;
+      let lstSpeciess = [];
+      if (resp.data) {
+        lstSpeciess = resp.data.list;
+      }
+      species.value = lstSpeciess;
+    };
+
+    const onSearchKeyup = debounce(
+      () =>
+        getData(
+          1,
+          pageSize.value,
+          "",
+          `${searchCode.value}`,
+          `${searchName.value}`,
+          `${searchSupplier.value}`,
+          `${searchSpecies.value}`,
+          `${searchFormPrice.value}`,
+          `${searchToPrice.value}`,
+          `${searchQuality.value}`,
+          `${searchUnit.value}`
+        ),
+      400
+    );
 
     return {
       list,
-      arrQuality,
-      arrSpecies,
-      arrSupplier,
-      item,
       isLoading,
       showSlideOut,
       pageSize,
@@ -441,6 +468,18 @@ export default defineComponent({
       onEditClick,
       onPageChange,
       getData,
+      supplier,
+      species,
+      quality,
+      searchCode,
+      searchName,
+      searchSupplier,
+      searchSpecies,
+      searchFormPrice,
+      searchToPrice,
+      searchQuality,
+      searchUnit,
+      onSearchKeyup,
     };
   },
   components: {

@@ -19,6 +19,7 @@ public class DeliveryBillModel {
     @Column(name = "date_delivery_bill")      private Date  dateDeliveryBill;
     @Column(name = "factory_id")       private Long  factoryId;
     @Column(name = "warehouse_id")       private Long  warehouseId;
+    @Column(name = "employee_id")       private Long  employeeId;
     @Column(name = "description")       private String  description;
 
     @Transient
@@ -27,8 +28,26 @@ public class DeliveryBillModel {
     private String  warehouseCode;
     @Transient
     private Long sumMoney;
+    @Transient
+    private String fullName;
     //Getters and Setters
 
+
+    public Long getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(Long employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
     public String getFactoryCode() {
         return factoryCode;

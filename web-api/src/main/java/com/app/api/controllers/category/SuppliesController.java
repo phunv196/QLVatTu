@@ -53,6 +53,14 @@ public class SuppliesController extends BaseController {
     )
     public Response getSuppliesList(
             @Parameter(description = "Order Id") @QueryParam("suppliesId") Long suppliesId,
+            @Parameter(description = "Order Id") @QueryParam("searchCode") String searchCode,
+            @Parameter(description = "Order Id") @QueryParam("searchName") String searchName,
+            @Parameter(description = "Order Id") @QueryParam("searchSupplier") Long searchSupplier,
+            @Parameter(description = "Order Id") @QueryParam("searchSpecies") Long searchSpecies,
+            @Parameter(description = "Order Id") @QueryParam("searchFormPrice") Long searchFormPrice,
+            @Parameter(description = "Order Id") @QueryParam("searchToPrice") Long searchToPrice,
+            @Parameter(description = "Order Id") @QueryParam("searchQuality") Long searchQuality,
+            @Parameter(description = "Order Id") @QueryParam("searchUnit") String searchUnit,
             @Parameter(description = "Page No, Starts from 1 ", example = "1") @DefaultValue("1") @QueryParam("page") int page,
             @Parameter(description = "Items in each page", example = "20") @DefaultValue("1000") @QueryParam("page-size") int pageSize
     ) {
@@ -62,8 +70,25 @@ public class SuppliesController extends BaseController {
             if (suppliesId == null) {
                 suppliesId = 0l;
             }
-            List<SuppliesModel> modelList = suppliesDao.getList(page, pageSize, suppliesId);
-            BigInteger total = suppliesDao.getSuppliesCount(suppliesId);
+            if (searchSupplier == null) {
+                searchSupplier = 0l;
+            }
+            if (searchSpecies == null) {
+                searchSpecies = 0l;
+            }
+            if (searchQuality == null) {
+                searchQuality = 0l;
+            }
+            if (searchFormPrice == null) {
+                searchFormPrice = 0l;
+            }
+            if (searchToPrice == null) {
+                searchToPrice = 0l;
+            }
+            List<SuppliesModel> modelList = suppliesDao.getList(page, pageSize, suppliesId, searchCode, searchName,
+                    searchSupplier, searchSpecies, searchFormPrice, searchToPrice, searchQuality, searchUnit);
+            BigInteger total = suppliesDao.getSuppliesCount(suppliesId, searchCode, searchName, searchSupplier, searchSpecies,
+                    searchFormPrice, searchToPrice, searchQuality, searchUnit);
             resp.setList(modelList);
             resp.setTotal(total.intValue());
             resp.setPageStats(total.intValue(),pageSize, page,"");

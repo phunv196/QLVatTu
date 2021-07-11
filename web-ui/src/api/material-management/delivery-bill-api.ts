@@ -3,8 +3,14 @@ import { AxiosResponse } from 'axios';
 
 export default {
   async getDeliveryBills(page = 1, pageSize = 20, deliveryBillId = '',
-    name:string ,code:string, formDate:string, toDate:string,
-    ): Promise<AxiosResponse> {
+    searchCode = "",
+    searchName = "",
+    searchEmployee = "",
+    searchWarehouse = "",
+    searchFormDate = "",
+    searchToDate = "",
+    searchFactory = ""
+  ): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string | Date> = {};
     if (page) {
       qsParams.page = page;
@@ -15,19 +21,29 @@ export default {
     if (deliveryBillId) {
       qsParams.id = deliveryBillId;
     }
-    if(name) {
-      qsParams.name = name;
+    if (searchCode) {
+      qsParams.searchCode = searchCode;
     }
-    if(code) {
-      qsParams.code = code;
+    if (searchName) {
+      qsParams.searchName = searchName;
     }
-    if(formDate) {
-      qsParams.formDate = formDate;
+    if (searchEmployee) {
+      qsParams.searchEmployee = searchEmployee;
     }
-    if(toDate) {
-      qsParams.toDate = toDate;
+    if (searchWarehouse) {
+      qsParams.searchWarehouse = searchWarehouse;
     }
-debugger
+    if (searchFormDate) {
+      qsParams.searchFormDate = searchFormDate;
+    }
+    if (searchToDate) {
+      qsParams.searchToDate = searchToDate;
+    }
+    if (searchFactory) {
+      qsParams.searchFactory = searchFactory;
+    }
+
+    debugger
     return api.get('/delivery_bills', { params: qsParams });
   },
 
@@ -53,7 +69,7 @@ debugger
   //   return api.get(`/delivery_bills/all`);
   // },
 
-  async getAllBySuppliesId(suppliesId:number): Promise<AxiosResponse> {
+  async getAllBySuppliesId(suppliesId: number): Promise<AxiosResponse> {
     debugger;
     return api.get(`/delivery_bills/all/${suppliesId}`);
   },

@@ -1,6 +1,7 @@
 package com.app.dao.category;
 
 import com.app.dao.base.BaseHibernateDAO;
+import com.app.dao.base.CommonUtils;
 import com.app.model.category.DeliveryBillModel;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.HibernateException;
@@ -19,27 +20,37 @@ public class DeliveryBillDao extends BaseHibernateDAO {
         return id == null ? 1 : id;
     }
 
-    public DeliveryBillModel getById(Long deliveryBillId){
+    public DeliveryBillModel getById(Long deliveryBillId) {
         String hql = "from DeliveryBillModel where deliveryBillId = :deliveryBillId";
         Query q = createQuery(hql);
         q.setParameter("deliveryBillId", deliveryBillId);
-        return  (DeliveryBillModel) q.uniqueResult();
+        return (DeliveryBillModel) q.uniqueResult();
     }
 
-    public int delete(Long deliveryBillId)  throws HibernateException, ConstraintViolationException {
+    public int delete(Long deliveryBillId) throws HibernateException, ConstraintViolationException {
         Query q = createQuery("delete DeliveryBillModel where deliveryBillId = :deliveryBillId");
         q.setParameter("deliveryBillId", deliveryBillId);
         return q.executeUpdate();
     }
 
-    public List<DeliveryBillModel> getList(int from, int limit, Long deliveryBillId, String name,
-                                           String code, Date formDate, Date toDate) {
-        String sql = createSqlWhereString(deliveryBillId, name, code, formDate, toDate);
+    public List<DeliveryBillModel> getList(int from, int limit, Long deliveryBillId, String searchCode, String searchName,
+                                           Long searchEmployee,
+                                           Long searchWarehouse,
+                                           String searchFormDate,
+                                           String searchToDate,
+                                           Long searchFactory) {
+        String sql = createSqlWhereString(deliveryBillId, searchCode,
+                searchName,
+                searchEmployee,
+                searchWarehouse,
+                searchFormDate,
+                searchToDate,
+                searchFactory);
         String sqlLimit = "";
-        if ( limit <= 0 || limit > 1000 ){
+        if (limit <= 0 || limit > 1000) {
             sqlLimit = " limit 1000 ";
         } else {
-            sqlLimit = " limit " +  limit;
+            sqlLimit = " limit " + limit;
         }
         if (from <= 0) {
             from = 0;
@@ -57,21 +68,29 @@ public class DeliveryBillDao extends BaseHibernateDAO {
                 " w.code warehouseCode," +
                 " f.factory_id factoryId, " +
                 " f.code factoryCode, " +
+                " e.full_name fullName, " +
                 " (select sum(d.amount * s.price) " +
                 " from delivery_bill_flow d" +
                 " join supplies s on d.supplies_id = s.supplies_id " +
                 " where d.delivery_bill_id = db.delivery_bill_id ) sumMoney " +
                 " from delivery_bill db " +
                 " left join factory f on f.factory_id = db.factory_id" +
+                " left join employees e on e.id = db.employee_id" +
                 " left join warehouse w on w.warehouse_id = db.warehouse_id";
         finalSql = finalSql + sql + " order by db.delivery_bill_id " + sqlLimit;
 
         SQLQuery q = createSQLQuery(finalSql);
-        if (deliveryBillId >0)   { q.setParameter("deliveryBillId", deliveryBillId); }
-        if (name != null)    { q.setParameter("name", "%" + name.toLowerCase() + "%"); }
-        if (code != null)   { q.setParameter("code", "%" + code.toLowerCase() + "%"); }
-        if (formDate != null)   { q.setParameter("formDate", formDate ); }
-        if (toDate != null)   { q.setParameter("toDate", toDate ); }
+        if (deliveryBillId > 0) {
+            q.setParameter("deliveryBillId", deliveryBillId);
+        }
+        if (searchCode != null)   { q.setParameter("searchCode", "%" + searchCode.toLowerCase() + "%"); }
+        if (searchName != null)    { q.setParameter("searchName", "%" + searchName.toLowerCase() + "%"); }
+        if (searchEmployee > 0)   { q.setParameter("searchEmployee", searchEmployee ); }
+        if (searchWarehouse > 0)   { q.setParameter("searchWarehouse", searchWarehouse ); }
+        if (searchFormDate != null && !searchFormDate.isEmpty())   { q.setParameter("searchFormDate", CommonUtils.convertStringToSQLDate(searchFormDate) ); }
+        if (searchToDate != null && !searchToDate.isEmpty())   { q.setParameter("searchToDate", CommonUtils.convertStringToSQLDate(searchToDate) ); }
+        if (searchFactory > 0)   { q.setParameter("searchFactory", searchFactory ); }
+
         //q.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP);
         //List rowList = q.list();
         q.setResultTransformer(Transformers.aliasToBean(DeliveryBillModel.class));
@@ -81,29 +100,53 @@ public class DeliveryBillDao extends BaseHibernateDAO {
     }
 
 
-    private static String createSqlWhereString(Long deliveryBillId, String name, String code,
-                                               Date formDate, Date toDate){
+    private static String createSqlWhereString(Long deliveryBillId, String searchCode, String searchName,
+                                               Long searchEmployee,
+                                               Long searchWarehouse,
+                                               String searchFormDate,
+                                               String searchToDate,
+                                               Long searchFactory) {
         String sqlWhere = " where  1 = 1 ";
 
-        if (deliveryBillId > 0)   { sqlWhere = sqlWhere + " and db.delivery_bill_id = :deliveryBillId "; }
-        if (name != null)   { sqlWhere = sqlWhere + " and LOWER(db.name) LIKE :name "; }
-        if (code != null)   { sqlWhere = sqlWhere + " and LOWER(db.code) LIKE :code "; }
-        if (formDate != null)   { sqlWhere = sqlWhere + " and db.date_delivery_bill >= :formDate "; }
-        if (toDate != null)   { sqlWhere = sqlWhere + " and db.date_delivery_bill <= :toDate "; }
-        return  sqlWhere;
+        if (deliveryBillId > 0) {
+            sqlWhere = sqlWhere + " and db.delivery_bill_id = :deliveryBillId ";
+        }
+        if (searchCode != null)   { sqlWhere = sqlWhere + " and LOWER(db.code) LIKE :searchCode "; }
+        if (searchName != null)   { sqlWhere = sqlWhere + " and LOWER(db.name) LIKE :searchName "; }
+        if (searchEmployee > 0)   { sqlWhere = sqlWhere + " and db.employee_id = :searchEmployee "; }
+        if (searchWarehouse > 0)   { sqlWhere = sqlWhere + " and db.warehouse_id = :searchWarehouse "; }
+        if (searchFormDate != null && !searchFormDate.isEmpty())   { sqlWhere = sqlWhere + " and db.date_delivery_bill >= :searchFormDate "; }
+        if (searchToDate != null && !searchToDate.isEmpty() )   { sqlWhere = sqlWhere + " and db.date_delivery_bill <= :searchToDate "; }
+        if (searchFactory > 0)   { sqlWhere = sqlWhere + " and db.factory_id = :searchFactory "; }
+        return sqlWhere;
     }
 
-    public BigInteger getDeliveryBillCount(Long deliveryBillId, String name, String code,
-                                            Date formDate, Date toDate) {
-        String sql = createSqlWhereString(deliveryBillId, name, code, formDate, toDate);
-        String countSql = "select count(*)  from delivery_bill db" + sql ;
+    public BigInteger getDeliveryBillCount(Long deliveryBillId, String searchCode, String searchName,
+                                           Long searchEmployee,
+                                           Long searchWarehouse,
+                                           String searchFormDate,
+                                           String searchToDate,
+                                           Long searchFactory) {
+        String sql = createSqlWhereString(deliveryBillId, searchCode,
+                searchName,
+                searchEmployee,
+                searchWarehouse,
+                searchFormDate,
+                searchToDate,
+                searchFactory);
+        String countSql = "select count(*)  from delivery_bill db" + sql;
         SQLQuery q = createSQLQuery(countSql);
-        if (deliveryBillId >0)   { q.setParameter("deliveryBillId", deliveryBillId); }
-        if (name != null)    { q.setParameter("name", "% " + name + "%"); }
-        if (code != null)   { q.setParameter("code", "% " + code + " %"); }
-        if (formDate != null)   { q.setParameter("formDate", formDate); }
-        if (toDate != null)   { q.setParameter("toDate", toDate); }
-        return (BigInteger)q.uniqueResult();
+        if (deliveryBillId > 0) {
+            q.setParameter("deliveryBillId", deliveryBillId);
+        }
+        if (searchCode != null)   { q.setParameter("searchCode", "%" + searchCode.toLowerCase() + "%"); }
+        if (searchName != null)    { q.setParameter("searchName", "%" + searchName.toLowerCase() + "%"); }
+        if (searchEmployee > 0)   { q.setParameter("searchEmployee", searchEmployee ); }
+        if (searchWarehouse > 0)   { q.setParameter("searchWarehouse", searchWarehouse ); }
+        if (searchFormDate != null && !searchFormDate.isEmpty())   { q.setParameter("searchFormDate", CommonUtils.convertStringToSQLDate(searchFormDate) ); }
+        if (searchToDate != null && !searchToDate.isEmpty())   { q.setParameter("searchToDate", CommonUtils.convertStringToSQLDate(searchToDate) ); }
+        if (searchFactory > 0)   { q.setParameter("searchFactory", searchFactory ); }
+        return (BigInteger) q.uniqueResult();
     }
 
     public List<Integer> getListBySuppliersId(Integer suppliesId) {
@@ -122,7 +165,9 @@ public class DeliveryBillDao extends BaseHibernateDAO {
                 " from delivery_bill db " +
                 " where db.delivery_bill_id in (:arrDeliveryBill)";
         SQLQuery q = createSQLQuery(finalSql);
-        if (arrDeliveryBill.size() >0)   { q.setParameterList("arrDeliveryBill", arrDeliveryBill); }
+        if (arrDeliveryBill.size() > 0) {
+            q.setParameterList("arrDeliveryBill", arrDeliveryBill);
+        }
 
         //q.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP);
         //List rowList = q.list();

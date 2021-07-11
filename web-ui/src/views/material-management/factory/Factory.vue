@@ -288,6 +288,7 @@ export default defineComponent({
       searchFormSuccessDate = "",
       searchToSuccessDate = ""
     ) => {
+      searchEmployee = searchEmployee === "null" ? "0" : searchEmployee;
       // isLoading.value = true;
       try {
         debugger;
@@ -479,7 +480,7 @@ export default defineComponent({
       searchCode,
       searchEmail,
       searchEmployee,
-      onSearchKeyup
+      onSearchKeyup,
     };
   },
   components: {

@@ -65,6 +65,7 @@
 </template>
 
 <script lang='ts'>
+import Datepicker from 'vue3-datepicker';
 import { defineComponent, ref } from 'vue';
 import WarehouseCardApi from '@/api/material-management/warehouse-card-api';
 import { useToast } from 'primevue/usetoast';
@@ -154,7 +155,8 @@ export default defineComponent({
     };
   },
   components: {
-    'WarehouseCardFlow': WarehouseCardFlow
+    'WarehouseCardFlow': WarehouseCardFlow,
+    Datepicker
   },
 });
 </script>

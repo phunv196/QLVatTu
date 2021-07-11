@@ -2,7 +2,13 @@ import api from '@/api/api-service';
 import { AxiosResponse } from 'axios';
 
 export default {
-  async getWarehouseCards(page = 1, pageSize = 20, warehouseCardId = ''): Promise<AxiosResponse> {
+  async getWarehouseCards(page = 1, pageSize = 20, warehouseCardId = '', searchCode = "",
+  searchName = "",
+  searchEmployee = "",
+  searchWarehouse = "",
+  searchFormDate = "",
+  searchToDate = "",
+  searchSupplies = ""): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
     if (page) {
       qsParams.page = page;
@@ -13,7 +19,27 @@ export default {
     if (warehouseCardId) {
       qsParams.id = warehouseCardId;
     }
-
+    if (searchCode) {
+      qsParams.searchCode = searchCode;
+    }
+    if (searchName) {
+      qsParams.searchName = searchName;
+    }
+    if (searchEmployee) {
+      qsParams.searchEmployee = searchEmployee;
+    }
+    if (searchWarehouse) {
+      qsParams.searchWarehouse = searchWarehouse;
+    }
+    if (searchFormDate) {
+      qsParams.searchFormDate = searchFormDate;
+    }
+    if (searchToDate) {
+      qsParams.searchToDate = searchToDate;
+    }
+    if (searchSupplies) {
+      qsParams.searchSupplies = searchSupplies;
+    }
     return api.get('/warehouse_cards', { params: qsParams });
   },
 
