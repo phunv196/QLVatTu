@@ -7,6 +7,7 @@ import org.hibernate.*;
 import org.hibernate.transform.Transformers;
 
 import java.math.BigInteger;
+import java.sql.Date;
 import java.util.List;
 
 public class FactoryDao extends BaseHibernateDAO {
@@ -36,8 +37,11 @@ public class FactoryDao extends BaseHibernateDAO {
         return q.executeUpdate();
     }
 
-    public List<FactoryModel> getList(int from, int limit, Long factoryId)  throws HibernateException, ConstraintViolationException {
-
+    public List<FactoryModel> getList(int from, int limit, Long factoryId, String searchCode, String searchName,
+                                      String searchEmail, String searchEmployee, Date searchFormDate, Date searchToDate, Date searchFormSuccessDate,
+                                      Date searchToSuccessDate)  throws HibernateException, ConstraintViolationException {
+        String sql = createSqlWhereString(factoryId,searchCode, searchName,
+                searchEmail, searchEmployee, searchFormDate, searchToDate, searchFormSuccessDate, searchToSuccessDate);
         String sqlLimit = "";
         if ( limit <= 0 || limit > 1000 ){
             sqlLimit = " limit 1000 ";
@@ -64,13 +68,18 @@ public class FactoryDao extends BaseHibernateDAO {
                 " from factory f " +
                 " left join employees e on e.id = f.employee_id";
         //String finalSql = "select factory_id from factory";
-        finalSql = finalSql + " order by f.factory_id " + sqlLimit;
+        finalSql = finalSql + sql + " order by f.factory_id " + sqlLimit;
 
         SQLQuery q = createSQLQuery(finalSql);
         if (factoryId >0)   { q.setParameter("factoryId", factoryId); }
-
-        //q.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP);
-        //List rowList = q.list();
+        if (searchCode != null)   { q.setParameter("searchCode", "%" + searchCode.toLowerCase() + "%"); }
+        if (searchName != null)    { q.setParameter("searchName", "%" + searchName.toLowerCase() + "%"); }
+        if (searchEmail != null)    { q.setParameter("searchEmail", "%" + searchEmail.toLowerCase() + "%"); }
+        if (searchEmployee != null && !searchEmployee.isEmpty())   { q.setParameter("searchEmployee", searchEmployee ); }
+        if (searchFormDate != null)   { q.setParameter("searchFormDate", searchFormDate ); }
+        if (searchToDate != null)   { q.setParameter("searchToDate", searchToDate ); }
+        if (searchFormSuccessDate != null)   { q.setParameter("searchFormSuccessDate", searchFormSuccessDate ); }
+        if (searchToSuccessDate != null)   { q.setParameter("searchToSuccessDate", searchToSuccessDate ); }
         q.setResultTransformer(Transformers.aliasToBean(FactoryModel.class));
         setResultTransformer(q, FactoryModel.class);
 
@@ -78,20 +87,41 @@ public class FactoryDao extends BaseHibernateDAO {
     }
 
 
-    public BigInteger getFactoryCount(Long factoryId) {
-        String sql = createSqlWhereString(factoryId);
-        String countSql = "select count(*) " + sql ;
+    public BigInteger getFactoryCount(Long factoryId, String searchCode, String searchName,
+                                      String searchEmail, String searchEmployee, Date searchFormDate, Date searchToDate, Date searchFormSuccessDate,
+                                      Date searchToSuccessDate) {
+        String sql = createSqlWhereString(factoryId,searchCode, searchName,
+                searchEmail, searchEmployee, searchFormDate, searchToDate, searchFormSuccessDate, searchToSuccessDate);
+        String countSql = "select count(*) from factory f " + sql ;
         SQLQuery q = createSQLQuery(countSql);
         if (factoryId >0)   { q.setParameter("factoryId", factoryId); }
+        if (searchCode != null)   { q.setParameter("searchCode", "%" + searchCode.toLowerCase() + "%"); }
+        if (searchName != null)    { q.setParameter("searchName", "%" + searchName.toLowerCase() + "%"); }
+        if (searchEmail != null)    { q.setParameter("searchEmail", "%" + searchEmail.toLowerCase() + "%"); }
+        if (searchEmployee != null && !searchEmployee.isEmpty())   { q.setParameter("searchEmployee", searchEmployee ); }
+        if (searchFormDate != null)   { q.setParameter("searchFormDate", searchFormDate ); }
+        if (searchToDate != null)   { q.setParameter("searchToDate", searchToDate ); }
+        if (searchFormSuccessDate != null)   { q.setParameter("searchFormSuccessDate", searchFormSuccessDate ); }
+        if (searchToSuccessDate != null)   { q.setParameter("searchToSuccessDate", searchToSuccessDate ); }
         return (BigInteger)q.uniqueResult();
     }
 
-    private String createSqlWhereString(Long factoryId){
+    private String createSqlWhereString(Long factoryId, String searchCode, String searchName,
+                                        String searchEmail, String searchEmployee, Date searchFormDate, Date searchToDate, Date searchFormSuccessDate,
+                                        Date searchToSuccessDate){
         String sqlWhere = " where  1 = 1 ";
 
-        if (factoryId > 0)   { sqlWhere = sqlWhere + " and factoryId = :factoryId "; }
+        if (factoryId > 0)   { sqlWhere = sqlWhere + " and f.factory_id = :factoryId "; }
+        if (searchCode != null)   { sqlWhere = sqlWhere + " and LOWER(f.code) LIKE :searchCode "; }
+        if (searchName != null)   { sqlWhere = sqlWhere + " and LOWER(f.name) LIKE :searchName "; }
+        if (searchEmail != null)   { sqlWhere = sqlWhere + " and LOWER(f.email) LIKE :searchEmail "; }
+        if (searchEmployee != null && !searchEmployee.isEmpty())   { sqlWhere = sqlWhere + " and f.employee_id = :searchEmployee "; }
+        if (searchFormDate != null)   { sqlWhere = sqlWhere + " and f.date_construction >= :searchFormDate "; }
+        if (searchToDate != null)   { sqlWhere = sqlWhere + " and f.date_construction <= :searchToDate "; }
+        if (searchFormSuccessDate != null)   { sqlWhere = sqlWhere + " and f.date_finish >= :searchFormSuccessDate "; }
+        if (searchToSuccessDate != null)   { sqlWhere = sqlWhere + " and f.date_finish <= :searchToSuccessDate "; }
 
-        return " from factory " + sqlWhere;
+        return sqlWhere;
     }
 
 

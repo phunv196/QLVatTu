@@ -62,7 +62,7 @@
           <i class="pi pi-search" style="margin: -6px 10px 0px" />
           <InputText
             type="text"
-            v-model="searchName"
+            v-model="searchEmail"
             class="p-inputtext-sm"
             placeholder="Search by name"
             style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
@@ -78,12 +78,12 @@
         <Dropdown
           class="p-inputtext-sm"
           style="width: 200px"
-          v-model="searchSupplier"
-          :options="[]"
+          v-model="searchEmployee"
+          :options="emp"
           :filter="true"
           :showClear="true"
-          optionLabel="name"
-          optionValue="supplierId"
+          optionLabel="fullName"
+          optionValue="id"
         />
       </div>
     </div>
@@ -109,7 +109,7 @@
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
-          >Đến ngày 
+          >Đến ngày
         </label>
         <span class="p-input-icon-left">
           <i class="pi pi-search" style="margin: -6px 10px 0px" />
@@ -132,7 +132,7 @@
           <i class="pi pi-search" style="margin: -6px 10px 0px" />
           <InputText
             type="date"
-            v-model="searchFormDate"
+            v-model="searchFormSuccessDate"
             class="p-inputtext-sm"
             placeholder="dd/mm/yyyy"
             style="width: 200px; height: 30px"
@@ -149,7 +149,7 @@
           <i class="pi pi-search" style="margin: -6px 10px 0px" />
           <InputText
             type="date"
-            v-model="searchToDate"
+            v-model="searchToSuccessDate"
             class="p-inputtext-sm"
             placeholder="dd/mm/yyyy"
             style="width: 200px; height: 30px"
@@ -247,6 +247,7 @@ import FactoryDetails from "@/views/material-management/factory/FactoryDetails.v
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import EmployeeApi from "@/api/employee-api";
+import { debounce } from "@/shared/utils";
 
 export default defineComponent({
   setup(): unknown {
@@ -264,11 +265,28 @@ export default defineComponent({
     const confirm = useConfirm();
     const toast = useToast();
     let currentPage = 1;
+    let emp = ref([]);
+    let searchFormSuccessDate = ref("");
+    let searchToSuccessDate = ref("");
+    let searchFormDate = ref("");
+    let searchToDate = ref("");
+    let searchName = ref("");
+    let searchCode = ref("");
+    let searchEmail = ref("");
+    let searchEmployee = ref("");
 
     const getData = async (
       page: number,
       requestedPageSize: number,
-      factoryId = ""
+      factoryId = "",
+      searchCode = "",
+      searchName = "",
+      searchEmail = "",
+      searchEmployee = "",
+      searchFormDate = "",
+      searchToDate = "",
+      searchFormSuccessDate = "",
+      searchToSuccessDate = ""
     ) => {
       // isLoading.value = true;
       try {
@@ -276,7 +294,15 @@ export default defineComponent({
         const resp = await FactoryApi.getFactorys(
           page,
           requestedPageSize,
-          factoryId
+          factoryId,
+          searchCode,
+          searchName,
+          searchEmail,
+          searchEmployee,
+          searchFormDate,
+          searchToDate,
+          searchFormSuccessDate,
+          searchToSuccessDate
         );
         debugger;
         list.value = resp.data.list.map((v: Record<string, unknown>) => {
@@ -307,31 +333,6 @@ export default defineComponent({
         isLoading.value = false;
       }
     };
-
-    // const getData = async (page:number, requestedPageSize: number) => {
-    //   // isLoading.value = true;
-    //   try {
-    //     const resp = await FactoryApi.getFactorys(page, requestedPageSize);
-    //     list.value = resp.data.list.map((v:Record<string, unknown>) => {
-    //       const dt1 = new Date(v.dateConstruction as string);
-    //       const dt2 = new Date(v.dateFinish as string);
-    //       const strDateConstruction = new Intl.DateTimeFormat(['ban', 'id'], { year: 'numeric', month: '2-digit', day: '2-digit' }).format(dt1);
-    //       const strDateFinish = new Intl.DateTimeFormat(['ban', 'id'], { year: 'numeric', month: '2-digit', day: '2-digit' }).format(dt2);
-    //       return {
-    //         ...v,
-    //         strDateConstruction,
-    //         strDateFinish,
-    //       };
-    //     });
-    //     // isLoading.value = false;
-    //     currentPage = resp.data.currentPage;
-    //     totalPages.value = resp.data.totalPages;
-    //     totalRecs.value = resp.data.total;
-    //   } catch (err) {
-    //     console.log('REST ERROR: %O', err.response ? err.response : err);
-    //     isLoading.value = false;
-    //   }
-    // };
 
     const confirmDialog = (rec: Record<string, unknown>) => {
       debugger;
@@ -420,7 +421,37 @@ export default defineComponent({
 
     onMounted(() => {
       getData(0, pageSize.value);
+      lstEmp();
     });
+
+    const lstEmp = async () => {
+      debugger;
+      const resp = await EmployeeApi.getAll();
+      debugger;
+      let lstEmps = [];
+      if (resp.data) {
+        lstEmps = resp.data.list;
+      }
+      emp.value = lstEmps;
+    };
+
+    const onSearchKeyup = debounce(
+      () =>
+        getData(
+          1,
+          pageSize.value,
+          "",
+          `${searchCode.value}`,
+          `${searchName.value}`,
+          `${searchEmail.value}`,
+          `${searchEmployee.value}`,
+          `${searchFormDate.value}`,
+          `${searchToDate.value}`,
+          `${searchFormSuccessDate.value}`,
+          `${searchToSuccessDate.value}`
+        ),
+      400
+    );
 
     return {
       list,
@@ -439,6 +470,16 @@ export default defineComponent({
       getData,
       arr,
       itemById,
+      emp,
+      searchFormSuccessDate,
+      searchToSuccessDate,
+      searchFormDate,
+      searchToDate,
+      searchName,
+      searchCode,
+      searchEmail,
+      searchEmployee,
+      onSearchKeyup
     };
   },
   components: {

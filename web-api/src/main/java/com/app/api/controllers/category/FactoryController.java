@@ -1,6 +1,7 @@
 package com.app.api.controllers.category;
 
 import com.app.api.BaseController;
+import com.app.dao.base.CommonUtils;
 import com.app.dao.category.FactoryDao;
 import com.app.model.BaseResponse;
 import com.app.model.category.FactoryModel;
@@ -38,6 +39,14 @@ public class FactoryController extends BaseController {
     )
     public Response getFactoryList(
             @Parameter(description = "Order Id") @QueryParam("factoryId") Long factoryId,
+            @Parameter(description = "Order Id") @QueryParam("searchCode") String searchCode,
+            @Parameter(description = "Order Id") @QueryParam("searchName") String searchName,
+            @Parameter(description = "Order Id") @QueryParam("searchEmail") String searchEmail,
+            @Parameter(description = "Order Id") @QueryParam("searchEmployee") String searchEmployee,
+            @Parameter(description = "Order Id") @QueryParam("searchFormDate") String searchFormDate,
+            @Parameter(description = "Order Id") @QueryParam("searchToDate") String searchToDate,
+            @Parameter(description = "Order Id") @QueryParam("searchFormSuccessDate") String searchFormSuccessDate,
+            @Parameter(description = "Order Id") @QueryParam("searchToSuccessDate") String searchToSuccessDate,
             @Parameter(description = "Page No, Starts from 1 ", example = "1") @DefaultValue("1") @QueryParam("page") int page,
             @Parameter(description = "Items in each page", example = "20") @DefaultValue("1000") @QueryParam("page-size") int pageSize
     ) {
@@ -46,8 +55,15 @@ public class FactoryController extends BaseController {
             if (factoryId == null) {
                 factoryId = 0l;
             }
-            List<FactoryModel> modelList = factoryDao.getList(page, pageSize, factoryId);
-            BigInteger total = factoryDao.getFactoryCount(factoryId);
+            java.sql.Date formDateSQL = CommonUtils.convertStringToSQLDate(searchFormDate);
+            java.sql.Date toDateSQL = CommonUtils.convertStringToSQLDate(searchToDate);
+            java.sql.Date formSuccessDateSQL = CommonUtils.convertStringToSQLDate(searchFormSuccessDate);
+            java.sql.Date toSuccessDateSQL = CommonUtils.convertStringToSQLDate(searchToSuccessDate);
+
+            List<FactoryModel> modelList = factoryDao.getList(page, pageSize, factoryId, searchCode, searchName,
+                    searchEmail, searchEmployee, formDateSQL, toDateSQL, formSuccessDateSQL, toSuccessDateSQL);
+            BigInteger total = factoryDao.getFactoryCount(factoryId, searchCode, searchName,
+                    searchEmail, searchEmployee, formDateSQL, toDateSQL, formSuccessDateSQL, toSuccessDateSQL);
             resp.setList(modelList);
             resp.setTotal(total.intValue());
             resp.setPageStats(total.intValue(),pageSize, page,"");
