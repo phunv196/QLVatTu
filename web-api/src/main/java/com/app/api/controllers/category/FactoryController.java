@@ -6,6 +6,7 @@ import com.app.dao.category.FactoryDao;
 import com.app.model.BaseResponse;
 import com.app.model.category.FactoryModel;
 import com.app.model.category.FactoryModel.FactoryResponse;
+import com.app.model.user.UserViewModel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -42,7 +43,7 @@ public class FactoryController extends BaseController {
             @Parameter(description = "Order Id") @QueryParam("searchCode") String searchCode,
             @Parameter(description = "Order Id") @QueryParam("searchName") String searchName,
             @Parameter(description = "Order Id") @QueryParam("searchEmail") String searchEmail,
-            @Parameter(description = "Order Id") @QueryParam("searchEmployee") String searchEmployee,
+            @Parameter(description = "Order Id") @QueryParam("searchEmployee") Long searchEmployee,
             @Parameter(description = "Order Id") @QueryParam("searchFormDate") String searchFormDate,
             @Parameter(description = "Order Id") @QueryParam("searchToDate") String searchToDate,
             @Parameter(description = "Order Id") @QueryParam("searchFormSuccessDate") String searchFormSuccessDate,
@@ -54,6 +55,9 @@ public class FactoryController extends BaseController {
         try {
             if (factoryId == null) {
                 factoryId = 0l;
+            }
+            if (searchEmployee == null) {
+                searchEmployee = 0l;
             }
             java.sql.Date formDateSQL = CommonUtils.convertStringToSQLDate(searchFormDate);
             java.sql.Date toDateSQL = CommonUtils.convertStringToSQLDate(searchToDate);

@@ -16,8 +16,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.catalina.User;
@@ -26,6 +28,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.criterion.Restrictions;
 
 import java.math.BigInteger;
+import java.security.Principal;
 import java.util.List;
 
 @Path("warehouse_cards")
@@ -35,7 +38,8 @@ import java.util.List;
 public class WarehouseCardController extends BaseController {
     WarehouseCardDao warehouseCardDao = new WarehouseCardDao();
     WarehouseCardFlowDao warehouseCardFlowDao = new WarehouseCardFlowDao();
-
+    @Context
+    HttpServletRequest request;
     @GET
     @RolesAllowed({"ADMIN"})
     @Operation(
@@ -102,6 +106,8 @@ public class WarehouseCardController extends BaseController {
     public Response addWarehouseCard(WarehouseCardModel warehouseCard) {
         BaseResponse resp = new BaseResponse();
         try {
+            UserViewModel userFromToken = (UserViewModel)securityContext.getUserPrincipal();
+            warehouseCard.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
             warehouseCardDao.beginTransaction();
             warehouseCardDao.save(warehouseCard);
             warehouseCardDao.commitTransaction();
@@ -124,6 +130,8 @@ public class WarehouseCardController extends BaseController {
         try {
             WarehouseCardModel foundProd  = warehouseCardDao.getById(warehouseCard.getWarehouseCardId());
             if (foundProd != null) {
+                UserViewModel userFromToken = (UserViewModel)securityContext.getUserPrincipal();
+                warehouseCard.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
                 warehouseCardDao.beginTransaction();
                 warehouseCardDao.update(warehouseCard);
                 warehouseCardDao.commitTransaction();

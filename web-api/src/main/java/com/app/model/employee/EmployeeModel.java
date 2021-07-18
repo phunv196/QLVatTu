@@ -8,7 +8,7 @@ import java.util.List;
 @Entity
 @Table(name = "employees")
 public class EmployeeModel {
-    @Id @GeneratedValue private Integer id;
+    @Id @GeneratedValue private Long employeeId;
     @Column(name = "code") private String  code;
     @Column(name = "last_name") private String  lastName;
     @Column(name = "first_name") private String  firstName;
@@ -25,17 +25,21 @@ public class EmployeeModel {
     @Column(name = "state") private String  state;
     @Column(name = "postal_code") private String  postalCode;
     @Column(name = "country") private String  country;
-    @Column(name = "position_id") private Integer positionId;
+    @Column(name = "position_id") private Long positionId;
+    @Column(name = "department_id") private Long  departmentId;
 
 
+    @Transient
+    private String positionName;
 
-    //Constructors
-    public EmployeeModel(){}
-    public EmployeeModel(Integer id, String code, String lastName, String firstName, String fullName,
+    @Transient
+    private String departmentName;
+    public EmployeeModel(){};
+    public EmployeeModel(Long employeeId, String code, String lastName, String firstName, String fullName,
                          String email, String avatar, String jobTitle, String department, Integer managerId,
-                         String phone, String address1, String address2, String city, String state,
-                         String postalCode, String country, Integer positionId) {
-        this.id = id;
+                         String phone, String address1, String address2, String city, String state, String postalCode,
+                         String country, Long positionId, Long departmentId, String positionName, String departmentName) {
+        this.employeeId = employeeId;
         this.code = code;
         this.lastName = lastName;
         this.firstName = firstName;
@@ -53,11 +57,12 @@ public class EmployeeModel {
         this.postalCode = postalCode;
         this.country = country;
         this.positionId = positionId;
+        this.departmentId = departmentId;
+        this.positionName = positionName;
+        this.departmentName = departmentName;
     }
 
-    // Getter and Setters
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+// Getter and Setters
 
     public String getLastName() { return lastName; }
     public void setLastName(String lastName) { this.lastName = lastName; }
@@ -117,12 +122,44 @@ public class EmployeeModel {
         this.fullName = fullName;
     }
 
-    public Integer getPositionId() {
+    public Long getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(Long employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    public Long getPositionId() {
         return positionId;
     }
 
-    public void setPositionId(Integer positionId) {
+    public void setPositionId(Long positionId) {
         this.positionId = positionId;
+    }
+
+    public Long getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(Long departmentId) {
+        this.departmentId = departmentId;
+    }
+
+    public String getPositionName() {
+        return positionName;
+    }
+
+    public void setPositionName(String positionName) {
+        this.positionName = positionName;
+    }
+
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
     }
 
     public static class EmployeeResponse extends PageResponse {

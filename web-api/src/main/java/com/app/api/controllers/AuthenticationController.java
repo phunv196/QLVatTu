@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.PermitAll;
+import jakarta.servlet.http.HttpSession;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -57,7 +58,7 @@ public class AuthenticationController extends BaseController {
         q.setParameter("uid", uid);
         q.setParameter("pwd", pwd);
 
-        UserViewModel userView = (UserViewModel)q.uniqueResult();  // can throw org.hibernate.NonUniqueResultException
+        UserViewModel userView = (UserViewModel)q.uniqueResult();  // can throw org.hibernate.NonUniqueResultExceptio
         if (userView!=null){
             String strToken = TokenUtil.createTokenForUser(userView);
             UserOutputModel usrOutput = new UserOutputModel(

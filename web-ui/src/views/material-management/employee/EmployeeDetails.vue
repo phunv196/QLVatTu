@@ -12,13 +12,43 @@
         <InputText type="text" v-model="recData.firstName" class="p-inputtext-sm p-mr-1"/>
         <InputText type="text" v-model="recData.lastName" class="p-inputtext-sm"/>
       </div>
-      <div class="p-mt-1">
+      <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"> Email </label>
         <InputText type="text" v-model="recData.email" class="p-inputtext-sm" style="width:325px"/>
       </div>
-      <div class="p-mt-1">
+      <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"> Phone </label>
         <InputText type="text" v-model="recData.phone" class="p-inputtext-sm" style="width:325px"/>
+      </div>
+      <div class="p-mt-3">
+        <label class="p-d-inline-block m-label-size-2 p-text-left p-mr-1"
+          >Phòng ban
+        </label>
+        <Dropdown
+          style="width: 30%"
+          class="p-inputtext-sm"
+          v-model="recData.positionId"
+          :options="position"
+          :filter="true"
+          :showClear="true"
+          optionLabel="name"
+          optionValue="positionId"
+        />
+      </div>
+      <div class="p-mt-3">
+        <label class="p-d-inline-block m-label-size-2 p-text-left p-mr-1"
+          >Chức vụ
+        </label>
+        <Dropdown
+          style="width: 30%"
+          class="p-inputtext-sm"
+          v-model="recData.departmentId"
+          :options="department"
+          :filter="true"
+          :showClear="true"
+          optionLabel="name"
+          optionValue="departmentId"
+        />
       </div>
     </div>
 
@@ -30,19 +60,19 @@
         <InputText type="text" v-model="recData.address1" class="p-inputtext-sm p-mr-1"/>
         <InputText type="text" v-model="recData.address2" class="p-inputtext-sm"/>
       </div>
-      <div class="p-mt-1">
+      <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"> City </label>
         <InputText type="text" v-model="recData.city" class="p-inputtext-sm"/>
       </div>
-      <div class="p-mt-1">
+      <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"> State </label>
         <InputText type="text" v-model="recData.state" class="p-inputtext-sm"/>
       </div>
-      <div class="p-mt-1">
+      <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"> Postal Code </label>
         <InputText type="text" v-model="recData.postalCode" class="p-inputtext-sm"/>
       </div>
-      <div class="p-mt-1">
+      <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"> Country </label>
         <InputText type="text" v-model="recData.country" class="p-inputtext-sm"/>
       </div>
@@ -60,9 +90,11 @@
 </template>
 
 <script lang='ts'>
-import { defineComponent, ref } from 'vue';
+import { defineComponent, onMounted, ref } from 'vue';
 import EmployeeApi from '@/api/employee-api';
 import { useToast } from 'primevue/usetoast';
+import positionApi from '@/api/material-management/position-api';
+import departmentApi from '@/api/material-management/department-api';
 
 export default defineComponent({
   props: {
@@ -72,6 +104,8 @@ export default defineComponent({
 
   setup(props, { emit }): unknown {
     const toast = useToast();
+    const position = ref([]);
+    const department = ref([]);
     const showMessage = ref(false);
     const changesApplied = ref(false);
     const recData = ref(JSON.parse(JSON.stringify(props.rec))); // do not create direct refs to props to avoid making changes to props, instead use a cloned value of prop
@@ -106,12 +140,41 @@ export default defineComponent({
       emit('cancel');
     };
 
+    onMounted( async () => {
+      await lstPosition();
+      await lstDepartment();
+    });
+
+    const lstPosition = async () => {
+      debugger;
+      const resp = await positionApi.getAll();
+      debugger;
+      let lstPositions = [];
+      if (resp.data) {
+        lstPositions = resp.data.list;
+      }
+      position.value = lstPositions;
+    };
+
+    const lstDepartment = async () => {
+      debugger;
+      const resp = await departmentApi.getAll();
+      debugger;
+      let lstDepartments = [];
+      if (resp.data) {
+        lstDepartments = resp.data.list;
+      }
+      department.value = lstDepartments;
+    };
+
     return {
       showMessage,
       changesApplied,
       recData,
       onApplyChanges,
       onCancel,
+      position,
+      department
     };
   },
 });

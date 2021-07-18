@@ -70,12 +70,6 @@ import { defineComponent, ref } from 'vue';
 import WarehouseCardApi from '@/api/material-management/warehouse-card-api';
 import { useToast } from 'primevue/usetoast';
 import WarehouseCardFlow from '@/views/material-management/warehouse-card-flow/WarehouseCardFlow.vue'
-import DeliveryBillApi from '@/api/material-management/delivery-bill-api';
-import SuppliesApi from '@/api/material-management/supplies-api';
-import WarehouseApi from '@/api/material-management/warehouse-api';
-import ReceiptApi from '@/api/material-management/receipt-api';
-import { numeric } from 'vuelidate/lib/validators';
-
 export default defineComponent({
   props: {
     rec: {
@@ -113,6 +107,7 @@ export default defineComponent({
       debugger
       const  checkId = await WarehouseCardApi.checkId(rawWarehouseCardObj.warehouseCardId);
       if (checkId.data) {
+        delete rawWarehouseCardObj.strDateCreated;
         resp = await WarehouseCardApi.updateWarehouseCard(rawWarehouseCardObj);
       } else {
         resp = await WarehouseCardApi.addWarehouseCard(rawWarehouseCardObj);

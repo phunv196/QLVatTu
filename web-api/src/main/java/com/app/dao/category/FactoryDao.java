@@ -38,7 +38,7 @@ public class FactoryDao extends BaseHibernateDAO {
     }
 
     public List<FactoryModel> getList(int from, int limit, Long factoryId, String searchCode, String searchName,
-                                      String searchEmail, String searchEmployee, Date searchFormDate, Date searchToDate, Date searchFormSuccessDate,
+                                      String searchEmail, Long searchEmployee, Date searchFormDate, Date searchToDate, Date searchFormSuccessDate,
                                       Date searchToSuccessDate)  throws HibernateException, ConstraintViolationException {
         String sql = createSqlWhereString(factoryId,searchCode, searchName,
                 searchEmail, searchEmployee, searchFormDate, searchToDate, searchFormSuccessDate, searchToSuccessDate);
@@ -75,7 +75,7 @@ public class FactoryDao extends BaseHibernateDAO {
         if (searchCode != null)   { q.setParameter("searchCode", "%" + searchCode.toLowerCase() + "%"); }
         if (searchName != null)    { q.setParameter("searchName", "%" + searchName.toLowerCase() + "%"); }
         if (searchEmail != null)    { q.setParameter("searchEmail", "%" + searchEmail.toLowerCase() + "%"); }
-        if (searchEmployee != null && !searchEmployee.isEmpty())   { q.setParameter("searchEmployee", searchEmployee ); }
+        if (searchEmployee > 0)   { q.setParameter("searchEmployee", searchEmployee ); }
         if (searchFormDate != null)   { q.setParameter("searchFormDate", searchFormDate ); }
         if (searchToDate != null)   { q.setParameter("searchToDate", searchToDate ); }
         if (searchFormSuccessDate != null)   { q.setParameter("searchFormSuccessDate", searchFormSuccessDate ); }
@@ -88,7 +88,7 @@ public class FactoryDao extends BaseHibernateDAO {
 
 
     public BigInteger getFactoryCount(Long factoryId, String searchCode, String searchName,
-                                      String searchEmail, String searchEmployee, Date searchFormDate, Date searchToDate, Date searchFormSuccessDate,
+                                      String searchEmail, Long searchEmployee, Date searchFormDate, Date searchToDate, Date searchFormSuccessDate,
                                       Date searchToSuccessDate) {
         String sql = createSqlWhereString(factoryId,searchCode, searchName,
                 searchEmail, searchEmployee, searchFormDate, searchToDate, searchFormSuccessDate, searchToSuccessDate);
@@ -98,7 +98,7 @@ public class FactoryDao extends BaseHibernateDAO {
         if (searchCode != null)   { q.setParameter("searchCode", "%" + searchCode.toLowerCase() + "%"); }
         if (searchName != null)    { q.setParameter("searchName", "%" + searchName.toLowerCase() + "%"); }
         if (searchEmail != null)    { q.setParameter("searchEmail", "%" + searchEmail.toLowerCase() + "%"); }
-        if (searchEmployee != null && !searchEmployee.isEmpty())   { q.setParameter("searchEmployee", searchEmployee ); }
+        if (searchEmployee > 0)   { q.setParameter("searchEmployee", searchEmployee ); }
         if (searchFormDate != null)   { q.setParameter("searchFormDate", searchFormDate ); }
         if (searchToDate != null)   { q.setParameter("searchToDate", searchToDate ); }
         if (searchFormSuccessDate != null)   { q.setParameter("searchFormSuccessDate", searchFormSuccessDate ); }
@@ -107,7 +107,7 @@ public class FactoryDao extends BaseHibernateDAO {
     }
 
     private String createSqlWhereString(Long factoryId, String searchCode, String searchName,
-                                        String searchEmail, String searchEmployee, Date searchFormDate, Date searchToDate, Date searchFormSuccessDate,
+                                        String searchEmail, Long searchEmployee, Date searchFormDate, Date searchToDate, Date searchFormSuccessDate,
                                         Date searchToSuccessDate){
         String sqlWhere = " where  1 = 1 ";
 
@@ -115,7 +115,7 @@ public class FactoryDao extends BaseHibernateDAO {
         if (searchCode != null)   { sqlWhere = sqlWhere + " and LOWER(f.code) LIKE :searchCode "; }
         if (searchName != null)   { sqlWhere = sqlWhere + " and LOWER(f.name) LIKE :searchName "; }
         if (searchEmail != null)   { sqlWhere = sqlWhere + " and LOWER(f.email) LIKE :searchEmail "; }
-        if (searchEmployee != null && !searchEmployee.isEmpty())   { sqlWhere = sqlWhere + " and f.employee_id = :searchEmployee "; }
+        if (searchEmployee > 0)   { sqlWhere = sqlWhere + " and f.employee_id = :searchEmployee "; }
         if (searchFormDate != null)   { sqlWhere = sqlWhere + " and f.date_construction >= :searchFormDate "; }
         if (searchToDate != null)   { sqlWhere = sqlWhere + " and f.date_construction <= :searchToDate "; }
         if (searchFormSuccessDate != null)   { sqlWhere = sqlWhere + " and f.date_finish >= :searchFormSuccessDate "; }

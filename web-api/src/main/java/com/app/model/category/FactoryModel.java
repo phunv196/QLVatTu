@@ -20,7 +20,7 @@ public class FactoryModel {
     @Column(name = "email")      private String  email;
     @Column(name = "address")      private String  address;
     @Column(name = "description")       private String  description;
-    @Column(name = "employee_id")      private Integer  employeeId;
+    @Column(name = "employee_id")      private Long  employeeId;
     @Column(name = "date_construction")      private Date dateConstruction;
     @Column(name = "date_finish")      private Date  dateFinish;
 
@@ -86,11 +86,11 @@ public class FactoryModel {
         this.description = description;
     }
 
-    public int getEmployeeId() {
+    public Long getEmployeeId() {
         return employeeId;
     }
 
-    public void setEmployeeId(int employeeId) {
+    public void setEmployeeId(Long employeeId) {
         this.employeeId = employeeId;
     }
 

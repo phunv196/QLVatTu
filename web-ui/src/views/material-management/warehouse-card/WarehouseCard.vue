@@ -143,7 +143,7 @@
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
-        >{{ $store.getters }}
+        >
         </label>
         <span class="p-input-icon-left" style="width: 200px; height: 30px">
         </span>
@@ -301,7 +301,7 @@ export default defineComponent({
     let searchEmployee = ref("");
     let searchWarehouse = ref("");
     let searchSupplies = ref("");
-    
+
     const getData = async (
       page: number,
       requestedPageSize: number,

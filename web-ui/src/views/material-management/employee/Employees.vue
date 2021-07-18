@@ -2,45 +2,188 @@
   <div>
     <ConfirmDialog position="top"></ConfirmDialog>
     <Toast />
-    <Sidebar v-model:visible="showSlideOut" position="right" style="width:700px">
-      <EmployeeDetails :rec="selectedRec" @cancel="showSlideOut = false" @changed="getData()" :isNew="isNewRec"> </EmployeeDetails>
+    <Sidebar
+      v-model:visible="showSlideOut"
+      position="right"
+      style="width: 700px"
+    >
+      <EmployeeDetails
+        :rec="selectedRec"
+        @cancel="showSlideOut = false"
+        @changed="getData()"
+        :isNew="isNewRec"
+      >
+      </EmployeeDetails>
     </Sidebar>
-    <h3> Manage Employees </h3>
-    <div class="p-d-flex p-flex-row p-mb-1" style="width:1000px">
-      <span class="p-input-icon-left">
-        <i class="pi pi-search"  style="margin: -6px 10px 0px;"/>
-        <InputText type="text" v-model="searchCode" class="p-inputtext-sm" placeholder="Search by code" style="width:180px;margin:1px 10px 0 10px"/>
-      </span>
-      <span class="p-input-icon-left">
-        <i class="pi pi-search" style="margin: -6px 10px 0px;" />
-        <InputText type="text" v-model="searchName" class="p-inputtext-sm" placeholder="Search by name" style="width:180px;margin:1px 10px 0 10px"/>
-      </span>
-      <span class="p-input-icon-left">
-        <i class="pi pi-search" />
-        <InputText type="text" v-model="searchValue" @keyup="onSearchKeyup" class="p-inputtext-sm" placeholder="Search by name or email" style="width:210px;"/>
-      </span>
-      <div style="display:inline-block; flex:1"></div>
-      <Button icon="pi pi-user" iconPos="right" label="ADD" @click="onAddClick()" class="p-ml-1 p-button-sm"></Button>
+    <h3>Manage Employees</h3>
+    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width: 1150px">
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Mã nhân viên
+        </label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search" style="margin: -6px 10px 0px" />
+          <InputText
+            type="text"
+            v-model="searchCode"
+            class="p-inputtext-sm"
+            placeholder="Search by code"
+            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+          />
+        </span>
+      </div>
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Tên nhân viên
+        </label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search" style="margin: -6px 10px 0px" />
+          <InputText
+            type="text"
+            v-model="searchName"
+            class="p-inputtext-sm"
+            placeholder="Search by name"
+            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+          />
+        </span>
+      </div>
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Email
+        </label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search" style="margin: -6px 10px 0px" />
+          <InputText
+            type="text"
+            v-model="searchEmail"
+            class="p-inputtext-sm"
+            placeholder="Search by email"
+            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+          />
+        </span>
+      </div>
+    </div>
+    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width: 1150px">
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Phone
+        </label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search" style="margin: -6px 10px 0px" />
+          <InputText
+            type="text"
+            v-model="searchPhone"
+            class="p-inputtext-sm"
+            placeholder="Search by Phone"
+            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+          />
+        </span>
+      </div>
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Phòng ban
+        </label>
+        <Dropdown
+          class="p-inputtext-sm"
+          style="width: 200px"
+          v-model="searchDepartment"
+          :options="department"
+          :filter="true"
+          :showClear="true"
+          optionLabel="name"
+          optionValue="departmentId"
+        />
+      </div>
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Chức vụ
+        </label>
+        <Dropdown
+          class="p-inputtext-sm"
+          style="width: 200px"
+          v-model="searchPosition"
+          :options="position"
+          :filter="true"
+          :showClear="true"
+          optionLabel="name"
+          optionValue="positionId"
+        />
+      </div>
+    </div>
+    <div
+      class="p-d-flex p-flex-row p-mb-1 p-jc-center"
+      style="width: 1150px; margin: 20px 0"
+    >
+      <Button
+        icon="pi pi-search"
+        iconPos="right"
+        label="Tìm kiếm"
+        @click="onSearchKeyup()"
+        class="p-ml-1 p-button-sm"
+      ></Button>
+      <Button
+        icon="pi pi-user"
+        iconPos="right"
+        label="ADD"
+        @click="onAddClick()"
+        class="p-ml-1 p-button-sm"
+      ></Button>
     </div>
     <DataTable
-      :value = "list"
-      :paginator = "true"
-      :lazy = "true"
-      :rows = "pageSize"
-      :totalRecords = "totalRecs"
-      :loading = "isLoading"
+      :value="list"
+      :paginator="true"
+      :lazy="true"
+      :rows="pageSize"
+      :totalRecords="totalRecs"
+      :loading="isLoading"
       @page="onPageChange($event)"
-      class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4" style="width:1000px">
-      <Column field="employeeId" header="EMPLOYEE ID" headerStyle="width:110px;"></Column>
-      <Column field="userId" header="USER ID" headerStyle="width:75px"></Column>
-      <Column field="fullName" header="NAME"></Column>
+      class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4"
+      style="width: 1150px"
+    >
+      <Column
+        field="employeeId"
+        header="EMPLOYEE ID"
+        headerStyle="width:110px;"
+      ></Column>
+      <Column field="fullName" header="Họ và tên"></Column>
+      <Column field="phone" header="Điện thoại"></Column>
       <Column field="email" header="EMAIL" headerStyle="width:210px"></Column>
-      <Column field="jobTitle" header="JOB TITLE" headerStyle="width:210px"></Column>
-      <Column field="department" header="DEPARTMENT" headerStyle="width:100px" ></Column>
+      <Column
+        field="departmentName"
+        header="Phòng ban"
+        headerStyle="width:160px"
+      ></Column>
+      <Column
+        field="positionName"
+        header="Chức vụ"
+        headerStyle="width:160px"
+      ></Column>
       <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px">
         <template #body="slotProps">
-          <Button icon="pi pi-pencil" @click="onEditClick(slotProps.data)" class="p-button-sm p-button-rounded p-button-secondary p-button-text" />
-          <Button icon="pi pi-trash"  @click="onDeleteClick(slotProps.data)" class="p-button-sm p-button-rounded p-button-danger p-button-text" />
+          <Button
+            icon="pi pi-pencil"
+            @click="onEditClick(slotProps.data)"
+            class="
+              p-button-sm p-button-rounded p-button-secondary p-button-text
+            "
+          />
+          <Button
+            icon="pi pi-trash"
+            @click="onDeleteClick(slotProps.data)"
+            class="p-button-sm p-button-rounded p-button-danger p-button-text"
+          />
         </template>
       </Column>
     </DataTable>
@@ -48,18 +191,19 @@
 </template>
 
 <script lang='ts'>
-import { ref, onMounted, defineComponent } from 'vue';
-import EmployeeDetails from '@/views/material-management/employee/EmployeeDetails.vue';
-import EmployeeApi from '@/api/employee-api'; // eslint-disable-line import/no-cycle
-import { useConfirm } from 'primevue/useconfirm';
-import { useToast } from 'primevue/usetoast';
-import { debounce } from '@/shared/utils';
+import { ref, onMounted, defineComponent } from "vue";
+import EmployeeDetails from "@/views/material-management/employee/EmployeeDetails.vue";
+import EmployeeApi from "@/api/employee-api"; // eslint-disable-line import/no-cycle
+import { useConfirm } from "primevue/useconfirm";
+import { useToast } from "primevue/usetoast";
+import { debounce } from "@/shared/utils";
+import positionApi from "@/api/material-management/position-api";
+import departmentApi from "@/api/material-management/department-api";
 
 export default defineComponent({
   setup(): unknown {
     const isLoading = ref(false);
     const showSlideOut = ref(false);
-    const searchValue = ref('');
     const pageSize = ref(10);
     const totalPages = ref(0);
     const totalRecs = ref(0);
@@ -70,21 +214,49 @@ export default defineComponent({
     const confirm = useConfirm();
     const toast = useToast();
     let currentPage = 1;
+    const position = ref([]);
+    const department = ref([]);
+    const searchName = ref("");
+    const searchCode = ref("");
+    const searchEmail = ref("");
+    const searchPhone = ref("");
+    const searchDepartment = ref("");
+    const searchPosition = ref("");
 
-    const getData = async (page:number, requestedPageSize: number, employeeId = '', nameOrEmail = '') => {
+    const getData = async (
+      page: number,
+      requestedPageSize: number,
+      employeeId = "",
+      searchCode = "",
+      searchName = "",
+      searchEmail = "",
+      searchPhone = "",
+      searchDepartment = "",
+      searchPosition = ""
+    ) => {
       // isLoading.value = true;
+      searchDepartment = searchDepartment === "null" ? "0" : searchDepartment;
+      searchPosition = searchPosition === "null" ? "0" : searchPosition;
       try {
-        const resp = await EmployeeApi.getEmployees(page, requestedPageSize, employeeId, nameOrEmail);
-        list.value = resp.data.list.map((v:Record<string, unknown>) => ({
-          ...v,
-          fullName: `${v.firstName}  ${v.lastName}`,
-        }));
+        const resp = await EmployeeApi.getEmployees(
+          page,
+          requestedPageSize,
+          employeeId,
+          searchCode,
+          searchName,
+          searchEmail,
+          searchPhone,
+          searchDepartment,
+          searchPosition
+        );
+        debugger
+        list.value = resp.data.list
         // isLoading.value = false;
         currentPage = resp.data.currentPage;
         totalPages.value = resp.data.totalPages;
         totalRecs.value = resp.data.total;
       } catch (err) {
-        console.log('REST ERROR: %O', err.response ? err.response : err);
+        console.log("REST ERROR: %O", err.response ? err.response : err);
         isLoading.value = false;
       }
     };
@@ -92,61 +264,123 @@ export default defineComponent({
     const confirmDialog = (rec: Record<string, unknown>) => {
       confirm.require({
         message: `Do you want to delete: ${rec.employeeId} ?`,
-        header: 'Delete Confirmation',
-        icon: 'pi pi-question-circle',
-        acceptIcon: 'pi pi-check',
+        header: "Delete Confirmation",
+        icon: "pi pi-question-circle",
+        acceptIcon: "pi pi-check",
         accept: async () => {
           try {
-            const resp = await EmployeeApi.deleteEmployee(rec.employeeId as string);
-            if (resp.data.msgType === 'SUCCESS') {
+            const resp = await EmployeeApi.deleteEmployee(
+              rec.employeeId as string
+            );
+            if (resp.data.msgType === "SUCCESS") {
               getData(currentPage, pageSize.value);
-              toast.add({ severity: 'success', summary: 'Successfully Deleted', life: 3000 });
+              toast.add({
+                severity: "success",
+                summary: "Successfully Deleted",
+                life: 3000,
+              });
             } else {
-              toast.add({ severity: 'error', summary: 'Access Denied', detail: resp.data.msg, life: 3000 });
+              toast.add({
+                severity: "error",
+                summary: "Access Denied",
+                detail: resp.data.msg,
+                life: 3000,
+              });
             }
           } catch (e) {
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to connect to server', life: 3000 });
+            toast.add({
+              severity: "error",
+              summary: "Error",
+              detail: "Unable to connect to server",
+              life: 3000,
+            });
           }
         },
         reject: () => {
-          console.log('NO');
+          console.log("NO");
         },
       });
     };
 
-    const onPageChange = (event:Record<string, unknown>) => {
-      if (currentPage !== (event.page as number + 1)) {
-        currentPage = event.page as number + 1;
-        getData(currentPage, pageSize.value);
+    const onPageChange = (event: Record<string, unknown>) => {
+      if (currentPage !== (event.page as number) + 1) {
+        currentPage = (event.page as number) + 1;
+        getData(
+          currentPage,
+          pageSize.value,
+          `${searchCode.value}`,
+          `${searchName.value}`,
+          `${searchEmail.value}`,
+          `${searchPhone.value}`,
+          `${searchDepartment.value}`,
+          `${searchPosition.value}`
+        );
       }
     };
 
-    const onSearchKeyup = debounce(() => getData(1, pageSize.value, '', `%${searchValue.value}%`), 400);
+    const onSearchKeyup = debounce(
+      () =>
+        getData(
+          1,
+          pageSize.value,
+          "",
+          `${searchCode.value}`,
+          `${searchName.value}`,
+          `${searchEmail.value}`,
+          `${searchPhone.value}`,
+          `${searchDepartment.value}`,
+          `${searchPosition.value}`
+        ),
+      400
+    );
 
     const onAddClick = () => {
       isNewRec.value = true;
-      selectedRec.value = { id: '' };
+      selectedRec.value = { id: "" };
       showSlideOut.value = true;
     };
 
-    const onDeleteClick = (rec:Record<string, unknown>) => {
+    const onDeleteClick = (rec: Record<string, unknown>) => {
       confirmDialog(rec);
     };
 
-    const onEditClick = async (rec:Record<string, unknown>) => {
+    const onEditClick = async (rec: Record<string, unknown>) => {
       showSlideOut.value = true;
       selectedRec.value = rec;
     };
 
-    onMounted(() => {
+    onMounted(async () => {
       getData(1, pageSize.value);
+      await lstPosition();
+      await lstDepartment();
     });
+
+    const lstPosition = async () => {
+      debugger;
+      const resp = await positionApi.getAll();
+      debugger;
+      let lstPositions = [];
+      if (resp.data) {
+        lstPositions = resp.data.list;
+      }
+      position.value = lstPositions;
+    };
+
+    const lstDepartment = async () => {
+      debugger;
+      const resp = await departmentApi.getAll();
+      debugger;
+      let lstDepartments = [];
+      if (resp.data) {
+        lstDepartments = resp.data.list;
+      }
+      department.value = lstDepartments;
+    };
 
     return {
       list,
       isLoading,
       showSlideOut,
-      searchValue,
       pageSize,
       totalPages,
       totalRecs,
@@ -159,6 +393,14 @@ export default defineComponent({
       onEditClick,
       onPageChange,
       getData,
+      position,
+      department,
+      searchName,
+      searchCode,
+      searchEmail,
+      searchPhone,
+      searchDepartment,
+      searchPosition,
     };
   },
   components: {

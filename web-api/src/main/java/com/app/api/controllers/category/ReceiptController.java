@@ -6,6 +6,7 @@ import com.app.dao.category.ReceiptFlowDao;
 import com.app.model.BaseResponse;
 import com.app.model.category.ReceiptModel;
 import com.app.model.category.ReceiptModel.ReceiptResponse;
+import com.app.model.user.UserViewModel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -115,6 +116,8 @@ public class ReceiptController extends BaseController {
     public Response addReceipt(ReceiptModel receipt) {
         BaseResponse resp = new BaseResponse();
         try {
+            UserViewModel userFromToken = (UserViewModel)securityContext.getUserPrincipal();
+            receipt.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
             receiptDao.beginTransaction();
             receiptDao.save(receipt);
             receiptDao.commitTransaction();
@@ -137,6 +140,8 @@ public class ReceiptController extends BaseController {
         try {
             ReceiptModel foundProd  = receiptDao.getById(receipt.getReceiptId());
             if (foundProd != null) {
+                UserViewModel userFromToken = (UserViewModel)securityContext.getUserPrincipal();
+                receipt.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
                 receiptDao.beginTransaction();
                 receiptDao.update(receipt);
                 receiptDao.commitTransaction();

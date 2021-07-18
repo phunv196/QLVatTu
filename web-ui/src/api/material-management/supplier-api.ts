@@ -2,7 +2,7 @@ import api from '@/api/api-service';
 import { AxiosResponse } from 'axios';
 
 export default {
-  async getSupplier(page = 1, pageSize = 20, supplierId = '', code='', name='', email='', phone=''): Promise<AxiosResponse> {
+  async getSupplier(page = 1, pageSize = 20, supplierId = '', code = '', name = '', email = '', phone = ''): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
     if (page) {
       qsParams.page = page;
@@ -23,7 +23,8 @@ export default {
     if (phone) {
       qsParams.phone = phone;
 
-    }if (supplierId) {
+    }
+    if (supplierId) {
       qsParams.id = supplierId;
     }
 

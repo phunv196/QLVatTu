@@ -5,7 +5,6 @@ import com.app.dao.EmployeeDao;
 import com.app.model.BaseResponse;
 import com.app.model.employee.EmployeeModel;
 import com.app.model.employee.EmployeeModel.EmployeeResponse;
-import com.app.model.employee.EmployeeUserModel;
 import com.app.model.employee.EmployeeUserModel.EmployeeUserResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,6 +23,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Path("employees")
@@ -37,56 +37,47 @@ public class EmployeeController extends BaseController {
     @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
       summary = "Get list of employees",
-      responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = EmployeeUserResponse.class)))}
+      responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = EmployeeResponse.class)))}
     )
     public Response getEmployeeList(
-        @Parameter(description="Employee Id", example="202") @QueryParam("employee-id") int employeeId,
-        @Parameter(description="User Id") @QueryParam("user-id") String userId,
-        @Parameter(description="Department") @QueryParam("department") String dept,
+        @Parameter(description="Employee Id", example="202") @QueryParam("employee-id") Long employeeId,
+        @Parameter(description = "Order Id") @QueryParam("searchCode") String searchCode,
+        @Parameter(description = "Order Id") @QueryParam("searchName") String searchName,
+        @Parameter(description = "Order Id") @QueryParam("searchEmail") String searchEmail,
+        @Parameter(description = "Order Id") @QueryParam("searchPhone") String searchPhone,
+        @Parameter(description = "Order Id") @QueryParam("searchDepartment") Long searchDepartment,
+        @Parameter(description = "Order Id") @QueryParam("searchPosition") Long searchPosition,
         @Parameter(description="Search by name or email - Use % for wildcard like '%ra%'", example="%ra%") @QueryParam("search") String search,
         @Parameter(description="Page No, Starts from 1 ", example="1") @DefaultValue("1")  @QueryParam("page")  int page,
         @Parameter(description="Items in each page", example="20") @DefaultValue("20") @QueryParam("page-size") int pageSize
     ) {
-        int recordFrom=0;
-        Criteria criteria = employeeDao.createCriteria(EmployeeUserModel.class);
+        EmployeeResponse resp = new EmployeeResponse();
+        try {
+            if (employeeId == null) {
+                employeeId = 0l;
+            }
 
-        if (employeeId > 0){
-            criteria.add(Restrictions.eq("employeeId",  employeeId ));
-        }
-        if (StringUtils.isNotBlank(userId)) {
-            criteria.add(Restrictions.eq("userId", userId));
-        }
-        if (StringUtils.isNotBlank(dept)){
-            criteria.add(Restrictions.like("department",  dept ).ignoreCase());
-        }
-        if (StringUtils.isNotBlank(search)){
-            criteria.add(
-                Restrictions.or(
-                    Restrictions.like("firstName",  search ).ignoreCase(),
-                    Restrictions.like("lastName",  search ).ignoreCase(),
-                    Restrictions.like("email",  search ).ignoreCase()
-                )
-            );
-        }
-        if (page<=0) { page = 1; }
-        if (pageSize<=0 || pageSize > 1000){ pageSize =20; }
-        recordFrom = (page-1) * pageSize;
+            if (searchDepartment == null) {
+                searchDepartment = 0l;
+            }
 
-        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
-        criteria.setProjection(Projections.rowCount());
-        Long rowCount = (Long)criteria.uniqueResult();
+            if (searchPosition == null) {
+                searchPosition = 0l;
+            }
 
-        // Execute the Main Query
-        criteria.setProjection(null);
-        criteria.setFirstResult(recordFrom);
-        criteria.setMaxResults(pageSize);
-        List<EmployeeUserModel> empUserList = criteria.list();
-        EmployeeUserResponse resp = new EmployeeUserResponse();
-        resp.setList(empUserList);
-
-        resp.setPageStats(rowCount.intValue(), pageSize, page,"");
-        resp.setSuccessMessage("List of employees");
-        return Response.ok(resp).build();
+            List<EmployeeModel> employeeList = employeeDao.getList(page, pageSize, employeeId, searchCode,
+                    searchName, searchEmail, searchPhone, searchDepartment, searchPosition);
+            BigInteger total = employeeDao.getEmployeeCount(employeeId, searchCode,
+                    searchName, searchEmail, searchPhone, searchDepartment, searchPosition);
+            resp.setList(employeeList);
+            resp.setTotal(total.intValue());
+            resp.setPageStats(total.intValue(), pageSize, page, "");
+            resp.setSuccessMessage("List of Orders and nested details " + (employeeId > 0 ? "- Customer:" + employeeId : ""));
+            return Response.ok(resp).build();
+        } catch (HibernateException | ConstraintViolationException e) {
+            resp.setErrorMessage("Cannot delete Order - " + e.getMessage() + ", " + (e.getCause() != null ? e.getCause().getMessage() : ""));
+            return Response.ok(resp).build();
+        }
     }
 
     @POST
@@ -118,15 +109,15 @@ public class EmployeeController extends BaseController {
 
         BaseResponse resp = new BaseResponse();
         try {
-            EmployeeModel foundEmp  = employeeDao.getById(emp.getId());
+            EmployeeModel foundEmp  = employeeDao.getById(emp.getEmployeeId());
             if (foundEmp != null){
                 employeeDao.beginTransaction();
                 employeeDao.update(emp);
                 employeeDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Employee Updated (id:%s)", emp.getId()));
+                resp.setSuccessMessage(String.format("Employee Updated (id:%s)", emp.getEmployeeId()));
                 return Response.ok(resp).build();
             } else {
-                resp.setErrorMessage(String.format("Cannot Update - Employee not found (id:%s)", emp.getId()));
+                resp.setErrorMessage(String.format("Cannot Update - Employee not found (id:%s)", emp.getEmployeeId()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
@@ -142,13 +133,16 @@ public class EmployeeController extends BaseController {
       summary = "Delete an Employee",
       responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
-    public Response deleteEmployee(@Parameter(description="Employee Id", example="1") @PathParam("employeeId") Integer employeeId) {
+    public Response deleteEmployee(@Parameter(description="Employee Id", example="1") @PathParam("employeeId") Long employeeId) {
         BaseResponse resp = new BaseResponse();
         if (employeeId == 201 || employeeId == 205){
             resp.setErrorMessage("Employee 201 and 205 are special, they cannot be deleted");
             return Response.ok(resp).build();
         }
         try {
+            if (employeeId == null) {
+                employeeId = 0l;
+            }
             EmployeeModel foundEmp  = employeeDao.getById(employeeId);
             if (foundEmp==null) {
                 resp.setErrorMessage(String.format("Cannot delete - Employee do not exist (id:%s)", employeeId));
