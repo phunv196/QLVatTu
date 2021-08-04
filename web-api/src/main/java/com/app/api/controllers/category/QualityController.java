@@ -1,10 +1,13 @@
 package com.app.api.controllers.category;
 
 import com.app.api.BaseController;
+import com.app.dao.base.CommonUtils;
 import com.app.dao.category.QualityDao;
 import com.app.model.BaseResponse;
+import com.app.model.category.PositionModel;
 import com.app.model.category.QualityModel;
 import com.app.model.category.QualityModel.QualityResponse;
+import com.app.model.category.SuppliesModel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -54,10 +57,10 @@ public class QualityController extends BaseController {
             criteria.add(Restrictions.eq("qualityId",  qualityId ));
         }
         if (StringUtils.isNotBlank(name)){
-            criteria.add(Restrictions.like("qualityName", "%"+name+"%" ).ignoreCase());
+            criteria.add(Restrictions.like("name", "%"+name+"%" ).ignoreCase());
         }
         if (StringUtils.isNotBlank(code)){
-            criteria.add(Restrictions.like("qualityCode", "%"+code+"%" ).ignoreCase());
+            criteria.add(Restrictions.like("code", "%"+code+"%" ).ignoreCase());
         }
         if (page<=0){ page = 1; }
         if (pageSize <= 0 || pageSize > 1000){ pageSize = 20; }
@@ -109,14 +112,6 @@ public class QualityController extends BaseController {
         BaseResponse resp = new BaseResponse();
         try {
             qualityDao.beginTransaction();
-            if(isNullOrEmpty(qual.getQualityName())) {
-                resp.setErrorMessage(String.format("Tên chất lượng chưa nhập (qual.getQualityName():%s)", qual.getQualityName()));
-                return Response.ok(resp).build();
-            }
-            if(isNullOrEmpty(qual.getQualityCode())) {
-                resp.setErrorMessage("Mã chất lượng chưa nhập");
-                return Response.ok(resp).build();
-            }
             qualityDao.save(qual);
             qualityDao.commitTransaction();
             resp.setSuccessMessage(String.format("Quality Added - New Quality ID : %s ", qual.getQualityId()));
@@ -179,5 +174,28 @@ public class QualityController extends BaseController {
             resp.setErrorMessage("Cannot delete Quality - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
+    }
+
+    @POST
+    @Path("byCode")
+    @RolesAllowed({"ADMIN"})
+    @Operation(
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response getByCode(
+            QualityModel model
+    ) {
+        int recordFrom = 0;
+        Criteria criteria = qualityDao.createCriteria(QualityModel.class);
+        if (model.getQualityId() != null){
+            criteria.add(Restrictions.ne("qualityId", model.getQualityId()));
+        }
+        if (!CommonUtils.isNullOrEmpty(model.getCode())){
+            criteria.add(Restrictions.eq("code", model.getCode()).ignoreCase());
+        }
+        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
+        criteria.setProjection(Projections.rowCount());
+        Long rowCount = (Long)criteria.uniqueResult();
+        return Response.ok(rowCount > 0).build();
     }
 }

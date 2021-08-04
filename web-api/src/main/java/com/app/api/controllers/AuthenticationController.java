@@ -2,11 +2,14 @@ package com.app.api.controllers;
 
 import com.app.api.BaseController;
 import com.app.dao.base.BaseHibernateDAO;
+import com.app.dao.base.CommonUtils;
 import com.app.model.BaseResponse;
 import com.app.model.user.LoginModel;
 import com.app.model.user.LoginModel.LoginResponse;
 import com.app.model.user.UserOutputModel;
 import com.app.model.user.UserViewModel;
+import com.app.util.Constants;
+import com.app.util.PlainTextPasswordEncoder;
 import com.app.util.TokenUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -43,7 +46,7 @@ public class AuthenticationController extends BaseController {
     )
     public Response authenticateUser(LoginModel loginModel) {
         String uid = loginModel.getUsername();
-        String pwd = loginModel.getPassword();
+        String pwd = PlainTextPasswordEncoder.encode(loginModel.getPassword(), "1");
 
         BaseResponse resp = new BaseResponse();
         if (StringUtils.isAnyBlank(uid,pwd )  ) {
@@ -53,7 +56,7 @@ public class AuthenticationController extends BaseController {
         }
 
 
-        String hql = "FROM UserViewModel u WHERE u.userId = :uid and u.password = :pwd";
+        String hql = "FROM UserViewModel u WHERE u.loginName = :uid and u.password = :pwd";
         Query q = dao.createQuery(hql);
         q.setParameter("uid", uid);
         q.setParameter("pwd", pwd);
@@ -62,7 +65,7 @@ public class AuthenticationController extends BaseController {
         if (userView!=null){
             String strToken = TokenUtil.createTokenForUser(userView);
             UserOutputModel usrOutput = new UserOutputModel(
-                userView.getUserId(),
+                userView.getLoginName(),
                 userView.getRole(),
                 userView.getFullName(),
                 userView.getEmail(),

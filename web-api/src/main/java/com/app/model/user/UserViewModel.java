@@ -13,7 +13,8 @@ import java.security.Principal;
 public class UserViewModel implements Serializable, Principal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")  private String userId;
+    @Column(name = "user_id")  private Long userId;
+    @Column(name = "login_name")  private String loginName;
     @Column(name = "password") private String password;
     @Schema(allowableValues="ADMIN, SUPPORT, CUSTOMER") private String role;
     @Column(name = "employee_id") private Integer employeeId;
@@ -23,8 +24,9 @@ public class UserViewModel implements Serializable, Principal {
 
     public UserViewModel(){}
 
-    public UserViewModel(String userId, String role, String fullName, String email, Integer empId, Integer custId){
+    public UserViewModel(Long userId, String loginName, String role, String fullName, String email, Integer empId, Integer custId){
         this.setUserId(userId);
+        this.setLoginName(loginName);
         this.setRole(role);
         this.setFullName(fullName);
         this.setEmail(email);
@@ -33,10 +35,18 @@ public class UserViewModel implements Serializable, Principal {
     }
 
     @JsonIgnore // This getter is duplicate of getId but is must for all classes that implements java.security.Principal
-    public String getName() {return userId;}
+    public String getName() {return loginName;}
 
-    public String getUserId() {return userId;}
-    public void setUserId(String userId) { this.userId = userId; }
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getLoginName() {return loginName;}
+    public void setLoginName(String loginName) { this.loginName = loginName; }
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }

@@ -13,7 +13,7 @@ import java.util.List;
 
 public class EmployeeDao extends BaseHibernateDAO {
     public EmployeeModel getById(Long employeeId){
-        String hql = "from EmployeeModel where id = :employeeId";
+        String hql = "from EmployeeModel where employeeId = :employeeId";
         Query q = createQuery(hql);
         q.setParameter("employeeId", employeeId);
         return  (EmployeeModel)q.uniqueResult();
@@ -21,7 +21,7 @@ public class EmployeeDao extends BaseHibernateDAO {
 
     public void delete(Long employeeId)  throws HibernateException, ConstraintViolationException {
         String sqlDeleteUser     = "delete from users where employee_id = :employeeId";
-        String sqlDeleteEmployee = "delete from employees where id = :employeeId";
+        String sqlDeleteEmployee = "delete from employees where employee_id = :employeeId";
 
         Query queryDeleteUser = createSQLQuery(sqlDeleteUser);
         queryDeleteUser.setParameter("employeeId", employeeId);
@@ -50,21 +50,25 @@ public class EmployeeDao extends BaseHibernateDAO {
         }
 
         sqlLimit = sqlLimit + " offset " + from;
-        String finalSql = "select e.id employeeId," +
+        String finalSql = "select e.employee_id employeeId," +
                 " e.code code," +
+                " e.first_name firstName," +
+                " e.last_name lastName," +
                 " e.full_name fullName," +
                 " e.phone phone," +
+                " e.birth birth," +
+                " e.sex sex," +
                 " e.email email," +
                 " e.department_id departmentId, " +
                 " d.name departmentName, " +
                 " e.position_id positionId, " +
                 " p.name positionName, " +
-                " e.address1 address1 " +
+                " e.address address " +
                 " from employees e " +
                 " left join department d on e.department_id = d.department_id" +
                 " left join position p on e.position_id = p.position_id";
         //String finalSql = "select factory_id from factory";
-        finalSql = finalSql + sql + " order by e.id " + sqlLimit;
+        finalSql = finalSql + sql + " order by e.employee_id " + sqlLimit;
 
         SQLQuery q = createSQLQuery(finalSql);
         if (employeeId >0)   { q.setParameter("id", employeeId); }
@@ -101,7 +105,7 @@ public class EmployeeDao extends BaseHibernateDAO {
                                         String searchEmail,String searchPhone, Long searchDepartment,Long searchPosition){
         String sqlWhere = " where  1 = 1 ";
 
-        if (employeeId > 0)   { sqlWhere = sqlWhere + " and e.id = :employeeId "; }
+        if (employeeId > 0)   { sqlWhere = sqlWhere + " and e.employee_id = :employeeId "; }
         if (searchCode != null)   { sqlWhere = sqlWhere + " and LOWER(e.code) LIKE :searchCode "; }
         if (searchName != null)   { sqlWhere = sqlWhere + " and LOWER(e.full_name) LIKE :searchName "; }
         if (searchEmail != null)   { sqlWhere = sqlWhere + " and LOWER(e.email) LIKE :searchEmail "; }

@@ -40,19 +40,19 @@ public class CartController extends BaseController {
       summary = "Get cart Items of an User",
       responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = CartViewResponse.class)))}
     )
-    public Response getCartItemsByUser( @Parameter(description="User Id", example="customer") @QueryParam("user-id") String userId) {
+    public Response getCartItemsByUser( @Parameter(description="User Id", example="customer") @QueryParam("login-name") String loginName) {
         CartViewResponse resp = new CartViewResponse();
         UserViewModel userFromToken = (UserViewModel)securityContext.getUserPrincipal();  // securityContext is defined in BaseController
         //Customers can query their own cart only
         if (userFromToken.getRole().equalsIgnoreCase(Constants.UserRoleConstants.ROLE_CUSTOMER)){
-            userId = userFromToken.getUserId();
+            loginName = userFromToken.getLoginName();
         }
 
-        List<CartViewModel> cartItemList =  cartDao.listCartItemsOfUser(userId);
+        List<CartViewModel> cartItemList =  cartDao.listCartItemsOfUser(loginName);
         resp.setList(cartItemList);
         resp.setTotal(cartItemList.size());
 
-        resp.setSuccessMessage("List of Cart Items for user :" + userId);
+        resp.setSuccessMessage("List of Cart Items for user :" + loginName);
         return Response.ok(resp).build();
     }
 
@@ -63,7 +63,7 @@ public class CartController extends BaseController {
       responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
     public Response getCartItemsByUser(
-        @Parameter(description="User Id", example="customer") @QueryParam("user-id") String userId,
+        @Parameter(description="User Id", example="customer") @QueryParam("login-name") String loginName,
         @Parameter(description="Product Id", example="610") @QueryParam("product-id") Integer productId,
         @Parameter(description="Quantity"  , example="2") @QueryParam("quantity") Long quantity
     ) {
@@ -72,31 +72,31 @@ public class CartController extends BaseController {
 
         //Customers can query their own cart only
         if (userFromToken.getRole().equalsIgnoreCase(Constants.UserRoleConstants.ROLE_CUSTOMER)){
-            userId = userFromToken.getUserId();
+            loginName = userFromToken.getLoginName();
         }
-        CartModel cart = new CartModel(userId,productId,quantity);
+        CartModel cart = new CartModel(loginName,productId,quantity);
         cartDao.beginTransaction();
         cartDao.save(cart);
         cartDao.commitTransaction();
-        resp.setSuccessMessage(String.format("New product(%s) added to cart of user (%s)", productId, userId));
+        resp.setSuccessMessage(String.format("New product(%s) added to cart of user (%s)", productId, loginName));
         return Response.ok(resp).build();
     }
 
 
     @DELETE
-    @Path("{userId}")
+    @Path("{loginName}")
     @RolesAllowed({"ADMIN"})
     @Operation(
       summary = "Delete all cart Items of an User",
       responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
-    public Response deleteCartItemsByUser(@Parameter(description="User ID", example="customer") @PathParam("userId") String userId) {
+    public Response deleteCartItemsByUser(@Parameter(description="User ID", example="customer") @PathParam("loginName") String loginName) {
         BaseResponse resp = new BaseResponse();
         try {
             cartDao.beginTransaction();
-            int result = cartDao.removeFromCart(userId, null);
+            int result = cartDao.removeFromCart(loginName, null);
             cartDao.commitTransaction();
-            resp.setSuccessMessage(String.format("All the Items from cart are removed for user:%s (Items Removed:%s)", userId, result));
+            resp.setSuccessMessage(String.format("All the Items from cart are removed for user:%s (Items Removed:%s)", loginName, result));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
             resp.setErrorMessage("Cannot update cart item - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
@@ -105,22 +105,22 @@ public class CartController extends BaseController {
     }
 
     @DELETE
-    @Path("{userId}/{productId}")
+    @Path("{loginName}/{productId}")
     @RolesAllowed({"ADMIN"})
     @Operation(
       summary = "Removes a product from cart of a user",
       responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
     public Response removeProductFromCartOfUser(
-       @Parameter(description = "User ID", example="customer") @PathParam("userId") String userId,
+       @Parameter(description = "User ID", example="customer") @PathParam("loginName") String loginName,
        @Parameter(description = "Product ID", example="601") @PathParam("productId") int productId
     ) {
         BaseResponse resp = new BaseResponse();
         try {
             cartDao.beginTransaction();
-            int result = cartDao.removeFromCart(userId, productId);
+            int result = cartDao.removeFromCart(loginName, productId);
             cartDao.commitTransaction();
-            resp.setSuccessMessage(String.format("Product:%s from cart is removed for user:%s (Items Removed:%s)", productId, userId, result));
+            resp.setSuccessMessage(String.format("Product:%s from cart is removed for user:%s (Items Removed:%s)", productId, loginName, result));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
             resp.setErrorMessage("Cannot update cart item - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
@@ -129,14 +129,14 @@ public class CartController extends BaseController {
     }
 
     @PUT
-    @Path("{userId}/{productId}/quantity")
+    @Path("{loginName}/{productId}/quantity")
     @RolesAllowed({"ADMIN"})
     @Operation(
       summary = "Modify cart of a user (by adding, removing or updating) product quantities",
       responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
     public Response addCartItemsForAnUser(
-        @Parameter(description = "User ID", example="customer") @PathParam("userId") String userId,
+        @Parameter(description = "User ID", example="customer") @PathParam("loginName") String loginName,
         @Parameter(description="Product Id", example="603") @PathParam("productId") int productId,
         @Parameter(description="Quantity", example="2") @QueryParam("quantity") Long quantity,
         @Parameter(example="add", schema = @Schema(allowableValues =  {"add","remove","update"})) @QueryParam("action") String action
@@ -152,20 +152,20 @@ public class CartController extends BaseController {
 
         //First Check if the product is already available in the cart, then just increase the quantity
         try {
-            CartModel cartItem = cartDao.getProductsInCart(userId, productId);
+            CartModel cartItem = cartDao.getProductsInCart(loginName, productId);
 
             if (action.equalsIgnoreCase("add")){
                 String msg="";
                 cartDao.beginTransaction();
                 if (cartItem == null) {
-                    cartItem = new CartModel(userId, productId, quantity);
+                    cartItem = new CartModel(loginName, productId, quantity);
                     cartDao.save(cartItem);
                     msg = "Product Added with specified quantities";
                 } else {
                     Long existingQuantity = cartItem.getQuantity();
                     Long newQuantity = existingQuantity + quantity;
                     cartDao.beginTransaction();
-                    resultCount = cartDao.updateProductQuantityInCart(userId, productId, newQuantity);
+                    resultCount = cartDao.updateProductQuantityInCart(loginName, productId, newQuantity);
                     cartDao.commitTransaction();
                     msg = "Quantities updated for a product that already exist in cart";
                 }
@@ -183,10 +183,10 @@ public class CartController extends BaseController {
                     Long newQuantity = existingQuantity- quantity;
                     cartDao.beginTransaction();
                     if (newQuantity.intValue() <= 0){
-                        resultCount = cartDao.removeFromCart(userId, productId);
+                        resultCount = cartDao.removeFromCart(loginName, productId);
                         msg = "Product completely removed from cart";
                     } else {
-                        resultCount = cartDao.updateProductQuantityInCart(userId, productId, newQuantity);
+                        resultCount = cartDao.updateProductQuantityInCart(loginName, productId, newQuantity);
                         msg = "Product quantity updated after removal";
                     }
                     cartDao.commitTransaction();
@@ -198,7 +198,7 @@ public class CartController extends BaseController {
                     resp.setErrorMessage("Cannot update - Product dont exist in the cart");
                 } else {
                     cartDao.beginTransaction();
-                    resultCount = cartDao.updateProductQuantityInCart(userId, productId, quantity);
+                    resultCount = cartDao.updateProductQuantityInCart(loginName, productId, quantity);
                     cartDao.commitTransaction();
                     resp.setSuccessMessage("Product Quantity updated " );
                 }

@@ -29,11 +29,12 @@ export default {
           icon:'pi pi-fw pi-filter',
           to: '/home/manage/position'
         },
+        // {
+        //   label:'Quyền',
+        //   icon:'pi pi-fw pi-filter',
+        //   to: '/home/manage/role'
+        // },
         {
-          label:'Quyền',
-          icon:'pi pi-fw pi-filter',
-          to: '/home/manage/role'
-        },{
           label:'Chủng loại',
           icon:'pi pi-fw pi-filter',
           to: '/home/manage/species'

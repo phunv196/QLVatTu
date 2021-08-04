@@ -53,5 +53,14 @@ export default {
 
   async getAll(): Promise<AxiosResponse> {
     return api.get('/employees/all',);
-  }
+  },
+
+  async getEmployeeByCode(employeeObj: Record<string, string | number>): Promise<AxiosResponse> {
+    debugger
+    return api.post('/employees/byCode', employeeObj);
+  },
+
+  async dowloadTemplate(): Promise<AxiosResponse> {
+    return api.get('/employees/dowloadTemplate',);
+  },
 };

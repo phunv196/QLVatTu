@@ -74,4 +74,7 @@ export default {
     debugger;
     return api.get(`/supplies/all`);
   },
+  async getSuppliesByCode(suppliesObj: Record<string, string | number>): Promise<AxiosResponse> {
+    return api.post('/supplies/byCode', suppliesObj);
+  },
 };

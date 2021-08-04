@@ -80,7 +80,7 @@ export default defineComponent({
       const rawCustomerObj = JSON.parse(JSON.stringify(recData.value));
       rawCustomerObj.id = rawCustomerObj.customerId;
       delete rawCustomerObj.customerId;
-      delete rawCustomerObj.userId;
+      delete rawCustomerObj.loginName;
       delete rawCustomerObj.password;
       delete rawCustomerObj.role;
       delete rawCustomerObj.fullName;

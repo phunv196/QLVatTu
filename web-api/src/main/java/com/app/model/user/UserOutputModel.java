@@ -9,7 +9,7 @@ import java.security.Principal;
 import java.util.List;
 
 public class UserOutputModel implements Serializable, Principal {
-    private String userId;
+    private String loginName;
 
     @Schema(allowableValues =  {"ADMIN", "SUPPORT", "CUSTOMER"}, example="ADMIN")
     private String role;
@@ -24,7 +24,7 @@ public class UserOutputModel implements Serializable, Principal {
     public UserOutputModel(){}
 
     public UserOutputModel(UserViewModel userView){
-        this.setUserId(userView.getUserId());
+        this.setLoginName(userView.getLoginName());
         this.setRole(userView.getRole());
         this.setFullName(userView.getFullName());
         this.setEmail(userView.getEmail());
@@ -33,8 +33,8 @@ public class UserOutputModel implements Serializable, Principal {
         this.setToken("");
     }
 
-    public UserOutputModel(String userId, String role, String fullName, String email, Integer empId, Integer custId, String token){
-        this.setUserId(userId);
+    public UserOutputModel(String loginName, String role, String fullName, String email, Integer empId, Integer custId, String token){
+        this.setLoginName(loginName);
         this.setRole(role);
         this.setFullName(fullName);
         this.setEmail(email);
@@ -45,11 +45,11 @@ public class UserOutputModel implements Serializable, Principal {
 
     //Getters & Setters
     @JsonIgnore // This getter is duplicate of getId but is must for all classes that implements java.security.Principal
-    public String getName() {return userId;}
+    public String getName() {return loginName;}
 
 
-    public String getUserId() {return userId;}
-    public void setUserId(String userId) { this.userId = userId; }
+    public String getLoginName() {return loginName;}
+    public void setLoginName(String loginName) { this.loginName = loginName; }
 
     public String getRole() {return role; }
     public void setRole(String role) {this.role = role; }

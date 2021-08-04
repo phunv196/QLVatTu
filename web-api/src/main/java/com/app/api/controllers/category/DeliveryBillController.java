@@ -7,6 +7,8 @@ import com.app.dao.category.DeliveryBillFlowDao;
 import com.app.model.BaseResponse;
 import com.app.model.category.DeliveryBillModel;
 import com.app.model.category.DeliveryBillModel.DeliveryBillResponse;
+import com.app.model.category.QualityModel;
+import com.app.model.category.SuppliesModel;
 import com.app.model.user.UserViewModel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,6 +23,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import java.math.BigInteger;
@@ -234,21 +237,6 @@ public class DeliveryBillController extends BaseController {
         return Response.ok(check).build();
     }
 
-//    @GET
-//    @Path("{suppliesId}")
-//    @RolesAllowed({"ADMIN", "SUPPORT"})
-//    @Operation(
-//            summary = "get sequenceId a deliveryBill",
-//            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
-//    )
-//    public Response getListSuppliersId(@Parameter(description="DeliveryBill Id", example="601") @PathParam("suppliesId") Long suppliesId) {
-//
-//        List<Long> arrSuppliersId = new ArrayList<>();
-//        arrSuppliersId = deliveryBillDao.getListBySuppliersId(suppliesId);
-//        Set<Long> set = new HashSet<>(arrSuppliersId);
-//        List<Long> arrSuppliers = new ArrayList<Long>(set);
-//        return Response.ok(arrSuppliers).build();
-//    }
 
     @DELETE
     @Path("delete_by_id/{deliveryBillId}")
@@ -258,5 +246,28 @@ public class DeliveryBillController extends BaseController {
         deliveryBillFlowDao.beginTransaction();
         deliveryBillFlowDao.deleteByDeliveryBillId(deliveryBillId);
         deliveryBillFlowDao.commitTransaction();
+    }
+
+    @POST
+    @Path("byCode")
+    @RolesAllowed({"ADMIN"})
+    @Operation(
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response getByCode(
+            DeliveryBillModel model
+    ) {
+        int recordFrom = 0;
+        Criteria criteria = deliveryBillDao.createCriteria(DeliveryBillModel.class);
+        if (model.getDeliveryBillId() != null){
+            criteria.add(Restrictions.ne("deliveryBillId", model.getDeliveryBillId()));
+        }
+        if (!CommonUtils.isNullOrEmpty(model.getCode())){
+            criteria.add(Restrictions.eq("code", model.getCode()).ignoreCase());
+        }
+        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
+        criteria.setProjection(Projections.rowCount());
+        Long rowCount = (Long)criteria.uniqueResult();
+        return Response.ok(rowCount > 0).build();
     }
 }

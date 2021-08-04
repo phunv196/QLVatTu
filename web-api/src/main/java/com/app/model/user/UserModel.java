@@ -14,7 +14,7 @@ import java.security.Principal;
 @Table(name = "users")
 public class UserModel implements Serializable, Principal {
     @Id
-    @Column(name = "user_id") private String userId;
+    @Column(name = "login_name") private String loginName;
     private String password;
 
     @Schema(allowableValues =  {"ADMIN", "SUPPORT", "CUSTOMER"}, example="ADMIN")
@@ -29,8 +29,8 @@ public class UserModel implements Serializable, Principal {
     //Constructors
     public UserModel(){}
 
-    public UserModel(String userId, String password, String role, Integer employeeId, Integer customerId){
-        this.setUserId(userId);
+    public UserModel(String loginName, String password, String role, Integer employeeId, Integer customerId){
+        this.setLoginName(loginName);
         this.setPassword(password);
         this.setRole(role);
         if (employeeId != null){
@@ -42,10 +42,10 @@ public class UserModel implements Serializable, Principal {
 
     //Getters and Setters
     @JsonIgnore // This getter is duplicate of getId but is must for all classes that implements java.security.Principal
-    public String getName() {return userId;}
+    public String getName() {return loginName;}
 
-    public String getUserId() {return userId;}
-    public void setUserId(String userId) { this.userId = userId; }
+    public String getLoginName() {return loginName;}
+    public void setLoginName(String loginName) { this.loginName = loginName; }
 
     public String getPassword() { return password; }
     public void setPassword(String password) {this.password = password; }

@@ -2,7 +2,7 @@ import api from '@/api/api-service';
 import { AxiosResponse } from 'axios';
 
 export default {
-  async getSpecies(page = 1, pageSize = 20, speciesId = '', code='', name=''): Promise<AxiosResponse> {
+  async getSpecies(page = 1, pageSize = 20, speciesId = '', code = '', name = ''): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
     if (page) {
       qsParams.page = page;
@@ -40,5 +40,9 @@ export default {
   async getAll(): Promise<AxiosResponse> {
     debugger;
     return api.get(`/species/all`);
+  },
+
+  async getSpeciesByCode(speciesObj: Record<string, string | number>): Promise<AxiosResponse> {
+    return api.post('/species/byCode', speciesObj);
   },
 };

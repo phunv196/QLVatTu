@@ -2,7 +2,7 @@ import api from '@/api/api-service';
 import { AxiosResponse } from 'axios';
 
 export default {
-  async getPositions(page = 1, pageSize = 20, positionId = '', code='', name=''): Promise<AxiosResponse> {
+  async getPositions(page = 1, pageSize = 20, positionId = '', code = '', name = ''): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
     if (page) {
       qsParams.page = page;
@@ -40,5 +40,9 @@ export default {
   async getAll(): Promise<AxiosResponse> {
     debugger;
     return api.get(`/positions/all`);
+  },
+
+  async getPositionByCode(positionObj: Record<string, string | number>): Promise<AxiosResponse> {
+    return api.post('/positions/byCode', positionObj);
   },
 };

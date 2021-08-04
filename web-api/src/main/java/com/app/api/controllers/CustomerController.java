@@ -42,7 +42,7 @@ public class CustomerController extends BaseController {
     )
     public Response getCustomerList(
         @Parameter(description="Customer Id") @QueryParam("customer-id") int customerId,
-        @Parameter(description="User Id") @QueryParam("user-id") String userId,
+        @Parameter(description="User Id") @QueryParam("login-name") String loginName,
         @Parameter(description="Company - Use % for wildcard") @QueryParam("company") String company,
         @Parameter(description="Search by first or last name, use % for wildcard ", example="t%") @QueryParam("name") String name,
         @Parameter(description="Page No, Starts from 1 ", example="1") @DefaultValue("1")  @QueryParam("page") int page,
@@ -54,8 +54,8 @@ public class CustomerController extends BaseController {
         if (customerId > 0) {
             criteria.add(Restrictions.eq("customerId", customerId));
         }
-        if (StringUtils.isNotBlank(userId)) {
-            criteria.add(Restrictions.eq("userId", userId));
+        if (StringUtils.isNotBlank(loginName)) {
+            criteria.add(Restrictions.eq("loginName", loginName));
         }
         if (StringUtils.isNotBlank(company)) {
             criteria.add(Restrictions.like("company", company).ignoreCase());

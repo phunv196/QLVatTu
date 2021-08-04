@@ -12,7 +12,7 @@ import java.util.List;
 public class CustomerUserModel {
     @Id
     @Column(name = "customer_id") private Integer customerId;
-    @Column(name = "user_id") private String userId;
+    @Column(name = "login_name") private String loginName;
     @Column(name = "password") private String password;
 
     @Schema(allowableValues =  {"ADMIN", "SUPPORT", "CUSTOMER"}, example="ADMIN")
@@ -35,8 +35,8 @@ public class CustomerUserModel {
     public Integer getCustomerId() { return customerId; }
     public void setCustomerId(Integer customerId) { this.customerId = customerId; }
 
-    public String getUserId() { return userId; }
-    public void setUserId(String userId) { this.userId = userId; }
+    public String getLoginName() { return loginName; }
+    public void setLoginName(String loginName) { this.loginName = loginName; }
 
     public String getPassword() { return password; }
     public void setPassword(String password) {this.password = password; }

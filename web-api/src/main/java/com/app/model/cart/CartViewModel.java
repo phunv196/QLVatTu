@@ -11,7 +11,7 @@ import java.util.List;
 @Table(name = "cart_view")
 public class CartViewModel {
 
-    @Id @Column(name = "user_id")    private String userId;
+    @Id @Column(name = "login_name")    private String loginName;
     @Id @Column(name = "product_id") private Integer productId;
     @Column(name = "product_code")   private String productCode;
     @Column(name = "product_name")   private String productName;
@@ -30,8 +30,8 @@ public class CartViewModel {
         this.listPrice = listPrice;
     }
 
-    public String getUserId() {return userId;}
-    public void setUserId(String userId) { this.userId = userId; }
+    public String getLoginName() {return loginName;}
+    public void setLoginName(String loginName) { this.loginName = loginName; }
 
     public Integer getProductId() { return productId; }
     public void setProductId(Integer productId) { this.productId = productId; }

@@ -27,7 +27,7 @@
       <Column field="fullName" header="NAME" headerStyle="width:200px"></Column>
       <Column field="email" header="EMAIL" headerStyle="width:160px"></Column>
       <Column field="phone" header="PHONE" headerStyle="width:150px"></Column>
-      <Column field="userId" header="USED ID" headerStyle="width:75px"></Column>
+      <Column field="loginName" header="USED ID" headerStyle="width:75px"></Column>
       <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px">
         <template #body="slotProps">
           <Button icon="pi pi-pencil" @click="onEditClick(slotProps.data)" class="p-button-sm p-button-rounded p-button-secondary p-button-text" />
@@ -116,7 +116,7 @@ export default defineComponent({
 
     const onAddClick = () => {
       isNewRec.value = true;
-      selectedRec.value = { userId: 'NEW' };
+      selectedRec.value = { loginName: 'NEW' };
       showSlideOut.value = true;
     };
 

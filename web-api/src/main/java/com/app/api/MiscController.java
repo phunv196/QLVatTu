@@ -1,5 +1,6 @@
 package com.app.api;
 
+import com.app.util.Constants;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
 import jakarta.annotation.security.PermitAll;
@@ -7,7 +8,6 @@ import jakarta.annotation.security.PermitAll;
 import com.app.model.BaseResponse;
 import jakarta.annotation.security.RolesAllowed;
 
-import com.app.util.Constants.UserRoleConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -59,7 +59,7 @@ public class MiscController extends BaseController{
 
     @GET
     @Path("/database-files")
-    @RolesAllowed({UserRoleConstants.ROLE_ADMIN})
+    @RolesAllowed({Constants.UserRoleConstants.ROLE_ADMIN})
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Operation(summary = "Zip files containing SQL scripts to fill this apps database (Example of how to send streaming response)")
     public Response downloadSqlScriptFiles() {

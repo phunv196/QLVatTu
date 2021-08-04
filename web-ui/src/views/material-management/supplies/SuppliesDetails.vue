@@ -7,7 +7,11 @@
         {{ recData.suppliesId ? recData.suppliesId : "NEW" }}
       </span>
     </h4>
-
+    <transition name="p-message">
+      <Message v-if="showMessage" severity="error" @close="showMessage = false">
+        {{ userMessage }}</Message
+      >
+    </transition>
     <div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-left p-mr-1"
@@ -57,7 +61,7 @@
           :options="arrQuality"
           :filter="true"
           :showClear="true"
-          optionLabel="qualityName"
+          optionLabel="name"
           optionValue="qualityId"
         />
       </div>
@@ -100,7 +104,7 @@
           style="width: 30%"
         />
       </div>
-      <!--      <div class="p-mt-3">-->
+      <!--      <div class="p-mt-3 p-d-flex p-ai-center">-->
       <!--        <label class="p-d-inline-block m-label-size-2 p-text-left p-mr-1"> Ghi chú </label>-->
       <!--        <textarea rows="3" v-model="recData.description" class="p-inputtext-sm" maxlength="500" style="width: 300px"/>-->
       <!--      </div>-->
@@ -139,7 +143,6 @@ import { useToast } from "primevue/usetoast";
 import SupplierApi from "@/api/material-management/supplier-api";
 import QualityApi from "@/api/material-management/quality-api";
 import SpeciesApi from "@/api/material-management/species-api";
-import { async } from "rxjs";
 
 export default defineComponent({
   props: {
@@ -151,6 +154,7 @@ export default defineComponent({
 
   setup(props, { emit }): unknown {
     debugger;
+    const userMessage = ref("");
     const arrQuality = ref([]);
     const arrSpecies = ref([]);
     const arrSupplier = ref([]);
@@ -159,34 +163,62 @@ export default defineComponent({
     const changesApplied = ref(false);
     const recData = ref(JSON.parse(JSON.stringify(props.rec))); // do not create direct refs to props to avoid making changes to props, instead use a cloned value of prop
     const onApplyChanges = async () => {
-      debugger;
       const rawSuppliesObj = JSON.parse(JSON.stringify(recData.value));
-      let resp;
-      if (rawSuppliesObj.suppliesId) {
-        resp = await SuppliesApi.updateSupplies(rawSuppliesObj);
-      } else {
-        resp = await SuppliesApi.addSupplies(rawSuppliesObj);
+      let msg: any[];
+      msg = [];
+      if (!rawSuppliesObj.code) {
+        msg.push("mã vât tư");
       }
-      if (resp.data.msgType === "SUCCESS") {
-        toast.add({
-          severity: "success",
-          summary: rawSuppliesObj.suppliesId
-            ? "Product Updated"
-            : "Product Added",
-          detail: `${rawSuppliesObj.name} (${rawSuppliesObj.code})`,
-          life: 3000,
-        });
-        if (!rawSuppliesObj.suppliesId) {
-          recData.value.id = "CREATED";
-        }
-        changesApplied.value = true;
-        emit("changed");
+      if (!rawSuppliesObj.name) {
+        msg.push("tên vât tư");
+      }
+      if (!rawSuppliesObj.supplierId) {
+        msg.push("nhà cung cấp");
+      }
+      if (!rawSuppliesObj.unit) {
+        msg.push("đơn vị tính");
+      }
+      if (!rawSuppliesObj.price) {
+        msg.push("giá vật tư");
+      }
+      if (msg.length > 0) {
+        userMessage.value = "Trường " + msg.join(", ") + "không được để trống!";
+        showMessage.value = true;
       } else {
-        toast.add({
-          severity: "error",
-          summary: "Error",
-          detail: resp.data.msg,
-        });
+        delete rawSuppliesObj.index;
+        const check = await SuppliesApi.getSuppliesByCode(rawSuppliesObj);
+        if (check.data) {
+          userMessage.value = "Mã vật tư bị trùng. Vui lòng nhập lại!";
+          showMessage.value = true;
+        } else {
+          let resp;
+          if (rawSuppliesObj.suppliesId) {
+            resp = await SuppliesApi.updateSupplies(rawSuppliesObj);
+          } else {
+            resp = await SuppliesApi.addSupplies(rawSuppliesObj);
+          }
+          if (resp.data.msgType === "SUCCESS") {
+            toast.add({
+              severity: "success",
+              summary: rawSuppliesObj.suppliesId
+                ? "Product Updated"
+                : "Product Added",
+              detail: `${rawSuppliesObj.name} (${rawSuppliesObj.code})`,
+              life: 3000,
+            });
+            if (!rawSuppliesObj.suppliesId) {
+              recData.value.id = "CREATED";
+            }
+            changesApplied.value = true;
+            emit("changed");
+          } else {
+            toast.add({
+              severity: "error",
+              summary: "Error",
+              detail: resp.data.msg,
+            });
+          }
+        }
       }
     };
 
@@ -194,7 +226,7 @@ export default defineComponent({
       emit("cancel");
     };
 
-    onMounted( async () => {
+    onMounted(async () => {
       await lstSupplier();
       await lstQuality();
       await lstSpecies();
@@ -242,6 +274,7 @@ export default defineComponent({
       recData,
       onApplyChanges,
       onCancel,
+      userMessage,
     };
   },
 });

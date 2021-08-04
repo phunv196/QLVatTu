@@ -2,10 +2,11 @@ package com.app.api.controllers;
 
 import com.app.api.BaseController;
 import com.app.dao.EmployeeDao;
+import com.app.dao.base.CommonUtils;
 import com.app.model.BaseResponse;
 import com.app.model.employee.EmployeeModel;
 import com.app.model.employee.EmployeeModel.EmployeeResponse;
-import com.app.model.employee.EmployeeUserModel.EmployeeUserResponse;
+import com.app.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,12 +18,16 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.apache.commons.lang3.StringUtils;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
+import java.io.File;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -30,8 +35,10 @@ import java.util.List;
 @Tag(name = "Employees")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@CrossOrigin
 public class EmployeeController extends BaseController {
     EmployeeDao employeeDao = new EmployeeDao();
+    EmployeeService service = new EmployeeService();
 
     @GET
     @RolesAllowed({"ADMIN", "SUPPORT"})
@@ -166,7 +173,7 @@ public class EmployeeController extends BaseController {
     @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get list of employees",
-            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = EmployeeUserResponse.class)))}
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = EmployeeResponse.class)))}
     )
     public Response getAll(
     ) {
@@ -184,5 +191,91 @@ public class EmployeeController extends BaseController {
 
         resp.setSuccessMessage("List of employees");
         return Response.ok(resp).build();
+    }
+
+    @GET
+    @Path("dowloadTemplate")
+    @RolesAllowed({"ADMIN", "SUPPORT"})
+    @Operation(
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public ResponseEntity<InputStreamResource> dowloadTemplate() throws Exception {
+        return service.processExport(req);
+    }
+
+//    @GET
+//    @Path("dowloadTemplate")
+//    @RolesAllowed({"ADMIN", "SUPPORT", "CUSTOMER"})
+//    @Produces("application/vnd.ms-excel")
+//    public Response downloadPdfFile()
+//    {
+////        File file = new File("D:/khoa luan tn/QLVatTu/web-api/src/main/resources/abc.xlsx");
+////
+////        Response.ResponseBuilder response = Response.ok((Object) file);
+////        response.header("Content-Disposition",
+////                "attachment; filename=new-excel-file.xlsx");
+////        return response.build();
+//
+//        StreamingOutput fileStream =  new StreamingOutput()
+//        {
+//            @Override
+//            public void write(java.io.OutputStream output) throws IOException, WebApplicationException
+//            {
+//                try
+//                {
+//                    File file = new File("D:/khoa luan tn/QLVatTu/web-api/src/main/resources/aaa.xls");
+//                    byte[] data = Files.readAllBytes(file.toPath());
+//                    output.write(data);
+//                    output.flush();
+//                    output.close();
+//                }
+//                catch (Exception e)
+//                {
+//                    throw new WebApplicationException("File Not Found !!");
+//                }
+//            }
+//        };
+//        return Response
+//                .ok(fileStream)
+//                .header("content-disposition","attachment; filename = myfile.xls")
+//                .build();
+//    }
+
+
+
+//    @GET
+//    @Path("/dowloadTemplate")
+//    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+//    public Response getFile() {
+//
+//        File file = new File("D:/khoa luan tn/QLVatTu/web-api/src/main/resources/aaa.xls");
+//
+//        ResponseBuilder response = Response.ok((Object) file);
+//        response.header("Content-Disposition",
+//                "attachment; filename=new-android-book.xls");
+//        return response.build();
+//
+//    }
+
+    @POST
+    @Path("byCode")
+    @RolesAllowed({"ADMIN"})
+    @Operation(
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response getByCode(
+            EmployeeModel model
+    ) {
+        Criteria criteria = employeeDao.createCriteria(EmployeeModel.class);
+        if (model.getEmployeeId() != null){
+            criteria.add(Restrictions.ne("employeeId", model.getEmployeeId()));
+        }
+        if (!CommonUtils.isNullOrEmpty(model.getCode())){
+            criteria.add(Restrictions.eq("code", model.getCode()).ignoreCase());
+        }
+        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
+        criteria.setProjection(Projections.rowCount());
+        Long rowCount = (Long)criteria.uniqueResult();
+        return Response.ok(rowCount > 0).build();
     }
 }

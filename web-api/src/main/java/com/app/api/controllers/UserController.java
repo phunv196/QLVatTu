@@ -47,13 +47,13 @@ public class UserController extends BaseController {
     public Response getUserList(
       @Parameter (description="Page No, Starts from 1 ", example="1") @DefaultValue("1")  @QueryParam("page") int page,
       @Parameter(description="Items in each page", example="20") @DefaultValue("20") @QueryParam("page-size") int pageSize,
-      @Parameter(description="User Id") @QueryParam("user-id") String userId,
+      @Parameter(description="User Id") @QueryParam("user-id") String loginName,
       @Parameter(description="Role", schema=@Schema(allowableValues={"ADMIN", "SUPPORT", "CUSTOMER"})) @QueryParam("role") String role
     ) {
         // Fill hibernate search by example user (Hibernate Query-by-example way of searching )
         int recordFrom=0;
         UserViewModel searchUser = new UserViewModel();
-        if (StringUtils.isNotBlank(userId)){ searchUser.setUserId(userId); }
+        if (StringUtils.isNotBlank(loginName)){ searchUser.setLoginName(loginName); }
         if (StringUtils.isNotBlank(role)){ searchUser.setRole(role); }
         //if (StringUtils.isNotBlank(firstName)){ searchUser.setFirstName(firstName); }
         if (page<=0){
@@ -111,24 +111,24 @@ public class UserController extends BaseController {
     }
 
     @GET
-    @Path("{userId}")
+    @Path("{loginName}")
     @RolesAllowed({"CUSTOMER", "SUPPORT"})
     @Operation(
       summary = "Get Details of a User by id",
       responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = UserResponse.class)))}
     )
-    public Response getUserDetailsById(@Parameter(description="User ID") @PathParam("userId") String userId) {
+    public Response getUserDetailsById(@Parameter(description="User ID") @PathParam("loginName") String loginName) {
         UserViewModel userFromToken = (UserViewModel)securityContext.getUserPrincipal();  // securityContext is defined in BaseController
-        UserViewModel userView = userDao.getById(userId);
+        UserViewModel userView = userDao.getById(loginName);
 
         UserResponse resp = new UserResponse();
         if (userView!=null) {
-            if (userFromToken.getRole().equalsIgnoreCase("ADMIN") || userFromToken.getUserId().equals(userId)) {
+            if (userFromToken.getRole().equalsIgnoreCase("ADMIN") || userFromToken.getLoginName().equals(loginName)) {
                 //For Admins and Own-Id - Just remove the password
                 userView.setPassword("");
             } else {
                 // If not a ADMIN or not his own id then strip all the data and just send the id
-                // others should be able to find out if the userId exist or not
+                // others should be able to find out if the loginName exist or not
                 userView.setEmployeeId(0);
                 userView.setCustomerId(0);
                 userView.setPassword("");
@@ -146,29 +146,29 @@ public class UserController extends BaseController {
     }
 
     @DELETE
-    @Path("{userId}")
+    @Path("{loginName}")
     @RolesAllowed({"ADMIN"})
     @Operation(
       summary = "Delete a user by id",
       responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
     public Response deleteUser(
-        @Parameter(description="User ID", example="mdaniel") @PathParam("userId") String userId,
+        @Parameter(description="User ID", example="mdaniel") @PathParam("loginName") String loginName,
         @Parameter(description="Delete associated orders, customer/employee data also", example="true") @DefaultValue("true")  @QueryParam("delete-related-data") boolean deleteRelatedData
     ) {
         BaseResponse resp = new BaseResponse();
-        if (userId.equals("admin") || userId.equals("support") || userId.equals("customer")){
+        if (loginName.equals("admin") || loginName.equals("support") || loginName.equals("customer")){
             resp.setErrorMessage("Cannot delete reserved User IDs - (admin, support or customer)");
             return Response.ok(resp).build();
         }
 
-        if (StringUtils.isBlank(userId)){
+        if (StringUtils.isBlank(loginName)){
             resp.setErrorMessage("Must provide a valid ID");
             return Response.ok(resp).build();
         }
 
         try {
-            UserViewModel userInfo = userDao.getById(userId);
+            UserViewModel userInfo = userDao.getById(loginName);
             if (userInfo==null){
                 resp.setErrorMessage("User not found");
                 return Response.ok(resp).build();

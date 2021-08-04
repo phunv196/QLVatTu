@@ -1,8 +1,10 @@
 package com.app.api.controllers.category;
 
 import com.app.api.BaseController;
+import com.app.dao.base.CommonUtils;
 import com.app.dao.category.SuppliesDao;
 import com.app.model.BaseResponse;
+import com.app.model.category.QualityModel;
 import com.app.model.category.SuppliesModel;
 import com.app.model.category.SuppliesModel.SuppliesResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,8 +18,11 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -193,5 +198,28 @@ public class SuppliesController extends BaseController {
             resp.setErrorMessage("Cannot delete Supplies - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
+    }
+
+    @POST
+    @Path("byCode")
+    @RolesAllowed({"ADMIN"})
+    @Operation(
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response getByCode(
+            SuppliesModel supplies
+    ) {
+        int recordFrom = 0;
+        Criteria criteria = suppliesDao.createCriteria(SuppliesModel.class);
+        if (supplies.getSuppliesId() != null){
+            criteria.add(Restrictions.ne("suppliesId", supplies.getSuppliesId()));
+        }
+        if (!CommonUtils.isNullOrEmpty(supplies.getCode())){
+            criteria.add(Restrictions.eq("code", supplies.getCode()).ignoreCase());
+        }
+        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
+        criteria.setProjection(Projections.rowCount());
+        Long rowCount = (Long)criteria.uniqueResult();
+        return Response.ok(rowCount > 0).build();
     }
 }

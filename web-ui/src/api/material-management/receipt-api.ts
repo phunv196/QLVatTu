@@ -76,4 +76,8 @@ export default {
     debugger;
     return api.delete(`/receipts/delete_by_id/${receiptId}`);
   },
+
+  async getReceiptByCode(receiptObj: Record<string, string | number>): Promise<AxiosResponse> {
+    return api.post('/receipts/byCode', receiptObj);
+  },
 };

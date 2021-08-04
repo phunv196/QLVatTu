@@ -2,7 +2,7 @@ import api from '@/api/api-service';
 import { AxiosResponse } from 'axios';
 
 export default {
-  async getWarehouses(page = 1, pageSize = 20, warehouseId = '', code='', name='', email='', phone='' ): Promise<AxiosResponse> {
+  async getWarehouses(page = 1, pageSize = 20, warehouseId = '', code = '', name = '', email = '', phone = ''): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
     if (page) {
       qsParams.page = page;
@@ -31,7 +31,6 @@ export default {
   },
 
   async deleteWarehouse(warehouseId: string): Promise<AxiosResponse> {
-    debugger;
     return api.delete(`/warehouses/${warehouseId}`);
   },
 
@@ -44,12 +43,14 @@ export default {
   },
 
   async getAll(): Promise<AxiosResponse> {
-    debugger;
     return api.get(`/warehouses/all`);
   },
 
-  async getAllBySuppliesId(suppliesId:number): Promise<AxiosResponse> {
-    debugger;
+  async getAllBySuppliesId(suppliesId: number): Promise<AxiosResponse> {
     return api.get(`/warehouses/all/${suppliesId}`);
+  },
+
+  async getWarehouseByCode(warehouseObj: Record<string, string | number>): Promise<AxiosResponse> {
+    return api.post('/warehouses/byCode', warehouseObj);
   },
 };

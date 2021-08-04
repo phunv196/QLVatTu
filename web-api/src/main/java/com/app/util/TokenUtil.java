@@ -26,7 +26,7 @@ public class TokenUtil {
 
         return Jwts.builder()
             .setExpiration(new Date(System.currentTimeMillis() + VALIDITY_TIME_MS))
-            .claim("id"     , userView.getUserId())
+            .claim("id"     , userView.getLoginName())
             .claim("role"   , userView.getRole())
             .claim("custId" , userView.getCustomerId())
             .claim("empId"  , userView.getEmployeeId())

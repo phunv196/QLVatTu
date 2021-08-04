@@ -5,7 +5,7 @@
     <Sidebar
       v-model:visible="showSlideOut"
       position="right"
-      style="width: 800px"
+      style="width: 1000px"
     >
       <FactoryDetails
         :rec="selectedRec"
@@ -17,23 +17,19 @@
       ></FactoryDetails>
     </Sidebar>
     <h3>Quản lý phân xưởng</h3>
-    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width: 1350px">
+    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1350px">
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
           >Mã PX
         </label>
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
-          <InputText
-            type="text"
-            v-model="searchCode"
-            class="p-inputtext-sm"
-            placeholder="Search by code"
-            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
-          />
-        </span>
+        <InputText
+          type="text"
+          v-model="searchCode"
+          class="p-inputtext-sm"
+          style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+        />
       </div>
       <div>
         <label
@@ -41,16 +37,12 @@
           style="padding-top: 7px"
           >Tên PX
         </label>
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
-          <InputText
-            type="text"
-            v-model="searchName"
-            class="p-inputtext-sm"
-            placeholder="Search by name"
-            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
-          />
-        </span>
+        <InputText
+          type="text"
+          v-model="searchName"
+          class="p-inputtext-sm"
+          style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+        />
       </div>
       <div>
         <label
@@ -58,16 +50,12 @@
           style="padding-top: 7px"
           >Email
         </label>
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
-          <InputText
-            type="text"
-            v-model="searchEmail"
-            class="p-inputtext-sm"
-            placeholder="Search by name"
-            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
-          />
-        </span>
+        <InputText
+          type="text"
+          v-model="searchEmail"
+          class="p-inputtext-sm"
+          style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+        />
       </div>
       <div>
         <label
@@ -83,27 +71,23 @@
           :filter="true"
           :showClear="true"
           optionLabel="fullName"
-          optionValue="id"
+          optionValue="employeeId"
         />
       </div>
     </div>
-    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width: 1350px">
+    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1350px">
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
           >Thi công từ
         </label>
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
-          <InputText
-            type="date"
-            v-model="searchFormDate"
-            class="p-inputtext-sm"
-            placeholder="dd/mm/yyyy"
-            style="width: 200px; height: 30px"
-          />
-        </span>
+        <InputText
+          type="date"
+          v-model="searchFormDate"
+          class="p-inputtext-sm"
+          style="width: 200px; height: 30px"
+        />
       </div>
       <div>
         <label
@@ -111,16 +95,12 @@
           style="padding-top: 7px"
           >Đến ngày
         </label>
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
-          <InputText
-            type="date"
-            v-model="searchToDate"
-            class="p-inputtext-sm"
-            placeholder="dd/mm/yyyy"
-            style="width: 200px; height: 30px"
-          />
-        </span>
+        <InputText
+          type="date"
+          v-model="searchToDate"
+          class="p-inputtext-sm"
+          style="width: 200px; height: 30px"
+        />
       </div>
       <div>
         <label
@@ -128,16 +108,12 @@
           style="padding-top: 7px"
           >Hoàn thành từ
         </label>
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
-          <InputText
-            type="date"
-            v-model="searchFormSuccessDate"
-            class="p-inputtext-sm"
-            placeholder="dd/mm/yyyy"
-            style="width: 200px; height: 30px"
-          />
-        </span>
+        <InputText
+          type="date"
+          v-model="searchFormSuccessDate"
+          class="p-inputtext-sm"
+          style="width: 200px; height: 30px"
+        />
       </div>
       <div>
         <label
@@ -145,20 +121,16 @@
           style="padding-top: 7px"
           >Đến ngày
         </label>
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
-          <InputText
-            type="date"
-            v-model="searchToSuccessDate"
-            class="p-inputtext-sm"
-            placeholder="dd/mm/yyyy"
-            style="width: 200px; height: 30px"
-          />
-        </span>
+        <InputText
+          type="date"
+          v-model="searchToSuccessDate"
+          class="p-inputtext-sm"
+          style="width: 200px; height: 30px"
+        />
       </div>
     </div>
     <div
-      class="p-d-flex p-flex-row p-mb-1 p-jc-center"
+      class="p-d-flex p-flex-row p-mb-3 p-jc-center"
       style="width: 1350px; margin: 20px 0"
     >
       <Button
@@ -306,6 +278,7 @@ export default defineComponent({
           searchToSuccessDate
         );
         debugger;
+        let i = 1;
         list.value = resp.data.list.map((v: Record<string, unknown>) => {
           const dt1 = new Date(v.dateConstruction as string);
           const dt2 = new Date(v.dateFinish as string);
@@ -319,10 +292,17 @@ export default defineComponent({
             month: "2-digit",
             day: "2-digit",
           }).format(dt2);
+          let index = 1;
+          if (page > 1) {
+            index = 10 * (currentPage - 1) + i++;
+          } else {
+            index = i++;
+          }
           return {
             ...v,
             strDateConstruction,
             strDateFinish,
+            index,
           };
         });
         // isLoading.value = false;
@@ -436,9 +416,30 @@ export default defineComponent({
       emp.value = lstEmps;
     };
 
-    const onSearchKeyup = debounce(
-      () =>
-        getData(
+    const onSearchKeyup = debounce(async () => {
+      let msg = [];
+      debugger
+      if (
+        Date.parse(`${searchFormDate.value}`) >
+        Date.parse(`${searchToDate.value}`)
+      ) {
+        msg.push("thi công từ ngày phải nhỏ hơn thi công đến ngày");
+      }
+      if (
+        Date.parse(`${searchFormSuccessDate.value}`) >
+        Date.parse(`${searchToSuccessDate.value}`)
+      ) {
+        msg.push("hoàn thành từ ngày phải nhỏ hơn hoàn thành đến ngày");
+      }
+      if (msg.length > 0) {
+        toast.add({
+          severity: "warn",
+          summary: "Cảnh báo",
+          detail: "Trường " + msg.join(", "),
+          life: 3000,
+        });
+      } else {
+        await getData(
           1,
           pageSize.value,
           "",
@@ -450,9 +451,9 @@ export default defineComponent({
           `${searchToDate.value}`,
           `${searchFormSuccessDate.value}`,
           `${searchToSuccessDate.value}`
-        ),
-      400
-    );
+        );
+      }
+    }, 400);
 
     return {
       list,

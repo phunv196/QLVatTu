@@ -6,10 +6,10 @@ import org.hibernate.*;
 
 public class UserDao extends BaseHibernateDAO {
 
-    public UserViewModel getById(String userId){
-        String hql = "from UserViewModel where userId = :userId";
+    public UserViewModel getById(String loginName){
+        String hql = "from UserViewModel where loginName = :loginName";
         Query q = createQuery(hql);
-        q.setParameter("userId", userId);
+        q.setParameter("loginName", loginName);
         return  (UserViewModel)q.uniqueResult();
     }
 
@@ -25,31 +25,31 @@ public class UserDao extends BaseHibernateDAO {
         String sqlDeleteOrderItems = "delete from order_items where order_id " +
                 " in (select id from orders where customer_id " +
                 "     in (select id from customers where id " +
-                "         in (Select customer_id from users where user_id = :userId ) " +
+                "         in (Select customer_id from users where login_name = :loginName ) " +
                 "   )" +
                 ")";
 
         String sqlDeleteOrders = "delete from orders where customer_id " +
                 " in (select id  from customers where id " +
-                "     in (Select customer_id from users where user_id = :userId) " +
+                "     in (Select customer_id from users where login_name = :loginName) " +
                 ")";
 
-        String sqlDeleteCart = "delete from cart where  user_id = :userId";
-        String sqlUser = "delete from users where user_id = :userId";
+        String sqlDeleteCart = "delete from cart where  login_name = :loginName";
+        String sqlUser = "delete from users where login_name = :loginName";
         String sqlDeleteCustomer = "delete from customers where id = :customerId";
-        String sqlDeleteEmployee = "delete from employees where id = :employeeId";
+        String sqlDeleteEmployee = "delete from employees where employee_id = :employeeId";
 
         Query queryDeleteOrderItems = createSQLQuery(sqlDeleteOrderItems);
-        queryDeleteOrderItems.setParameter("userId", user.getUserId());
+        queryDeleteOrderItems.setParameter("loginName", user.getLoginName());
 
         Query queryDeleteOrders = createSQLQuery(sqlDeleteOrders);
-        queryDeleteOrders.setParameter("userId", user.getUserId());
+        queryDeleteOrders.setParameter("loginName", user.getLoginName());
 
         Query queryDeleteCart = createSQLQuery(sqlDeleteCart);
-        queryDeleteCart.setParameter("userId", user.getUserId());
+        queryDeleteCart.setParameter("loginName", user.getLoginName());
 
         Query queryDeleteUser = createSQLQuery(sqlUser);
-        queryDeleteUser.setParameter("userId", user.getUserId());
+        queryDeleteUser.setParameter("loginName", user.getLoginName());
 
         Query queryDeleteCustomer = createSQLQuery(sqlDeleteCustomer);
         if (deleteRelatedData && user.getCustomerId() != null) {

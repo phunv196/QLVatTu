@@ -40,4 +40,8 @@ export default {
     debugger;
     return api.get(`/roles/all`);
   },
+
+  async getRoleByCode(roleObj: Record<string, string | number>): Promise<AxiosResponse> {
+    return api.post('/roles/byCode', roleObj);
+  },
 };

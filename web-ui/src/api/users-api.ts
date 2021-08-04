@@ -7,7 +7,7 @@ export default {
     const resp = await api.post('/authenticate/user', { username, password });
     const respData = resp.data.data;
     if (respData) {
-      commitJwtTokenToStore(respData.token, respData.userId, respData.role, respData.fullName);
+      commitJwtTokenToStore(respData.token, respData.loginName, respData.role, respData.fullName);
       return resp;
     }
     return Promise.reject(resp.data ? resp.data : resp);
@@ -17,20 +17,20 @@ export default {
     return api.post('/users', userObj);
   },
 
-  async getUsers(page = 1, pageSize = 20, userId?: string, role?: string): Promise<AxiosResponse> {
+  async getUsers(page = 1, pageSize = 20, loginName?: string, role?: string): Promise<AxiosResponse> {
     const qsParams: Record<string, number|string> = { };
     if (page) { qsParams.page = page; }
     if (pageSize) { qsParams['page-size'] = pageSize; }
-    if (userId) { qsParams['user-id'] = userId; }
+    if (loginName) { qsParams['user-id'] = loginName; }
     if (role) { qsParams.role = role; }
     return api.get('/users', { params: qsParams });
   },
 
-  async deleteUser(userId: string): Promise<AxiosResponse> {
-    return api.delete(`/users/${userId}`);
+  async deleteUser(loginName: string): Promise<AxiosResponse> {
+    return api.delete(`/users/${loginName}`);
   },
 
-  async resetPasswordUser(userId: string): Promise<AxiosResponse> {
-    return api.get(`/users/${userId}`);
+  async resetPasswordUser(loginName: string): Promise<AxiosResponse> {
+    return api.get(`/users/${loginName}`);
   },
 };

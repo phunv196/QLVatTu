@@ -40,4 +40,8 @@ export default {
     debugger;
     return api.get(`/qualitys/all`);
   },
+
+  async getQualityByCode(qualityObj: Record<string, string | number>): Promise<AxiosResponse> {
+    return api.post('/qualitys/byCode', qualityObj);
+  },
 };

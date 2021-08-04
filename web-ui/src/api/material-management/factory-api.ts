@@ -72,4 +72,8 @@ export default {
     debugger;
     return api.get(`/factorys/all`);
   },
+
+  async getFactorByCode(factoryObj: Record<string, string | number>): Promise<AxiosResponse> {
+    return api.post('/factorys/byCode', factoryObj);
+  },
 };

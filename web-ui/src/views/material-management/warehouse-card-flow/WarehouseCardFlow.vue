@@ -4,10 +4,10 @@
     <Toast/>
     <Sidebar v-model:visible="showSlideOut" position="right" style="width:700px">
       <WarehouseCardFlowDetails :rec="selectedRec" @cancel="showSlideOut = false" @changed="getData()"
-                                :suppliesId.sync="suppliesId" :arrReceipt.sync="arrReceipt" :arrDeliveryBill.sync="arrDeliveryBill" :isNew="isNewRec"></WarehouseCardFlowDetails>
+                                :suppliesId="suppliesId" :arrReceipt="arrReceipt" :arrDeliveryBill="arrDeliveryBill" :isNew="isNewRec"></WarehouseCardFlowDetails>
     </Sidebar>
     <h3> Danh sách dòng thẻ kho </h3>
-    <div class="p-d-flex p-flex-row p-mb-1" style="width:1000px">
+    <div class="p-d-flex p-flex-row p-mb-3" style="width:1000px">
       <div style="display:inline-block; flex:1"></div>
       <Button icon="pi pi-user" iconPos="right" label="ADD" @click="onAddClick()"
               class="p-ml-1 p-button-sm"></Button>
@@ -21,7 +21,7 @@
       :loading="isLoading"
       @page="onPageChange($event)"
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4" style="width:1000px">
-      <Column field="warehouseCardFlowId" header="ID dòng thẻ kho" headerStyle="width:90px;"></Column>
+      <Column field="index" header="STT" headerStyle="width:90px;"></Column>
       <Column field="receiptCode" header="Mã phiếu nhập" headerStyle="width:90px"></Column>
       <Column field="deliveryBillCode" header="Mã phiếu xuất" headerStyle="width:90px"></Column>
       <Column field="type" header="Mã nhân viên" headerStyle="width:90px"></Column>
@@ -57,7 +57,7 @@ export default defineComponent({
   setup(props): unknown {
     const isLoading = ref(false);
     const showSlideOut = ref(false);
-    const pageSize = ref(10);
+    const pageSize = ref(5);
     const totalPages = ref(0);
     const totalRecs = ref(0);
     const selectedRec = ref({});
@@ -80,9 +80,17 @@ export default defineComponent({
       try {
         debugger
         const resp = await WarehouseCardFlowApi.getWarehouseCardFlows(page, requestedPageSize, warehouseCardId.value);
-        list.value = resp.data.list.map((v:Record<string, unknown>) => {
+        let i = 1;
+        list.value = resp.data.list.map((v: Record<string, unknown>) => {
+          let index = 1;
+          if (page > 1) {
+            index = (10 * (currentPage - 1)) / 2 + i++
+          } else {
+            index = i++;
+          }
           return {
             ...v,
+            index,
           };
         });
         // isLoading.value = false;

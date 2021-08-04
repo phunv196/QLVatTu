@@ -1,10 +1,14 @@
 package com.app.api.controllers.category;
 
 import com.app.api.BaseController;
+import com.app.dao.base.CommonUtils;
 import com.app.dao.category.PositionDao;
 import com.app.model.BaseResponse;
+import com.app.model.category.FactoryModel;
 import com.app.model.category.PositionModel;
 import com.app.model.category.PositionModel.PositionResponse;
+import com.app.model.category.QualityModel;
+import com.app.model.category.SuppliesModel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -170,5 +174,28 @@ public class PositionController extends BaseController {
             resp.setErrorMessage("Cannot delete Position - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
+    }
+
+    @POST
+    @Path("byCode")
+    @RolesAllowed({"ADMIN"})
+    @Operation(
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response getByCode(
+            PositionModel model
+    ) {
+        int recordFrom = 0;
+        Criteria criteria = positionDao.createCriteria(PositionModel.class);
+        if (model.getPositionId() != null){
+            criteria.add(Restrictions.ne("positionId", model.getPositionId()));
+        }
+        if (!CommonUtils.isNullOrEmpty(model.getCode())){
+            criteria.add(Restrictions.eq("code", model.getCode()).ignoreCase());
+        }
+        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
+        criteria.setProjection(Projections.rowCount());
+        Long rowCount = (Long)criteria.uniqueResult();
+        return Response.ok(rowCount > 0).build();
     }
 }

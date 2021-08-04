@@ -7,20 +7,52 @@
                    :isNew="isNewRec"></SpeciesDetails>
     </Sidebar>
     <h3> Quản lý chủng loại </h3>
-    <div class="p-d-flex p-flex-row p-mb-1" style="width:1000px">
-      <span class="p-input-icon-left">
-        <i class="pi pi-search"  style="margin: -6px 10px 0px;"/>
-        <InputText type="text" v-model="searchCode" class="p-inputtext-sm" placeholder="Search by code" style="width:180px;margin:1px 10px 0 10px"/>
-      </span>
-      <span class="p-input-icon-left">
-        <i class="pi pi-search" style="margin: -6px 10px 0px;" />
-        <InputText type="text" v-model="searchName" class="p-inputtext-sm" placeholder="Search by name" style="width:180px;margin:1px 10px 0 10px"/>
-      </span>
-      <div style="display:inline-block; flex:1"></div>
-      <Button icon="pi pi-search" iconPos="right" label="Tìm kiếm" @click="onSearchKeyup()"
-              class="p-ml-1 p-button-sm"></Button>
-      <Button icon="pi pi-user" iconPos="right" label="ADD" @click="onAddClick()"
-              class="p-ml-1 p-button-sm"></Button>
+        <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1000px">
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Mã chủng loại
+        </label>
+        <InputText
+          type="text"
+          v-model="searchCode"
+          class="p-inputtext-sm"
+          style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+        />
+      </div>
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Tên chủng loại
+        </label>
+        <InputText
+          type="text"
+          v-model="searchName"
+          class="p-inputtext-sm"
+          style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+        />
+      </div>
+    </div>
+    <div
+      class="p-d-flex p-flex-row p-mb-3 p-jc-center"
+      style="width: 1000px; margin: 20px 0"
+    >
+      <Button
+        icon="pi pi-search"
+        iconPos="right"
+        label="Tìm kiếm"
+        @click="onSearchKeyup()"
+        class="p-ml-1 p-button-sm"
+      ></Button>
+      <Button
+        icon="pi pi-user"
+        iconPos="right"
+        label="ADD"
+        @click="onAddClick()"
+        class="p-ml-1 p-button-sm"
+      ></Button>
     </div>
     <DataTable
       :value="list"
@@ -31,7 +63,7 @@
       :loading="isLoading"
       @page="onPageChange($event)"
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4" style="width:1000px">
-      <Column field="speciesId" header="ID chủng loại" headerStyle="width:90px;"></Column>
+      <Column field="index" header="STT" headerStyle="width:90px;"></Column>
       <Column field="code" header="Mã chủng loại" headerStyle="width:90px"></Column>
       <Column field="name" header="Tên chủng loại" headerStyle="width:160px"></Column>
       <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px">
@@ -77,7 +109,19 @@ export default defineComponent({
       try {
         debugger
         const resp = await SpeciesApi.getSpecies(page, requestedPageSize, speciesId, code, name);
-        list.value = resp.data.list;
+        let i = 1;
+        list.value = resp.data.list.map((v: Record<string, unknown>) => {
+          let index = 1;
+          if (page > 1) {
+            index = (10 * (currentPage - 1)) + i++
+          } else {
+            index = i++;
+          }
+          return {
+            ...v,
+            index,
+          };
+        });
         // isLoading.value = false;
         currentPage = resp.data.currentPage;
         totalPages.value = resp.data.totalPages;

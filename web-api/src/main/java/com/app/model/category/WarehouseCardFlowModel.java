@@ -18,7 +18,7 @@ public class WarehouseCardFlowModel {
     @Column(name = "receipt_id")      private Long  receiptId;
     @Column(name = "amount")      private Long amount;
     @Column(name = "description")       private String  description;
-    @Column(name = "type")       private String  type;
+    @Column(name = "type")       private Long  type;
 
     @Transient
     private String employeeName;
@@ -32,11 +32,11 @@ public class WarehouseCardFlowModel {
     //Getters and Setters
 
 
-    public String getType() {
+    public Long getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(Long type) {
         this.type = type;
     }
 

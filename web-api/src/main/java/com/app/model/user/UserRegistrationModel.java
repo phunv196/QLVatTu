@@ -3,7 +3,7 @@ package com.app.model.user;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public class UserRegistrationModel {
-    @Schema(example = "mickey", required=true) private String userId;
+    @Schema(example = "mickey", required=true) private String loginName;
     @Schema(example = "mickey", required=true) private String password;
     @Schema(example = "CUSTOMER", allowableValues={"ADMIN", "SUPPORT", "CUSTOMER"}, required=true) private String role;
     @Schema(example = "Mouse" , required=true) private String lastName;
@@ -21,8 +21,8 @@ public class UserRegistrationModel {
     @Schema(description="applicable for ROLES - ADMIN and SUPPORT only ", example = "201") private Integer managerId;
 
     //Getters and Setters
-    public String getUserId() {return userId;}
-    public void setUserId(String userId) { this.userId = userId; }
+    public String getLoginName() {return loginName;}
+    public void setLoginName(String loginName) { this.loginName = loginName; }
 
     public String getPassword() { return password; }
     public void setPassword(String password) {this.password = password; }
