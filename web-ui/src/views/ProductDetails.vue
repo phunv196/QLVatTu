@@ -27,17 +27,6 @@
           optionLabel = "label"
           optionValue = "code"
         />
-        <SelectButton
-          @click="setValue()"
-          v-model="recData.discontinued"
-          class="p-inputtext-sm p-mr-1 p-d-inline-block"
-          :options="[
-            { label: 'Phiếu nhập', code: 1 },
-            { label: 'Phiếu xuất', code: 0 },
-          ]"
-          optionLabel="label"
-          optionValue="code"
-        />
       </div>
     </div>
 
