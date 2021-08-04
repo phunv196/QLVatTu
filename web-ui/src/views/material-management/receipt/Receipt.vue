@@ -16,41 +16,33 @@
       ></ReceiptDetails>
     </Sidebar>
     <h3>Quản lý nhập kho</h3>
-    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width: 1350px">
+    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1350px">
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
           >Mã phiếu nhập
         </label>
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
           <InputText
             type="text"
             v-model="searchCode"
             class="p-inputtext-sm"
-            placeholder="Search by code"
             style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
           />
-        </span>
-      </div>
+        </div>
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
           >Tên phiếu nhập
         </label>
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
           <InputText
             type="text"
             v-model="searchName"
             class="p-inputtext-sm"
-            placeholder="Search by name"
             style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
           />
-        </span>
-      </div>
+        </div>
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
@@ -65,19 +57,17 @@
           :filter="true"
           :showClear="true"
           optionLabel="fullName"
-          optionValue="id"
+          optionValue="employeeId"
         />
       </div>
     </div>
-    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width: 1350px">
+    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1350px">
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
           >Ngày lập từ
         </label>
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
           <InputText
             type="date"
             v-model="searchFormDate"
@@ -85,16 +75,13 @@
             placeholder="dd/mm/yyyy"
             style="width: 200px; height: 30px"
           />
-        </span>
-      </div>
+        </div>
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
           >Đến ngày
         </label>
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
           <InputText
             type="date"
             v-model="searchToDate"
@@ -102,8 +89,7 @@
             placeholder="dd/mm/yyyy"
             style="width: 200px; height: 30px"
           />
-        </span>
-      </div>
+        </div>
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
@@ -123,7 +109,7 @@
       </div>
     </div>
     <div
-      class="p-d-flex p-flex-row p-mb-1 p-jc-center"
+      class="p-d-flex p-flex-row p-mb-3 p-jc-center"
       style="width: 1350px; margin: 20px 0"
     >
       <Button
@@ -269,6 +255,7 @@ export default defineComponent({
           searchFormDate,
           searchToDate,
         );
+        let i = 1;
         list.value = resp.data.list.map((v: Record<string, unknown>) => {
           const dt = new Date(v.dateWarehousing as string);
           const strDateWarehousing = new Intl.DateTimeFormat(["ban", "id"], {
@@ -276,9 +263,16 @@ export default defineComponent({
             month: "2-digit",
             day: "2-digit",
           }).format(dt);
+          let index = 1;
+          if (page > 1) {
+            index = (10 * (currentPage - 1)) + i++
+          } else {
+            index = i++;
+          }
           return {
             ...v,
             strDateWarehousing,
+            index
           };
         });
         // isLoading.value = false;

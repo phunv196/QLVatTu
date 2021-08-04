@@ -50,5 +50,7 @@
     <mapping class="com.app.model.category.WarehouseCardModel"/>
     <mapping class="com.app.model.category.WarehouseModel"/>
     <mapping class="com.app.model.category.DepartmentModel"/>
+    <mapping class="com.app.model.category.AttachmentFileModel"/>
+    <mapping class="com.app.exceldownload.model.Customer"/>
 </session-factory>
 </hibernate-configuration>

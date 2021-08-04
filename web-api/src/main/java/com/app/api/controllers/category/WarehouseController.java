@@ -1,8 +1,11 @@
 package com.app.api.controllers.category;
 
 import com.app.api.BaseController;
+import com.app.dao.base.CommonUtils;
 import com.app.dao.category.WarehouseDao;
 import com.app.model.BaseResponse;
+import com.app.model.category.QualityModel;
+import com.app.model.category.SuppliesModel;
 import com.app.model.category.WarehouseModel;
 import com.app.model.category.WarehouseModel.WarehouseResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -176,5 +179,28 @@ public class WarehouseController extends BaseController {
             resp.setErrorMessage("Cannot delete Warehouse - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
+    }
+
+    @POST
+    @Path("byCode")
+    @RolesAllowed({"ADMIN"})
+    @Operation(
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response getByCode(
+            WarehouseModel warehouseModel
+    ) {
+        int recordFrom = 0;
+        Criteria criteria = warehouseDao.createCriteria(WarehouseModel.class);
+        if (warehouseModel.getWarehouseId() != null){
+            criteria.add(Restrictions.ne("warehouseId", warehouseModel.getWarehouseId()));
+        }
+        if (!CommonUtils.isNullOrEmpty(warehouseModel.getCode())){
+            criteria.add(Restrictions.eq("code", warehouseModel.getCode()).ignoreCase());
+        }
+        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
+        criteria.setProjection(Projections.rowCount());
+        Long rowCount = (Long)criteria.uniqueResult();
+        return Response.ok(rowCount > 0).build();
     }
 }

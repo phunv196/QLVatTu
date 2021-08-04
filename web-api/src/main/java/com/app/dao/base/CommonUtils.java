@@ -1650,7 +1650,11 @@ public class CommonUtils {
         }
     }
 
-
+    public static String getCurrentLanguage(HttpServletRequest req) {
+        // TODO Auto-generated method stub
+        String langCode = req.getHeader("Current-Language");
+        return NVL(langCode, "vi");
+    }
 
     /**
      *
@@ -1763,5 +1767,37 @@ public class CommonUtils {
 
     public static Date getLastDayOfMonth(Date dDate) throws Exception {
         return getLastDayOfMonth(dDate.getMonth() + 1, dDate.getYear() + 1900);
+    }
+
+    /**
+     * Checks if is object empty.
+     *
+     * @param object the object
+     * @return true, if is object empty
+     */
+    public static boolean isEmpty(Object object) {
+        if (object == null) {
+            return true;
+        } else if (object instanceof String) {
+            if (((String) object).trim().length() == 0) {
+                return true;
+            }
+        } else if (object instanceof Collection) {
+            return isCollectionEmpty((Collection<?>) object);
+        }
+        return false;
+    }
+
+    /**
+     * Checks if is collection empty.
+     *
+     * @param collection the collection
+     * @return true, if is collection empty
+     */
+    private static boolean isCollectionEmpty(Collection<?> collection) {
+        if (collection == null || collection.isEmpty()) {
+            return true;
+        }
+        return false;
     }
 }

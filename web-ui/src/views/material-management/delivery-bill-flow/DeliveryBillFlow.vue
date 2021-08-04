@@ -7,7 +7,7 @@
                                :arrSupplies="arrSupplies" :isNew="isNewRec"></DeliveryBillFlowDetails>
     </Sidebar>
     <h3> Danh sách vật tư xuất </h3>
-    <div class="p-d-flex p-flex-row p-mb-1" style="width:1000px">
+    <div class="p-d-flex p-flex-row p-mb-3" style="width:1000px">
       <div style="display:inline-block; flex:1"></div>
       <Button icon="pi pi-user" iconPos="right" label="ADD" @click="onAddClick()"
               class="p-ml-1 p-button-sm"></Button>
@@ -21,8 +21,7 @@
       :loading="isLoading"
       @page="onPageChange($event)"
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4" style="width:1000px">
-      <Column field="deliveryBillFlowId" header="ID" headerStyle="width:50px;"></Column>
-<!--      <Column field="deliveryBillId" header="ID" rendered="false" headerStyle="width:50px; display: none"></Column>-->
+      <Column field="index" header="STT" headerStyle="width:50px;"></Column>
       <Column field="suppliesCode" header="Mã vật tư" headerStyle="width:90px"></Column>
       <Column field="suppliesName" header="Tên vật tư" headerStyle="width:160px"></Column>
       <Column field="speciesName" header="Chủng loại" headerStyle="width:160px"></Column>
@@ -75,7 +74,19 @@ export default defineComponent({
       try {
         debugger
         const resp = await DeliveryBillFlowApi.getDeliveryBillFlows(page, requestedPageSize, deliveryBillId.value);
-        list.value = resp.data.list;
+        let i = 1;
+        list.value = resp.data.list.map((v: Record<string, unknown>) => {
+          let index = 1;
+          if (page > 1) {
+            index = (10 * (currentPage - 1)) / 2 + i++
+          } else {
+            index = i++;
+          }
+          return {
+            ...v,
+            index,
+          };
+        });
         // isLoading.value = false;
         currentPage = resp.data.currentPage;
         totalPages.value = resp.data.totalPages;

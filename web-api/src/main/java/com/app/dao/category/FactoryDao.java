@@ -66,7 +66,7 @@ public class FactoryDao extends BaseHibernateDAO {
                 " f.date_construction dateConstruction," +
                 " f.date_finish dateFinish" +
                 " from factory f " +
-                " left join employees e on e.id = f.employee_id";
+                " left join employees e on e.employee_id = f.employee_id";
         //String finalSql = "select factory_id from factory";
         finalSql = finalSql + sql + " order by f.factory_id " + sqlLimit;
 

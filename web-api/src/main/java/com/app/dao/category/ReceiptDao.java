@@ -70,7 +70,7 @@ public class ReceiptDao extends BaseHibernateDAO {
                 " where rf.receipt_id = r.receipt_id ) sumMoney " +
                 " from receipt r " +
                 " left join warehouse w on w.warehouse_id = r.warehouse_id" +
-                " left join employees e on e.id = r.employee_id";
+                " left join employees e on e.employee_id = r.employee_id";
         finalSql = finalSql + sql + " order by r.receipt_id " + sqlLimit;
 
         SQLQuery q = createSQLQuery(finalSql);

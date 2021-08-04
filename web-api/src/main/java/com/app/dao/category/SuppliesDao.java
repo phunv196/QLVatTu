@@ -57,7 +57,7 @@ public class SuppliesDao extends BaseHibernateDAO {
                 " sup.supplier_id supplierId," +
                 " sup.name supplierName," +
                 " q.quality_Id qualityId," +
-                " q.quality_name qualityName" +
+                " q.name qualityName" +
                 " from supplies s " +
                 " left join species spec on spec.species_id = s.species_id" +
                 " left join supplier sup on sup.supplier_id = s.supplier_id" +

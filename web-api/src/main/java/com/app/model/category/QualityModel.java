@@ -13,28 +13,28 @@ public class QualityModel {
     @Column(name = "quality_id", unique = true, nullable = false) private Long qualityId;
 
     @Schema(example="601")
-    @Column(name = "quality_code")       private String  qualityCode;
-    @Column(name = "quality_name")      private String  qualityName;
+    @Column(name = "code")       private String  code;
+    @Column(name = "name")      private String  name;
     @Column(name = "description")       private String  description;
 
     //Getters and Setters
     public Long getQualityId() { return qualityId; }
     public void setQualityId(Long qualityId) { this.qualityId = qualityId; }
 
-    public String getQualityCode() {
-        return qualityCode;
+    public String getCode() {
+        return code;
     }
 
-    public void setQualityCode(String qualityCode) {
-        this.qualityCode = qualityCode;
+    public void setCode(String code) {
+        this.code = code;
     }
 
-    public String getQualityName() {
-        return qualityName;
+    public String getName() {
+        return name;
     }
 
-    public void setQualityName(String qualityName) {
-        this.qualityName = qualityName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() { return description; }

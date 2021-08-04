@@ -15,7 +15,7 @@
       ></SuppliesDetails>
     </Sidebar>
     <h3>Quản lý vật tư</h3>
-    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width: 1350px">
+    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1350px">
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
@@ -23,12 +23,10 @@
           >Mã vật tư
         </label>
         <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
           <InputText
             type="text"
             v-model="searchCode"
             class="p-inputtext-sm"
-            placeholder="Search by code"
             style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
           />
         </span>
@@ -40,12 +38,10 @@
           >Tên vật tư
         </label>
         <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
           <InputText
             type="text"
             v-model="searchName"
             class="p-inputtext-sm"
-            placeholder="Search by name"
             style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
           />
         </span>
@@ -85,7 +81,7 @@
         />
       </div>
     </div>
-    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width: 1350px">
+    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1350px">
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
@@ -93,7 +89,6 @@
           >Giá từ
         </label>
         <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
           <InputNumber
             type="text"
             v-model="searchFormPrice"
@@ -106,10 +101,9 @@
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
-          >Đến
+          >Giá đến
         </label>
         <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
           <InputNumber
             type="text"
             v-model="searchToPrice"
@@ -131,7 +125,7 @@
           :options="quality"
           :filter="true"
           :showClear="true"
-          optionLabel="qualityName"
+          optionLabel="name"
           optionValue="qualityId"
         />
       </div>
@@ -152,7 +146,7 @@
       </div>
     </div>
     <div
-      class="p-d-flex p-flex-row p-mb-1 p-jc-center"
+      class="p-d-flex p-flex-row p-mb-3 p-jc-center"
       style="width: 1350px; margin: 20px 0"
     >
       <Button
@@ -181,11 +175,7 @@
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4"
       style="width: 1350px"
     >
-      <Column
-        field="suppliesId"
-        header="ID vật tư"
-        headerStyle="width:90px;"
-      ></Column>
+      <Column field="index" header="STT" headerStyle="width:90px;"></Column>
       <Column field="code" header="Mã vật tư" headerStyle="width:90px"></Column>
       <Column
         field="name"
@@ -248,6 +238,7 @@ import SupplierApi from "@/api/material-management/supplier-api";
 import QualityApi from "@/api/material-management/quality-api";
 import SpeciesApi from "@/api/material-management/species-api";
 import { debounce } from "@/shared/utils";
+import { async } from "rxjs";
 
 export default defineComponent({
   setup(): unknown {
@@ -305,7 +296,19 @@ export default defineComponent({
           searchQuality,
           searchUnit
         );
-        list.value = resp.data.list;
+        let i = 1;
+        list.value = resp.data.list.map((v: Record<string, unknown>) => {
+          let index = 1;
+          if (page > 1) {
+            index = 10 * (currentPage - 1) + i++;
+          } else {
+            index = i++;
+          }
+          return {
+            ...v,
+            index,
+          };
+        });
         currentPage = resp.data.currentPage;
         totalPages.value = resp.data.totalPages;
         totalRecs.value = resp.data.total;
@@ -357,10 +360,10 @@ export default defineComponent({
       });
     };
 
-    const onPageChange = (event: Record<string, unknown>) => {
+    const onPageChange = async (event: Record<string, unknown>) => {
       if (currentPage !== (event.page as number) + 1) {
         currentPage = (event.page as number) + 1;
-        getData(
+        await getData(
           currentPage,
           pageSize.value,
           "",
@@ -378,7 +381,6 @@ export default defineComponent({
 
     const onAddClick = async () => {
       debugger;
-
       isNewRec.value = true;
       selectedRec.value = { suppliesId: "" };
       showSlideOut.value = true;
@@ -435,9 +437,19 @@ export default defineComponent({
       species.value = lstSpeciess;
     };
 
-    const onSearchKeyup = debounce(
-      () =>
-        getData(
+    const onSearchKeyup = debounce(async () => {
+      if (
+        parseInt(`${searchFormPrice.value}`) >
+        parseInt(`${searchToPrice.value}`)
+      ) {
+        toast.add({
+          severity: "warn",
+          summary: "Cảnh báo",
+          detail: "Trường giá từ phải nhỏ hơn trường giá đến",
+          life: 3000,
+        });
+      } else {
+        await getData(
           1,
           pageSize.value,
           "",
@@ -449,9 +461,9 @@ export default defineComponent({
           `${searchToPrice.value}`,
           `${searchQuality.value}`,
           `${searchUnit.value}`
-        ),
-      400
-    );
+        );
+      }
+    }, 400);
 
     return {
       list,

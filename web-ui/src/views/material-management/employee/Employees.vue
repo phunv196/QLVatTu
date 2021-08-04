@@ -5,7 +5,7 @@
     <Sidebar
       v-model:visible="showSlideOut"
       position="right"
-      style="width: 700px"
+      style="width: 1000px"
     >
       <EmployeeDetails
         :rec="selectedRec"
@@ -16,23 +16,19 @@
       </EmployeeDetails>
     </Sidebar>
     <h3>Manage Employees</h3>
-    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width: 1150px">
+    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1150px">
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
           >Mã nhân viên
         </label>
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
-          <InputText
-            type="text"
-            v-model="searchCode"
-            class="p-inputtext-sm"
-            placeholder="Search by code"
-            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
-          />
-        </span>
+        <InputText
+          type="text"
+          v-model="searchCode"
+          class="p-inputtext-sm"
+          style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+        />
       </div>
       <div>
         <label
@@ -40,16 +36,12 @@
           style="padding-top: 7px"
           >Tên nhân viên
         </label>
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
-          <InputText
-            type="text"
-            v-model="searchName"
-            class="p-inputtext-sm"
-            placeholder="Search by name"
-            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
-          />
-        </span>
+        <InputText
+          type="text"
+          v-model="searchName"
+          class="p-inputtext-sm"
+          style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+        />
       </div>
       <div>
         <label
@@ -57,35 +49,27 @@
           style="padding-top: 7px"
           >Email
         </label>
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
-          <InputText
-            type="text"
-            v-model="searchEmail"
-            class="p-inputtext-sm"
-            placeholder="Search by email"
-            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
-          />
-        </span>
+        <InputText
+          type="text"
+          v-model="searchEmail"
+          class="p-inputtext-sm"
+          style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+        />
       </div>
     </div>
-    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width: 1150px">
+    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1150px">
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
           >Phone
         </label>
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
-          <InputText
-            type="text"
-            v-model="searchPhone"
-            class="p-inputtext-sm"
-            placeholder="Search by Phone"
-            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
-          />
-        </span>
+        <InputText
+          type="text"
+          v-model="searchPhone"
+          class="p-inputtext-sm"
+          style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+        />
       </div>
       <div>
         <label
@@ -123,9 +107,16 @@
       </div>
     </div>
     <div
-      class="p-d-flex p-flex-row p-mb-1 p-jc-center"
+      class="p-d-flex p-flex-row p-mb-3 p-jc-center"
       style="width: 1150px; margin: 20px 0"
     >
+    <Button
+        icon="pi pi-user"
+        iconPos="right"
+        label="Dowload Template"
+        @click="dowloadTemplate()"
+        class="p-ml-1 p-button-sm"
+      ></Button>
       <Button
         icon="pi pi-search"
         iconPos="right"
@@ -150,14 +141,20 @@
       :loading="isLoading"
       @page="onPageChange($event)"
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4"
-      style="width: 1150px"
+      style="width: 1250px"
     >
       <Column
-        field="employeeId"
-        header="EMPLOYEE ID"
-        headerStyle="width:110px;"
+        field="index"
+        header="STT"
+        headerStyle="width:50px; text-align: center"
+      ></Column>
+      <Column
+        field="code"
+        header="Mã nhân viên"
+        headerStyle="width:120px;"
       ></Column>
       <Column field="fullName" header="Họ và tên"></Column>
+      <Column field="strBitrh" header="ngày sinh"></Column>
       <Column field="phone" header="Điện thoại"></Column>
       <Column field="email" header="EMAIL" headerStyle="width:210px"></Column>
       <Column
@@ -199,6 +196,8 @@ import { useToast } from "primevue/usetoast";
 import { debounce } from "@/shared/utils";
 import positionApi from "@/api/material-management/position-api";
 import departmentApi from "@/api/material-management/department-api";
+import { async } from "rxjs";
+import employeeApi from "@/api/employee-api";
 
 export default defineComponent({
   setup(): unknown {
@@ -249,8 +248,31 @@ export default defineComponent({
           searchDepartment,
           searchPosition
         );
-        debugger
-        list.value = resp.data.list
+        let i = 1;
+        debugger;
+        list.value = resp.data.list.map((v: Record<string, unknown>) => {
+          let index = 1;
+          if (page > 1) {
+            index = 10 * (currentPage - 1) + i++;
+          } else {
+            index = i++;
+          }
+          let strBitrh = '';
+          if (v.birth) {
+            const date = new Date(v.birth as string);
+            strBitrh = new Intl.DateTimeFormat(["ban", "id"], {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+            }).format(date);
+          }
+
+          return {
+            ...v,
+            index,
+            strBitrh,
+          };
+        });
         // isLoading.value = false;
         currentPage = resp.data.currentPage;
         totalPages.value = resp.data.totalPages;
@@ -336,7 +358,7 @@ export default defineComponent({
 
     const onAddClick = () => {
       isNewRec.value = true;
-      selectedRec.value = { id: "" };
+      selectedRec.value = { employeeId: "" };
       showSlideOut.value = true;
     };
 
@@ -347,6 +369,7 @@ export default defineComponent({
     const onEditClick = async (rec: Record<string, unknown>) => {
       showSlideOut.value = true;
       selectedRec.value = rec;
+      debugger;
     };
 
     onMounted(async () => {
@@ -377,6 +400,12 @@ export default defineComponent({
       department.value = lstDepartments;
     };
 
+    const dowloadTemplate = async () => {
+      employeeApi.dowloadTemplate().then(res => {
+        debugger
+      })
+    }
+
     return {
       list,
       isLoading,
@@ -401,6 +430,7 @@ export default defineComponent({
       searchPhone,
       searchDepartment,
       searchPosition,
+      dowloadTemplate
     };
   },
   components: {

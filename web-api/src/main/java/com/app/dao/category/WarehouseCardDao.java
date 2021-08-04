@@ -62,7 +62,7 @@ public class WarehouseCardDao extends BaseHibernateDAO {
                 " wc.name name," +
                 " wc.description description," +
                 " wc.date_created dateCreated," +
-                " e.id employeeId," +
+                " e.employee_id employeeId," +
                 " e.full_name fullName," +
                 " concat(e.first_name, ' ' , e.last_name) employeeName," +
                 " s.supplies_id suppliesId," +
@@ -78,10 +78,13 @@ public class WarehouseCardDao extends BaseHibernateDAO {
                 " (select sum(amount) from warehouse_card_flow wcf where wcf.delivery_bill_id IS NOT NULL " +
                 " and wcf.warehouse_card_id = wc.warehouse_card_id ) amountDeliveryBill," +
                 " (select sum(amount) from warehouse_card_flow wcf where wcf.receipt_id IS NOT NULL " +
-                " and wcf.warehouse_card_id = wc.warehouse_card_id ) amountReceipt" +
+                " and wcf.warehouse_card_id = wc.warehouse_card_id ) amountReceipt, " +
+                " ((select sum(amount) from warehouse_card_flow wcf where wcf.delivery_bill_id IS NOT NULL " +
+                " and wcf.warehouse_card_id = wc.warehouse_card_id ) - (select sum(amount) from warehouse_card_flow wcf where wcf.receipt_id IS NOT NULL " +
+                " and wcf.warehouse_card_id = wc.warehouse_card_id ) ) amountInventory " +
                 " from warehouse_card wc " +
                 " left join supplies s on s.supplies_id = wc.supplies_id" +
-                " left join employees e on e.id = wc.employee_id" +
+                " left join employees e on e.employee_id = wc.employee_id" +
                 " left join warehouse w on w.warehouse_id = wc.warehouse_id";
         finalSql = finalSql + sql + " order by wc.warehouse_card_id " + sqlLimit;
 

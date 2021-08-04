@@ -88,4 +88,8 @@ export default {
     debugger;
     return api.delete(`/delivery_bills/delete_by_id/${deliveryBillId}`);
   },
+  
+  async getDeliveryBillByCode(deliveryBillObj: Record<string, string | number>): Promise<AxiosResponse> {
+    return api.post('/delivery_bills/byCode', deliveryBillObj);
+  },
 };

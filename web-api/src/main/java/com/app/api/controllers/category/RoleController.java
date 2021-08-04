@@ -1,10 +1,14 @@
 package com.app.api.controllers.category;
 
 import com.app.api.BaseController;
+import com.app.dao.base.CommonUtils;
 import com.app.dao.category.RoleDao;
 import com.app.model.BaseResponse;
+import com.app.model.category.QualityModel;
+import com.app.model.category.ReceiptModel;
 import com.app.model.category.RoleModel;
 import com.app.model.category.RoleModel.RolesResponse;
+import com.app.model.category.SuppliesModel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -168,5 +172,28 @@ public class RoleController extends BaseController {
             resp.setErrorMessage("Cannot delete Role - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
+    }
+
+    @POST
+    @Path("byCode")
+    @RolesAllowed({"ADMIN"})
+    @Operation(
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response getByCode(
+            RoleModel model
+    ) {
+        int recordFrom = 0;
+        Criteria criteria = roleDao.createCriteria(RoleModel.class);
+        if (model.getRoleId() != null){
+            criteria.add(Restrictions.ne("roleId", model.getRoleId()));
+        }
+        if (!CommonUtils.isNullOrEmpty(model.getCode())){
+            criteria.add(Restrictions.eq("code", model.getCode()).ignoreCase());
+        }
+        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
+        criteria.setProjection(Projections.rowCount());
+        Long rowCount = (Long)criteria.uniqueResult();
+        return Response.ok(rowCount > 0).build();
     }
 }

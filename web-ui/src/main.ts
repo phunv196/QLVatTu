@@ -30,6 +30,8 @@ import BlockUI from 'primevue/blockui';
 import SelectButton from 'primevue/selectbutton';
 import Menu from 'primevue/menu';
 import Chart from 'primevue/chart';
+import RadioButton from 'primevue/radiobutton';
+import Datepicker from 'vue3-datepicker';
 
 // Event Bus
 import mitt from 'mitt';
@@ -78,6 +80,8 @@ app.component('Sidebar', Sidebar);
 app.component('BlockUI', BlockUI);
 app.component('Menu', Menu);
 app.component('Chart', Chart);
+app.component('RadioButton', RadioButton);
+app.component('Datepicker', Datepicker);
 
 // app.config.globalProperties.$AppEvent = AppEvent;
 app.mount('#app');

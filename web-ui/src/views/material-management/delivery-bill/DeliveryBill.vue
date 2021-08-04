@@ -17,23 +17,19 @@
       ></DeliveryBillDetails>
     </Sidebar>
     <h3>Quản lý phiếu xuất kho</h3>
-    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width: 1350px">
+    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1350px">
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
           >Mã phiếu xuất
         </label>
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
           <InputText
             type="text"
             v-model="searchCode"
             class="p-inputtext-sm"
-            placeholder="Search by code"
             style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
           />
-        </span>
       </div>
       <div>
         <label
@@ -41,16 +37,12 @@
           style="padding-top: 7px"
           >Tên phiếu xuất
         </label>
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
           <InputText
             type="text"
             v-model="searchName"
             class="p-inputtext-sm"
-            placeholder="Search by name"
             style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
           />
-        </span>
       </div>
       <div>
         <label
@@ -66,7 +58,7 @@
           :filter="true"
           :showClear="true"
           optionLabel="fullName"
-          optionValue="id"
+          optionValue="employeeId"
         />
       </div>
       <div>
@@ -87,15 +79,13 @@
         />
       </div>
     </div>
-    <div class="p-d-flex p-flex-row p-mb-1 p-jc-around" style="width: 1350px">
+    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1350px">
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
           >Ngày lập từ
         </label>
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
           <InputText
             type="date"
             v-model="searchFormDate"
@@ -103,7 +93,6 @@
             placeholder="dd/mm/yyyy"
             style="width: 200px; height: 30px"
           />
-        </span>
       </div>
       <div>
         <label
@@ -111,8 +100,6 @@
           style="padding-top: 7px"
           >Đến ngày
         </label>
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" style="margin: -6px 10px 0px" />
           <InputText
             type="date"
             v-model="searchToDate"
@@ -120,7 +107,6 @@
             placeholder="dd/mm/yyyy"
             style="width: 200px; height: 30px"
           />
-        </span>
       </div>
       <div>
         <label
@@ -150,7 +136,7 @@
       </div>
     </div>
     <div
-      class="p-d-flex p-flex-row p-mb-1 p-jc-center"
+      class="p-d-flex p-flex-row p-mb-3 p-jc-center"
       style="width: 1350px; margin: 20px 0"
     >
       <Button
@@ -180,8 +166,8 @@
       style="width: 1350px"
     >
       <Column
-        field="deliveryBillId"
-        header="ID phiếu xuất"
+        field="index"
+        header="STT"
         headerStyle="width:90px;"
       ></Column>
       <Column
@@ -307,6 +293,7 @@ export default defineComponent({
           searchFactory
         );
         //list.value = resp.data.list
+        let i = 1;
         list.value = resp.data.list.map((v: Record<string, unknown>) => {
           const dt = new Date(v.dateDeliveryBill as string);
           const strDateDeliveryBill = new Intl.DateTimeFormat(["ban", "id"], {
@@ -314,9 +301,16 @@ export default defineComponent({
             month: "2-digit",
             day: "2-digit",
           }).format(dt);
+          let index = 1;
+          if (page > 1) {
+            index = (10 * (currentPage - 1)) + i++
+          } else {
+            index = i++;
+          }
           return {
             ...v,
             strDateDeliveryBill,
+            index
           };
         });
         // isLoading.value = false;

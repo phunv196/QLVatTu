@@ -1,66 +1,105 @@
 <template>
   <div class="m-font-regular">
     <BlockUI :blocked="isLoading" :fullScreen="true"></BlockUI>
-<!--    <div v-if="$props.isRegister">-->
-<!--      <h4>USER REGISTRATION</h4>-->
-<!--      <span class="m-gray-text">Provide some fake details, the data will be refreshed at certain interval</span>-->
-<!--    </div>-->
+    <!--    <div v-if="$props.isRegister">-->
+    <!--      <h4>USER REGISTRATION</h4>-->
+    <!--      <span class="m-gray-text">Provide some fake details, the data will be refreshed at certain interval</span>-->
+    <!--    </div>-->
     <div>
-      <span class="m-font-bold">USER ID: </span> <span style="color: var(--primary-color)"> {{ $props.rec.userId ? $props.rec.userId : 'New' }}</span>
+      <span class="m-font-bold">USER ID: </span>
+      <span style="color: var(--primary-color)">
+        {{ $props.rec.userId ? $props.rec.userId : "New" }}</span
+      >
       &nbsp;
-<!--      <span class="m-font-bold">ROLE: </span> <span style="color: var(&#45;&#45;primary-color)"> {{ $props.rec.role }} </span>-->
+      <!--      <span class="m-font-bold">ROLE: </span> <span style="color: var(&#45;&#45;primary-color)"> {{ $props.rec.role }} </span>-->
     </div>
     <div class="p-mt-4"></div>
     <transition name="p-message">
-      <Message v-if="showMessage" severity="info" @close="showMessage = false"> {{ userMessage }}</Message>
+      <Message v-if="showMessage" severity="info" @close="showMessage = false">
+        {{ userMessage }}</Message
+      >
     </transition>
     <div>
       <!-- ID & Password -->
       <div v-if="!recData.userId">
-        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1" >Tên tài khoản </label>
-        <InputText type="text" v-model="recData.userId" class="p-inputtext-sm"/>
+        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
+          >Tên tài khoản
+        </label>
+        <InputText
+          type="text"
+          v-model="recData.userId"
+          class="p-inputtext-sm"
+        />
       </div>
       <div class="p-mt-3">
-        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"> Mật khẩu </label>
-        <Password v-model="recData.password" toggleMask class="p-inputtext-sm"></Password>
+        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1">
+          Mật khẩu
+        </label>
+        <Password
+          v-model="recData.password"
+          toggleMask
+          class="p-inputtext-sm"
+        ></Password>
       </div>
       <div class="p-mt-3">
-        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"> Nhân viên </label>
-        <Dropdown class="p-inputtext-sm" style="width: 200px" v-model = "recData.employeeId"
-                  :options = emp
-                  :filter = true
-                  :showClear= true
-                  optionLabel="fullName"
-                  optionValue="id"/>
+        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1">
+          Nhân viên
+        </label>
+        <Dropdown
+          class="p-inputtext-sm"
+          style="width: 200px"
+          v-model="recData.employeeId"
+          :options="emp"
+          :filter="true"
+          :showClear="true"
+          optionLabel="fullName"
+          optionValue="employeeId"
+        />
       </div>
       <div class="p-mt-3">
-        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"> Quyền tài khoản </label>
-        <Dropdown class="p-inputtext-sm" style="width: 200px" v-model="recData.role"
-                  :options = emps
-                  :filter = true
-                  :showClear= true
-                  optionLabel="name"
-                  optionValue="code"/>
+        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1">
+          Quyền tài khoản
+        </label>
+        <Dropdown
+          class="p-inputtext-sm"
+          style="width: 200px"
+          v-model="recData.role"
+          :options="emps"
+          :filter="true"
+          :showClear="true"
+          optionLabel="name"
+          optionValue="code"
+        />
       </div>
     </div>
 
-<!--    <div v-if="$props.isRegister" class="p-mt-2 p-d-flex p-flex-row p-jc-end" style="width:100%">-->
-<!--      <Button label="LOGIN" @click="$router.push('/login')" class="p-button-sm p-button-outlined p-mr-1"></Button>-->
-<!--      <Button icon="pi pi-check" iconPos="left" label="REGISTER" @click="onRegister()" class="p-button-sm"></Button>-->
-<!--    </div>-->
-    <div  class="p-mt-2 p-d-flex p-flex-row p-jc-end" style="width:100%">
-      <Button label="CANCEL" @click="$emit('cancel')" class="p-button-sm p-button-outlined p-mr-1"></Button>
-      <Button icon="pi pi-check" iconPos="left" label="APPLY CHANGES" @click="onApplyChanges()" class="p-button-sm"></Button>
+    <!--    <div v-if="$props.isRegister" class="p-mt-2 p-d-flex p-flex-row p-jc-end" style="width:100%">-->
+    <!--      <Button label="LOGIN" @click="$router.push('/login')" class="p-button-sm p-button-outlined p-mr-1"></Button>-->
+    <!--      <Button icon="pi pi-check" iconPos="left" label="REGISTER" @click="onRegister()" class="p-button-sm"></Button>-->
+    <!--    </div>-->
+    <div class="p-mt-2 p-d-flex p-flex-row p-jc-end" style="width: 100%">
+      <Button
+        label="CANCEL"
+        @click="$emit('cancel')"
+        class="p-button-sm p-button-outlined p-mr-1"
+      ></Button>
+      <Button
+        icon="pi pi-check"
+        iconPos="left"
+        label="APPLY CHANGES"
+        @click="onApplyChanges()"
+        class="p-button-sm"
+      ></Button>
     </div>
   </div>
 </template>
 
 <script lang='ts'>
-import { defineComponent, onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
-import UsersApi from '@/api/users-api';
-import EmployeeApi from '@/api/employee-api';
-import RoleApi from '@/api/material-management/role-api';
+import { defineComponent, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import UsersApi from "@/api/users-api";
+import EmployeeApi from "@/api/employee-api";
+import RoleApi from "@/api/material-management/role-api";
 
 export default defineComponent({
   props: {
@@ -71,22 +110,22 @@ export default defineComponent({
 
   setup(props): unknown {
     const showMessage = ref(false);
+    const userMessage = ref("");
     const recData = ref(props.rec);
-    const userMessage = ref('');
     const emp = ref([]);
     const emps = ref([]);
     const router = useRouter();
 
     const onApplyChanges = () => {
-      userMessage.value = 'Updating User Details is disabled';
+      userMessage.value = "Updating User Details is disabled";
       showMessage.value = true;
     };
     const onRegister = async () => {
-      debugger
+      debugger;
       const rawUserObj = JSON.parse(JSON.stringify(recData.value));
       const resp = await UsersApi.registerUser(rawUserObj);
-      if (resp.data.msgType === 'SUCCESS') {
-        router.push('/login');
+      if (resp.data.msgType === "SUCCESS") {
+        router.push("/login");
       } else {
         userMessage.value = resp.data.msg; // 'Error during registration';
         showMessage.value = true;
@@ -98,9 +137,9 @@ export default defineComponent({
     });
 
     const lstEmp = async () => {
-      debugger
+      debugger;
       const resp = await EmployeeApi.getAll();
-      debugger
+      debugger;
       let lstEmps = [];
       if (resp.data) {
         lstEmps = resp.data.list;
@@ -108,15 +147,13 @@ export default defineComponent({
       emp.value = lstEmps;
 
       const resps = await RoleApi.getAll();
-      debugger
+      debugger;
       let lstRole = [];
       if (resps.data) {
         lstRole = resps.data.list;
       }
       emps.value = lstRole;
-    }
-
-
+    };
 
     return {
       router,
@@ -126,7 +163,7 @@ export default defineComponent({
       onApplyChanges,
       onRegister,
       emp,
-      emps
+      emps,
     };
   },
 });

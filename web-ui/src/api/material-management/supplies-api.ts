@@ -69,9 +69,11 @@ export default {
     debugger;
     return api.get(`/supplies/${suppliesId}`);
   },
-
   async getAll(): Promise<AxiosResponse> {
     debugger;
     return api.get(`/supplies/all`);
+  },
+  async getSuppliesByCode(suppliesObj: Record<string, string | number>): Promise<AxiosResponse> {
+    return api.post('/supplies/byCode', suppliesObj);
   },
 };

@@ -48,4 +48,7 @@ export default {
     debugger;
     return api.get(`/department/all`);
   },
+  async getDepartmentByCode(departmentObj: Record<string, string | number>): Promise<AxiosResponse> {
+    return api.post('/department/byCode', departmentObj);
+  },
 };

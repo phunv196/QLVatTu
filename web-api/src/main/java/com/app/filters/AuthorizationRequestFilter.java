@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.security.Principal;
+
+import com.app.util.Constants;
 import jakarta.annotation.Priority;
 import jakarta.annotation.security.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +19,6 @@ import com.app.model.user.*;
 import com.app.model.BaseResponse;
 import com.app.model.BaseResponse.MessageTypeEnum;
 import com.app.util.TokenUtil;
-import com.app.util.Constants.UserRoleConstants;
 
 @Provider
 @Priority(Priorities.AUTHENTICATION)
@@ -81,7 +82,7 @@ public class AuthorizationRequestFilter implements ContainerRequestFilter {
         });
 
         // Everything is permitted for the role "admin"
-        if (userView.getRole().equalsIgnoreCase(UserRoleConstants.ROLE_ADMIN)){
+        if (userView.getRole().equalsIgnoreCase(Constants.UserRoleConstants.ROLE_ADMIN)){
             return;
         }
 
@@ -92,7 +93,7 @@ public class AuthorizationRequestFilter implements ContainerRequestFilter {
             if (allowedRoleSet.contains(userView.getRole())){
                 return;
             }
-            if (allowedRoleSet.contains(UserRoleConstants.ROLE_CUSTOMER)){
+            if (allowedRoleSet.contains(Constants.UserRoleConstants.ROLE_CUSTOMER)){
                 // Any endpoint for role "CUSTOMER" is available to all authenticated users (ADMIN, SUPPORT)
                 return;
             } else {

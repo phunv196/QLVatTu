@@ -37,7 +37,7 @@ public class UserDao extends BaseHibernateDAO {
         String sqlDeleteCart = "delete from cart where  user_id = :userId";
         String sqlUser = "delete from users where user_id = :userId";
         String sqlDeleteCustomer = "delete from customers where id = :customerId";
-        String sqlDeleteEmployee = "delete from employees where id = :employeeId";
+        String sqlDeleteEmployee = "delete from employees where employee_id = :employeeId";
 
         Query queryDeleteOrderItems = createSQLQuery(sqlDeleteOrderItems);
         queryDeleteOrderItems.setParameter("userId", user.getUserId());

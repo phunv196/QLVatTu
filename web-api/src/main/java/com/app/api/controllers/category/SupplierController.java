@@ -1,10 +1,14 @@
 package com.app.api.controllers.category;
 
 import com.app.api.BaseController;
+import com.app.dao.base.CommonUtils;
 import com.app.dao.category.SupplierDao;
 import com.app.model.BaseResponse;
+import com.app.model.category.QualityModel;
+import com.app.model.category.SpeciesModel;
 import com.app.model.category.SupplierModel;
 import com.app.model.category.SupplierModel.SupplierResponse;
+import com.app.model.category.SuppliesModel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -179,5 +183,28 @@ public class SupplierController extends BaseController {
             resp.setErrorMessage("Cannot delete Supplier - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
+    }
+
+    @POST
+    @Path("byCode")
+    @RolesAllowed({"ADMIN"})
+    @Operation(
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response getByCode(
+            SupplierModel supplier
+    ) {
+        int recordFrom = 0;
+        Criteria criteria = supplierDao.createCriteria(SupplierModel.class);
+        if (supplier.getSupplierId() != null){
+            criteria.add(Restrictions.ne("supplierId", supplier.getSupplierId()));
+        }
+        if (!CommonUtils.isNullOrEmpty(supplier.getCode())){
+            criteria.add(Restrictions.eq("code", supplier.getCode()).ignoreCase());
+        }
+        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
+        criteria.setProjection(Projections.rowCount());
+        Long rowCount = (Long)criteria.uniqueResult();
+        return Response.ok(rowCount > 0).build();
     }
 }

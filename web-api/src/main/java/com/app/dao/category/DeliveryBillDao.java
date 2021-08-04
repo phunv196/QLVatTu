@@ -75,7 +75,7 @@ public class DeliveryBillDao extends BaseHibernateDAO {
                 " where d.delivery_bill_id = db.delivery_bill_id ) sumMoney " +
                 " from delivery_bill db " +
                 " left join factory f on f.factory_id = db.factory_id" +
-                " left join employees e on e.id = db.employee_id" +
+                " left join employees e on e.employee_id = db.employee_id" +
                 " left join warehouse w on w.warehouse_id = db.warehouse_id";
         finalSql = finalSql + sql + " order by db.delivery_bill_id " + sqlLimit;
 

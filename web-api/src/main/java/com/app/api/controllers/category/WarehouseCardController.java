@@ -1,10 +1,13 @@
 package com.app.api.controllers.category;
 
 import com.app.api.BaseController;
+import com.app.dao.base.CommonUtils;
 import com.app.dao.category.WarehouseCardDao;
 import com.app.dao.category.WarehouseCardFlowDao;
 import com.app.model.BaseResponse;
+import com.app.model.category.QualityModel;
 import com.app.model.category.ReceiptModel;
+import com.app.model.category.SuppliesModel;
 import com.app.model.category.WarehouseCardModel;
 import com.app.model.category.WarehouseCardModel.WarehouseCardResponse;
 import com.app.model.user.UserViewModel;
@@ -25,6 +28,7 @@ import jakarta.ws.rs.core.Response;
 import org.apache.catalina.User;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import java.math.BigInteger;
@@ -216,5 +220,28 @@ public class WarehouseCardController extends BaseController {
         warehouseCardFlowDao.beginTransaction();
         warehouseCardFlowDao.deleteByWarehouseCardId(warehouseCardId);
         warehouseCardFlowDao.commitTransaction();
+    }
+
+    @POST
+    @Path("byCode")
+    @RolesAllowed({"ADMIN"})
+    @Operation(
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = WarehouseCardModel.class)))}
+    )
+    public Response getByCode(
+            WarehouseCardModel model
+    ) {
+        int recordFrom = 0;
+        Criteria criteria = warehouseCardDao.createCriteria(WarehouseCardModel.class);
+        if (model.getWarehouseCardId() != null){
+            criteria.add(Restrictions.ne("warehouseCardId", model.getWarehouseCardId()));
+        }
+        if (!CommonUtils.isNullOrEmpty(model.getCode())){
+            criteria.add(Restrictions.eq("code", model.getCode()).ignoreCase());
+        }
+        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
+        criteria.setProjection(Projections.rowCount());
+        Long rowCount = (Long)criteria.uniqueResult();
+        return Response.ok(rowCount > 0).build();
     }
 }

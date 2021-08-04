@@ -7,7 +7,7 @@
                    :arrSupplies="arrSupplies" :arrSupplier="arrSupplier" :isNew="isNewRec"></ReceiptFlowDetails>
     </Sidebar>
     <h3> Danh sách vật tư nhập </h3>
-    <div class="p-d-flex p-flex-row p-mb-1" style="width:1000px">
+    <div class="p-d-flex p-flex-row p-mb-3" style="width:1000px">
       <div style="display:inline-block; flex:1"></div>
       <Button icon="pi pi-user" iconPos="right" label="ADD" @click="onAddClick()"
               class="p-ml-1 p-button-sm"></Button>
@@ -21,7 +21,7 @@
       :loading="isLoading"
       @page="onPageChange($event)"
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4" style="width:1000px">
-      <Column field="receiptFlowId" header="ID" headerStyle="width:50px;"></Column>
+      <Column field="index" header="STT" headerStyle="width:50px;"></Column>
       <Column field="suppliesCode" header="Mã vật tư" headerStyle="width:80px"></Column>
       <Column field="suppliesName" header="Tên vật tư" headerStyle="width:160px"></Column>
       <Column field="supplierCode" header="Nhà sản xuất" headerStyle="width:160px"></Column>
@@ -79,7 +79,19 @@ debugger
       try {
         debugger
         const resp = await ReceiptFlowApi.getReceiptFlows(page, requestedPageSize, receiptId.value);
-        list.value = resp.data.list;
+        let i = 1;
+        list.value = resp.data.list.map((v: Record<string, unknown>) => {
+          let index = 1;
+          if (page > 1) {
+            index = (10 * (currentPage - 1)) / 2 + i++
+          } else {
+            index = i++;
+          }
+          return {
+            ...v,
+            index,
+          };
+        });
         // isLoading.value = false;
         currentPage = resp.data.currentPage;
         totalPages.value = resp.data.totalPages;

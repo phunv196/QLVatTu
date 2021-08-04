@@ -74,4 +74,9 @@ export default {
     debugger;
     return api.delete(`/warehouse_cards/delete_by_id/${warehouseCardId}`);
   },
+  
+  async getWarehouseCardByCode(warehouseCardObj: Record<string, string | number>): Promise<AxiosResponse> {
+    debugger
+    return api.post('/warehouse_cards/byCode', warehouseCardObj);
+  },
 };
