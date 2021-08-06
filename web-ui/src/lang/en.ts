@@ -1,6 +1,6 @@
 export default {
   root: {
-    product_name: 'MRIN',
+    product_name: 'PhuNV',
     change_lang: 'Change Language',
     login: 'LOGIN',
     username: 'User Name',

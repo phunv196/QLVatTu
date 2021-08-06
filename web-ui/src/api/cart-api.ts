@@ -4,7 +4,7 @@ import { AxiosResponse } from 'axios';
 export default {
   async getCartItems(loginName: string): Promise<AxiosResponse> {
     const qsParams: Record<string, string> = {
-      'user-id': loginName || '',
+      'login-name': loginName || '',
     };
     return api.get('/cart', { params: qsParams });
   },

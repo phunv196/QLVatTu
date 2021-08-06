@@ -26,7 +26,8 @@ public class TokenUtil {
 
         return Jwts.builder()
             .setExpiration(new Date(System.currentTimeMillis() + VALIDITY_TIME_MS))
-            .claim("id"     , userView.getLoginName())
+            .claim("userId"     , userView.getUserId())
+            .claim("loginName"     , userView.getLoginName())
             .claim("role"   , userView.getRole())
             .claim("custId" , userView.getCustomerId())
             .claim("empId"  , userView.getEmployeeId())
@@ -40,7 +41,8 @@ public class TokenUtil {
         try {
             Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(strToken).getBody();
             return new UserViewModel(
-                (String)claims.get("id"),
+                (Integer)claims.get("userId"),
+                (String)claims.get("loginName"),
                 (String)claims.get("role"),
                 (String)claims.get("name"),
                 (String)claims.get("email"),

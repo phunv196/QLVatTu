@@ -13,7 +13,7 @@ import java.security.Principal;
 public class UserViewModel implements Serializable, Principal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")  private Long userId;
+    @Column(name = "user_id")  private Integer userId;
     @Column(name = "login_name")  private String loginName;
     @Column(name = "password") private String password;
     @Schema(allowableValues="ADMIN, SUPPORT, CUSTOMER") private String role;
@@ -24,7 +24,7 @@ public class UserViewModel implements Serializable, Principal {
 
     public UserViewModel(){}
 
-    public UserViewModel(Long userId, String loginName, String role, String fullName, String email, Integer empId, Integer custId){
+    public UserViewModel(Integer userId, String loginName, String role, String fullName, String email, Integer empId, Integer custId){
         this.setUserId(userId);
         this.setLoginName(loginName);
         this.setRole(role);
@@ -37,11 +37,11 @@ public class UserViewModel implements Serializable, Principal {
     @JsonIgnore // This getter is duplicate of getId but is must for all classes that implements java.security.Principal
     public String getName() {return loginName;}
 
-    public Long getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 

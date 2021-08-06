@@ -23,9 +23,10 @@ export function getLocaleNumberDisplay(n: number, locale = 'en-US'): string {
   return new Intl.NumberFormat(locale, { maximumSignificantDigits: 3 }).format(n);
 }
 
-export function commitJwtTokenToStore(jwt: string, user: string, role: string, userName: string): void {
+export function commitJwtTokenToStore(jwt: string, userId: number, user: string, role: string, userName: string): void {
   store.commit('jwt', jwt);
   store.commit('jwtTime', new Date().toISOString());
+  store.commit('userId', userId);
   store.commit('user', user);
   store.commit('role', role);
   store.commit('userName', userName);

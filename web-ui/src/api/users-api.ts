@@ -7,9 +7,12 @@ export default {
     const resp = await api.post('/authenticate/user', { username, password });
     const respData = resp.data.data;
     if (respData) {
-      commitJwtTokenToStore(respData.token, respData.loginName, respData.role, respData.fullName);
+      debugger
+      commitJwtTokenToStore(respData.token, respData.userId, respData.loginName, respData.role, respData.fullName);
+      debugger
       return resp;
     }
+    debugger
     return Promise.reject(resp.data ? resp.data : resp);
   },
 
@@ -21,7 +24,7 @@ export default {
     const qsParams: Record<string, number|string> = { };
     if (page) { qsParams.page = page; }
     if (pageSize) { qsParams['page-size'] = pageSize; }
-    if (loginName) { qsParams['user-id'] = loginName; }
+    if (loginName) { qsParams['login-name'] = loginName; }
     if (role) { qsParams.role = role; }
     return api.get('/users', { params: qsParams });
   },

@@ -14,6 +14,7 @@ import java.security.Principal;
 @Table(name = "users")
 public class UserModel implements Serializable, Principal {
     @Id
+    @Column(name = "user_id")  private Long userId;
     @Column(name = "login_name") private String loginName;
     private String password;
 
@@ -26,10 +27,21 @@ public class UserModel implements Serializable, Principal {
     @Column(name = "customer_id")
     private Integer customerId;
 
+    @Column(name = "full_name")
+    private String fullName;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "phone")
+    private String phone;
+
     //Constructors
     public UserModel(){}
 
-    public UserModel(String loginName, String password, String role, Integer employeeId, Integer customerId){
+    public UserModel(Long userId, String loginName, String password, String role, Integer employeeId, Integer customerId,
+                String fullName, String email, String phone){
+        this.setUserId(userId);
         this.setLoginName(loginName);
         this.setPassword(password);
         this.setRole(role);
@@ -38,11 +50,22 @@ public class UserModel implements Serializable, Principal {
         } else {
             this.setCustomerId(customerId);
         }
+        this.setFullName(fullName);
+        this.setEmail(email);
+        this.setPhone(phone);
     }
 
     //Getters and Setters
     @JsonIgnore // This getter is duplicate of getId but is must for all classes that implements java.security.Principal
     public String getName() {return loginName;}
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
 
     public String getLoginName() {return loginName;}
     public void setLoginName(String loginName) { this.loginName = loginName; }
@@ -58,4 +81,28 @@ public class UserModel implements Serializable, Principal {
 
     public Integer getCustomerId() { return customerId; }
     public void setCustomerId(Integer customerId) { this.customerId = customerId; }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 }

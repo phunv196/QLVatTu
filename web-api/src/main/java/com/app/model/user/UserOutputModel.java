@@ -4,11 +4,14 @@ import com.app.model.BaseResponse;
 import com.app.model.PageResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import javax.persistence.Column;
 import java.io.Serializable;
 import java.security.Principal;
 import java.util.List;
 
 public class UserOutputModel implements Serializable, Principal {
+    private Integer userId;
     private String loginName;
 
     @Schema(allowableValues =  {"ADMIN", "SUPPORT", "CUSTOMER"}, example="ADMIN")
@@ -24,6 +27,7 @@ public class UserOutputModel implements Serializable, Principal {
     public UserOutputModel(){}
 
     public UserOutputModel(UserViewModel userView){
+        this.setUserId(userView.getUserId());
         this.setLoginName(userView.getLoginName());
         this.setRole(userView.getRole());
         this.setFullName(userView.getFullName());
@@ -33,7 +37,8 @@ public class UserOutputModel implements Serializable, Principal {
         this.setToken("");
     }
 
-    public UserOutputModel(String loginName, String role, String fullName, String email, Integer empId, Integer custId, String token){
+    public UserOutputModel(Integer userId, String loginName, String role, String fullName, String email, Integer empId, Integer custId, String token){
+        this.setUserId(userId);
         this.setLoginName(loginName);
         this.setRole(role);
         this.setFullName(fullName);
@@ -47,6 +52,13 @@ public class UserOutputModel implements Serializable, Principal {
     @JsonIgnore // This getter is duplicate of getId but is must for all classes that implements java.security.Principal
     public String getName() {return loginName;}
 
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
 
     public String getLoginName() {return loginName;}
     public void setLoginName(String loginName) { this.loginName = loginName; }
