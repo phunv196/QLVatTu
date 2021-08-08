@@ -2,13 +2,11 @@ package com.app.api.controllers;
 
 import com.app.api.BaseController;
 import com.app.dao.base.BaseHibernateDAO;
-import com.app.dao.base.CommonUtils;
 import com.app.model.BaseResponse;
 import com.app.model.user.LoginModel;
 import com.app.model.user.LoginModel.LoginResponse;
+import com.app.model.user.UserModel;
 import com.app.model.user.UserOutputModel;
-import com.app.model.user.UserViewModel;
-import com.app.util.Constants;
 import com.app.util.PlainTextPasswordEncoder;
 import com.app.util.TokenUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,7 +15,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.PermitAll;
-import jakarta.servlet.http.HttpSession;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -56,21 +53,21 @@ public class AuthenticationController extends BaseController {
         }
 
 
-        String hql = "FROM UserViewModel u WHERE u.loginName = :uid";
+        String hql = "FROM UserModel u WHERE u.loginName = :uid";
         Query q = dao.createQuery(hql);
         q.setParameter("uid", uid);
-        UserViewModel userView = (UserViewModel)q.uniqueResult();  // can throw org.hibernate.NonUniqueResultExceptio
-        String pwdEncoder = PlainTextPasswordEncoder.encode(loginModel.getPassword(), userView.getUserId().toString());
-        if (userView!=null && pwdEncoder.equals(userView.getPassword())){
-            String strToken = TokenUtil.createTokenForUser(userView);
+        UserModel user = (UserModel)q.uniqueResult();  // can throw org.hibernate.NonUniqueResultExceptio
+        String pwdEncoder = PlainTextPasswordEncoder.encode(loginModel.getPassword(), user.getUserId().toString());
+        if (user!=null && pwdEncoder.equals(user.getPassword())){
+            String strToken = TokenUtil.createTokenForUser(user);
             UserOutputModel usrOutput = new UserOutputModel(
-                userView.getUserId(),
-                userView.getLoginName(),
-                userView.getRole(),
-                userView.getFullName(),
-                userView.getEmail(),
-                userView.getEmployeeId(),
-                userView.getCustomerId(),
+                user.getUserId(),
+                user.getLoginName(),
+                user.getRole(),
+                user.getFullName(),
+                user.getEmail(),
+                user.getEmployeeId(),
+                user.getCustomerId(),
                 strToken
             );
             LoginResponse successResp = new LoginResponse(usrOutput);

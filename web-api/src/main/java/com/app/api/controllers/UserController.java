@@ -4,11 +4,11 @@ import com.app.api.BaseController;
 import com.app.dao.UserDao;
 import com.app.model.BaseResponse;
 import com.app.model.user.LoginModel.LoginResponse;
+import com.app.model.user.UserModel;
 import com.app.model.user.UserOutputModel;
 import com.app.model.user.UserOutputModel.UserListResponse;
 import com.app.model.user.UserOutputModel.UserResponse;
 import com.app.model.user.UserRegistrationModel;
-import com.app.model.user.UserViewModel;
 import com.app.util.Constants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -52,7 +52,7 @@ public class UserController extends BaseController {
     ) {
         // Fill hibernate search by example user (Hibernate Query-by-example way of searching )
         int recordFrom=0;
-        UserViewModel searchUser = new UserViewModel();
+        UserModel searchUser = new UserModel();
         if (StringUtils.isNotBlank(loginName)){ searchUser.setLoginName(loginName); }
         if (StringUtils.isNotBlank(role)){ searchUser.setRole(role); }
         //if (StringUtils.isNotBlank(firstName)){ searchUser.setFirstName(firstName); }
@@ -65,7 +65,7 @@ public class UserController extends BaseController {
         recordFrom = (page-1) * pageSize;
 
         Example userExample = Example.create(searchUser);
-        Criteria criteria = userDao.createCriteria(UserViewModel.class);
+        Criteria criteria = userDao.createCriteria(UserModel.class);
         criteria.add(userExample);
 
         // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
@@ -76,12 +76,12 @@ public class UserController extends BaseController {
         criteria.setProjection(null);
         criteria.setFirstResult( (int) (long)recordFrom);
         criteria.setMaxResults(  (int) (long)pageSize);
-        List<UserViewModel> userList = criteria.list();
+        List<UserModel> userList = criteria.list();
 
         // Fill the result into userOutput list
         criteria.setProjection(null);
         List<UserOutputModel> userFoundList = new ArrayList<>();
-        for (UserViewModel tmpUser : userList) {
+        for (UserModel tmpUser : userList) {
             UserOutputModel usrOutput = new UserOutputModel(tmpUser);
             userFoundList.add(usrOutput);
         }
@@ -101,7 +101,7 @@ public class UserController extends BaseController {
       responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = LoginResponse.class)))}
     )
     public Response getLoggedInUser() {
-        UserViewModel userFromToken = (UserViewModel)securityContext.getUserPrincipal();  // securityContext is defined in BaseController
+        UserModel userFromToken = (UserModel)securityContext.getUserPrincipal();  // securityContext is defined in BaseController
         UserOutputModel userOutput = new UserOutputModel(userFromToken);
 
         LoginResponse resp = new LoginResponse();
@@ -118,8 +118,8 @@ public class UserController extends BaseController {
       responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = UserResponse.class)))}
     )
     public Response getUserDetailsById(@Parameter(description="User ID") @PathParam("loginName") String loginName) {
-        UserViewModel userFromToken = (UserViewModel)securityContext.getUserPrincipal();  // securityContext is defined in BaseController
-        UserViewModel userView = userDao.getById(loginName);
+        UserModel userFromToken = (UserModel)securityContext.getUserPrincipal();  // securityContext is defined in BaseController
+        UserModel userView = userDao.getById(loginName);
 
         UserResponse resp = new UserResponse();
         if (userView!=null) {
@@ -168,7 +168,7 @@ public class UserController extends BaseController {
         }
 
         try {
-            UserViewModel userInfo = userDao.getById(loginName);
+            UserModel userInfo = userDao.getById(loginName);
             if (userInfo==null){
                 resp.setErrorMessage("User not found");
                 return Response.ok(resp).build();
@@ -192,7 +192,7 @@ public class UserController extends BaseController {
     )
     public Response addUser(UserRegistrationModel registerObj) {
         BaseResponse resp = new BaseResponse();
-        UserViewModel userFromToken = (UserViewModel)securityContext.getUserPrincipal();  // securityContext is defined in BaseController
+        UserModel userFromToken = (UserModel)securityContext.getUserPrincipal();  // securityContext is defined in BaseController
         //Customers can query their own cart only
         if (userFromToken==null || !userFromToken.getRole().equalsIgnoreCase(Constants.UserRoleConstants.ROLE_ADMIN)){
             if (registerObj.getRole().equalsIgnoreCase(Constants.UserRoleConstants.ROLE_ADMIN)) {

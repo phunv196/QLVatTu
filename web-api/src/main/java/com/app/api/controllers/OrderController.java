@@ -7,7 +7,7 @@ import com.app.model.order.OrderItemModel;
 import com.app.model.order.OrderModel;
 import com.app.model.order.OrderWithNestedDetailModel;
 import com.app.model.order.OrderWithNestedDetailResponse;
-import com.app.model.user.UserViewModel;
+import com.app.model.user.UserModel;
 import com.app.util.Constants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -54,7 +54,7 @@ public class OrderController extends BaseController {
 
         OrderWithNestedDetailResponse resp = new OrderWithNestedDetailResponse();
 
-        UserViewModel userFromToken = (UserViewModel)securityContext.getUserPrincipal();  // securityContext is defined in BaseController
+        UserModel userFromToken = (UserModel) securityContext.getUserPrincipal();  // securityContext is defined in BaseController
         //Customers can query their own cart only
         if (userFromToken.getRole().equalsIgnoreCase(Constants.UserRoleConstants.ROLE_CUSTOMER)){
             if (customerId>0) {

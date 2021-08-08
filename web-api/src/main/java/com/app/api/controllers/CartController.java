@@ -6,7 +6,7 @@ import com.app.model.BaseResponse;
 import com.app.model.cart.CartModel;
 import com.app.model.cart.CartViewModel;
 import com.app.model.cart.CartViewModel.CartViewResponse;
-import com.app.model.user.UserViewModel;
+import com.app.model.user.UserModel;
 import com.app.util.Constants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -42,7 +42,7 @@ public class CartController extends BaseController {
     )
     public Response getCartItemsByUser( @Parameter(description="User Id", example="customer") @QueryParam("login-name") String loginName) {
         CartViewResponse resp = new CartViewResponse();
-        UserViewModel userFromToken = (UserViewModel)securityContext.getUserPrincipal();  // securityContext is defined in BaseController
+        UserModel userFromToken = (UserModel) securityContext.getUserPrincipal();  // securityContext is defined in BaseController
         //Customers can query their own cart only
         if (userFromToken.getRole().equalsIgnoreCase(Constants.UserRoleConstants.ROLE_CUSTOMER)){
             loginName = userFromToken.getLoginName();
@@ -68,7 +68,7 @@ public class CartController extends BaseController {
         @Parameter(description="Quantity"  , example="2") @QueryParam("quantity") Long quantity
     ) {
         BaseResponse resp = new BaseResponse();
-        UserViewModel userFromToken = (UserViewModel)securityContext.getUserPrincipal();  // securityContext is defined in BaseController
+        UserModel userFromToken = (UserModel)securityContext.getUserPrincipal();  // securityContext is defined in BaseController
 
         //Customers can query their own cart only
         if (userFromToken.getRole().equalsIgnoreCase(Constants.UserRoleConstants.ROLE_CUSTOMER)){

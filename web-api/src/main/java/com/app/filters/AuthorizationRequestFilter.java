@@ -37,7 +37,7 @@ public class AuthorizationRequestFilter implements ContainerRequestFilter {
         String className = method.getDeclaringClass().getName();
         String path = reqContext.getUriInfo().getPath();
         BaseResponse resp = new BaseResponse();
-        final UserViewModel userView;
+        final UserModel userView;
 
         //Allow Access for @PermitAll or OpenAPI Spec
         if (reqContext.getMethod().equalsIgnoreCase("OPTIONS") || method.isAnnotationPresent(PermitAll.class) || className.equals("io.swagger.v3.jaxrs2.integration.resources.OpenApiResource")) {

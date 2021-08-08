@@ -1,19 +1,19 @@
 package com.app.dao;
 
 import com.app.dao.base.BaseHibernateDAO;
-import com.app.model.user.UserViewModel;
+import com.app.model.user.UserModel;
 import org.hibernate.*;
 
 public class UserDao extends BaseHibernateDAO {
 
-    public UserViewModel getById(String loginName){
-        String hql = "from UserViewModel where loginName = :loginName";
+    public UserModel getById(String loginName){
+        String hql = "from UserModel where loginName = :loginName";
         Query q = createQuery(hql);
         q.setParameter("loginName", loginName);
-        return  (UserViewModel)q.uniqueResult();
+        return  (UserModel)q.uniqueResult();
     }
 
-    public void delete(UserViewModel user, boolean deleteRelatedData ){
+    public void delete(UserModel user, boolean deleteRelatedData ){
 
        /* To cleanly remove an user
           1. First delete the order-items and order that belong to the associated customer

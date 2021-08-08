@@ -5,11 +5,9 @@ import com.app.dao.base.CommonUtils;
 import com.app.dao.category.ReceiptDao;
 import com.app.dao.category.ReceiptFlowDao;
 import com.app.model.BaseResponse;
-import com.app.model.category.QualityModel;
 import com.app.model.category.ReceiptModel;
 import com.app.model.category.ReceiptModel.ReceiptResponse;
-import com.app.model.category.SuppliesModel;
-import com.app.model.user.UserViewModel;
+import com.app.model.user.UserModel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -120,7 +118,7 @@ public class ReceiptController extends BaseController {
     public Response addReceipt(ReceiptModel receipt) {
         BaseResponse resp = new BaseResponse();
         try {
-            UserViewModel userFromToken = (UserViewModel)securityContext.getUserPrincipal();
+            UserModel userFromToken = (UserModel)securityContext.getUserPrincipal();
             receipt.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
             receiptDao.beginTransaction();
             receiptDao.save(receipt);
@@ -144,7 +142,7 @@ public class ReceiptController extends BaseController {
         try {
             ReceiptModel foundProd  = receiptDao.getById(receipt.getReceiptId());
             if (foundProd != null) {
-                UserViewModel userFromToken = (UserViewModel)securityContext.getUserPrincipal();
+                UserModel userFromToken = (UserModel)securityContext.getUserPrincipal();
                 receipt.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
                 receiptDao.beginTransaction();
                 receiptDao.update(receipt);

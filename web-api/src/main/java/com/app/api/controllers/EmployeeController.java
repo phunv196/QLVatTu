@@ -19,6 +19,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
+import org.apache.commons.io.FileUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Projections;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.util.Base64;
 import java.util.List;
 
 @Path("employees")
@@ -199,8 +201,12 @@ public class EmployeeController extends BaseController {
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
-    public ResponseEntity<InputStreamResource> dowloadTemplate() throws Exception {
-        return service.processExport(req);
+    public Response dowloadTemplate() throws Exception {
+        String path = "C:/Users/Admin/Downloads/31072021_brief_list.xls";
+        File file = new File(path);
+        byte[] fileContent = FileUtils.readFileToByteArray(file);
+        String encodedString = Base64.getEncoder().encodeToString(fileContent);
+        return Response.ok(encodedString).build();
     }
 
 //    @GET

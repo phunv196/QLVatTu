@@ -5,12 +5,10 @@ import com.app.dao.base.CommonUtils;
 import com.app.dao.category.WarehouseCardDao;
 import com.app.dao.category.WarehouseCardFlowDao;
 import com.app.model.BaseResponse;
-import com.app.model.category.QualityModel;
 import com.app.model.category.ReceiptModel;
-import com.app.model.category.SuppliesModel;
 import com.app.model.category.WarehouseCardModel;
 import com.app.model.category.WarehouseCardModel.WarehouseCardResponse;
-import com.app.model.user.UserViewModel;
+import com.app.model.user.UserModel;
 import com.app.util.TokenUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -110,7 +108,7 @@ public class WarehouseCardController extends BaseController {
     public Response addWarehouseCard(WarehouseCardModel warehouseCard) {
         BaseResponse resp = new BaseResponse();
         try {
-            UserViewModel userFromToken = (UserViewModel)securityContext.getUserPrincipal();
+            UserModel userFromToken = (UserModel)securityContext.getUserPrincipal();
             warehouseCard.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
             warehouseCardDao.beginTransaction();
             warehouseCardDao.save(warehouseCard);
@@ -134,7 +132,7 @@ public class WarehouseCardController extends BaseController {
         try {
             WarehouseCardModel foundProd  = warehouseCardDao.getById(warehouseCard.getWarehouseCardId());
             if (foundProd != null) {
-                UserViewModel userFromToken = (UserViewModel)securityContext.getUserPrincipal();
+                UserModel userFromToken = (UserModel)securityContext.getUserPrincipal();
                 warehouseCard.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
                 warehouseCardDao.beginTransaction();
                 warehouseCardDao.update(warehouseCard);

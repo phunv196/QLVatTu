@@ -7,9 +7,7 @@ import com.app.dao.category.DeliveryBillFlowDao;
 import com.app.model.BaseResponse;
 import com.app.model.category.DeliveryBillModel;
 import com.app.model.category.DeliveryBillModel.DeliveryBillResponse;
-import com.app.model.category.QualityModel;
-import com.app.model.category.SuppliesModel;
-import com.app.model.user.UserViewModel;
+import com.app.model.user.UserModel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -135,7 +133,7 @@ public class DeliveryBillController extends BaseController {
     public Response addDeliveryBill(DeliveryBillModel deliveryBill) {
         BaseResponse resp = new BaseResponse();
         try {
-            UserViewModel userFromToken = (UserViewModel)securityContext.getUserPrincipal();
+            UserModel userFromToken = (UserModel)securityContext.getUserPrincipal();
             deliveryBill.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
             deliveryBillDao.beginTransaction();
             deliveryBillDao.save(deliveryBill);
@@ -159,7 +157,7 @@ public class DeliveryBillController extends BaseController {
         try {
             DeliveryBillModel foundProd = deliveryBillDao.getById(deliveryBill.getDeliveryBillId());
             if (foundProd != null) {
-                UserViewModel userFromToken = (UserViewModel)securityContext.getUserPrincipal();
+                UserModel userFromToken = (UserModel)securityContext.getUserPrincipal();
                 deliveryBill.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
                 deliveryBillDao.beginTransaction();
                 deliveryBillDao.update(deliveryBill);

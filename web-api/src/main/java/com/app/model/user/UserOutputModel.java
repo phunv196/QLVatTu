@@ -26,14 +26,14 @@ public class UserOutputModel implements Serializable, Principal {
     //Constructors
     public UserOutputModel(){}
 
-    public UserOutputModel(UserViewModel userView){
-        this.setUserId(userView.getUserId());
-        this.setLoginName(userView.getLoginName());
-        this.setRole(userView.getRole());
-        this.setFullName(userView.getFullName());
-        this.setEmail(userView.getEmail());
-        this.setEmployeeId(userView.getEmployeeId());
-        this.setCustomerId(userView.getCustomerId());
+    public UserOutputModel(UserModel user){
+        this.setUserId(user.getUserId());
+        this.setLoginName(user.getLoginName());
+        this.setRole(user.getRole());
+        this.setFullName(user.getFullName());
+        this.setEmail(user.getEmail());
+        this.setEmployeeId(user.getEmployeeId());
+        this.setCustomerId(user.getCustomerId());
         this.setToken("");
     }
 

@@ -110,7 +110,7 @@
       class="p-d-flex p-flex-row p-mb-3 p-jc-center"
       style="width: 1150px; margin: 20px 0"
     >
-    <Button
+      <Button
         icon="pi pi-user"
         iconPos="right"
         label="Dowload Template"
@@ -257,7 +257,7 @@ export default defineComponent({
           } else {
             index = i++;
           }
-          let strBitrh = '';
+          let strBitrh = "";
           if (v.birth) {
             const date = new Date(v.birth as string);
             strBitrh = new Intl.DateTimeFormat(["ban", "id"], {
@@ -401,10 +401,40 @@ export default defineComponent({
     };
 
     const dowloadTemplate = async () => {
-      employeeApi.dowloadTemplate().then(res => {
-        debugger
-      })
-    }
+      await employeeApi.dowloadTemplate().then((res) => {
+        //window.open ("data:application/vnd.ms-excel;base64," + res.data);
+        var contentType = "application/vnd.ms-excel";
+        var blob1 = b64toBlob(res.data, contentType, "");
+        var blobUrl1 = URL.createObjectURL(blob1);
+        window.open(blobUrl1);
+      });
+    };
+
+    const b64toBlob = (b64Data: any, contentType: any, sliceSize: any) => {
+      contentType = contentType || "";
+      var sliceSize = sliceSize || 512;
+      var byteCharacters = atob(b64Data);
+      var byteArrays = [];
+
+      for (
+        var offset = 0;
+        offset < byteCharacters.length;
+        offset += sliceSize
+      ) {
+        var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+        var byteNumbers = new Array(slice.length);
+        for (var i = 0; i < slice.length; i++) {
+          byteNumbers[i] = slice.charCodeAt(i);
+        }
+
+        var byteArray = new Uint8Array(byteNumbers);
+
+        byteArrays.push(byteArray);
+      }
+      var blob = new Blob(byteArrays, { type: contentType });
+      return blob;
+    };
 
     return {
       list,
@@ -430,7 +460,7 @@ export default defineComponent({
       searchPhone,
       searchDepartment,
       searchPosition,
-      dowloadTemplate
+      dowloadTemplate,
     };
   },
   components: {
