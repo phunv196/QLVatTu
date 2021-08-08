@@ -14,7 +14,7 @@ import java.security.Principal;
 @Table(name = "users")
 public class UserModel implements Serializable, Principal {
     @Id
-    @Column(name = "user_id")  private Long userId;
+    @Column(name = "user_id")  private Integer userId;
     @Column(name = "login_name") private String loginName;
     private String password;
 
@@ -39,7 +39,7 @@ public class UserModel implements Serializable, Principal {
     //Constructors
     public UserModel(){}
 
-    public UserModel(Long userId, String loginName, String password, String role, Integer employeeId, Integer customerId,
+    public UserModel(Integer userId, String loginName, String password, String role, Integer employeeId, Integer customerId,
                 String fullName, String email, String phone){
         this.setUserId(userId);
         this.setLoginName(loginName);
@@ -55,15 +55,25 @@ public class UserModel implements Serializable, Principal {
         this.setPhone(phone);
     }
 
+    public UserModel(Integer userId, String loginName, String role, String name, String email, Integer empId, String phone) {
+        this.setUserId(userId);
+        this.setLoginName(loginName);
+        this.setRole(role);
+        this.setFullName(name);
+        this.setEmail(email);
+        this.setEmployeeId(empId);
+        this.setPhone(phone);
+    }
+
     //Getters and Setters
     @JsonIgnore // This getter is duplicate of getId but is must for all classes that implements java.security.Principal
     public String getName() {return loginName;}
 
-    public Long getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
