@@ -279,7 +279,6 @@ export default defineComponent({
       searchWarehouse = searchWarehouse === "null" ? "0" : searchWarehouse;
       searchFactory = searchFactory === "null" ? "0" : searchFactory;
       try {
-        debugger;
         const resp = await DeliveryBillApi.getDeliveryBills(
           page,
           requestedPageSize,
@@ -324,7 +323,6 @@ export default defineComponent({
     };
 
     const confirmDialog = (rec: Record<string, unknown>) => {
-      debugger;
       confirm.require({
         message: `Do you want to remove ${rec.name} from product catalog ?`,
         header: "Remove",
@@ -401,7 +399,6 @@ export default defineComponent({
     );
 
     const onAddClick = async () => {
-      debugger;
       const today = new Date().getTime();
       const res = await FactoryApi.getAll();
       let factoryItem: any;
@@ -430,7 +427,6 @@ export default defineComponent({
     };
 
     const onDeleteClick = (rec: Record<string, unknown>) => {
-      debugger;
       confirmDialog(rec);
     };
 
@@ -460,9 +456,7 @@ export default defineComponent({
     });
 
     const lstEmp = async () => {
-      debugger;
       const resp = await EmployeeApi.getAll();
-      debugger;
       let lstEmps = [];
       if (resp.data) {
         lstEmps = resp.data.list;
@@ -471,9 +465,7 @@ export default defineComponent({
     };
 
     const lstWarehouse = async () => {
-      debugger;
       const resp = await WarehouseApi.getAll();
-      debugger;
       let lstWarehouses = [];
       if (resp.data) {
         lstWarehouses = resp.data.list;
@@ -482,9 +474,7 @@ export default defineComponent({
     };
 
     const lstfactory = async () => {
-      debugger;
       const resp = await FactoryApi.getAll();
-      debugger;
       let lstfactorys = [];
       if (resp.data) {
         lstfactorys = resp.data.list;

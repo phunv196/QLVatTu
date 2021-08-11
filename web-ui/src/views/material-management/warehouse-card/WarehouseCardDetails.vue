@@ -15,8 +15,8 @@
     <div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
-          >Mã thẻ kho</label
-        >
+          >Mã thẻ kho <strong class="p-error">*</strong>
+        </label>
         <InputText
           type="text"
           v-model="recData.code"
@@ -24,7 +24,7 @@
           style="width: 30%"
         />
         <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
-          >Tên thẻ kho
+          >Tên thẻ kho <strong class="p-error">*</strong>
         </label>
         <InputText
           type="text"
@@ -37,8 +37,8 @@
         <label
           class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
           style="padding-top: 10px"
-          >Ngày lập thẻ kho</label
-        >
+          >Ngày lập thẻ kho <strong class="p-error">*</strong>
+        </label>
         <Datepicker
           class="p-inputtext-sm"
           style="width: 320px"
@@ -50,7 +50,7 @@
         <label
           class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
           style="padding-top: 10px; margin-right: 10px"
-          >Vật tư
+          >Vật tư <strong class="p-error">*</strong>
         </label>
         <Dropdown
           style="width: 30%"
@@ -67,7 +67,7 @@
         <label
           class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
           style="padding-top: 10px; margin-right: 10px"
-          >Kho
+          >Kho <strong class="p-error">*</strong>
         </label>
         <Dropdown
           style="width: 30%; left: 5px"
@@ -82,9 +82,7 @@
         />
       </div>
       <div class="p-mt-3 p-d-flex p-ai-center">
-        <label
-          class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
-        >
+        <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1">
           Ghi chú
         </label>
         <textarea
@@ -144,7 +142,6 @@ export default defineComponent({
     arrSupplies: [],
   },
   setup(props, { emit }): unknown {
-    debugger;
     const toast = useToast();
     const showMessage = ref(false);
     const userMessage = ref("");
@@ -155,7 +152,6 @@ export default defineComponent({
     let checkDate = false;
     test1.value = recData.value.suppliesId != null ? true : false;
     const change = async () => {
-      debugger;
       // const today = new Date().getDate();
       // const dateCreated = new Date(recData.value.dateCreated).getDate();
       // checkDate = dateCreated == today ? false : true;
@@ -250,7 +246,7 @@ export default defineComponent({
     };
   },
   components: {
-     WarehouseCardFlow,
+    WarehouseCardFlow,
   },
 });
 </script>

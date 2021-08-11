@@ -36,7 +36,7 @@
         <label
           class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
           style="padding-top: 10px; margin-right: 10px"
-          >Phiếu nhập
+          >Phiếu nhập <strong class="p-error">*</strong>
         </label>
         <Dropdown
           style="width: 76.3%"
@@ -60,7 +60,7 @@
         <label
           class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
           style="padding-top: 10px; margin-right: 10px"
-          >Phiếu xuất
+          >Phiếu xuất <strong class="p-error">*</strong>
         </label>
         <Dropdown
           style="width: 76.3%"
@@ -76,7 +76,7 @@
       </div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Số lượng
+          >Số lượng <strong class="p-error">*</strong>
         </label>
         <InputNumber
           type="text"

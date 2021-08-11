@@ -40,8 +40,7 @@ import java.util.List;
 public class WarehouseCardController extends BaseController {
     WarehouseCardDao warehouseCardDao = new WarehouseCardDao();
     WarehouseCardFlowDao warehouseCardFlowDao = new WarehouseCardFlowDao();
-    @Context
-    HttpServletRequest request;
+
     @GET
     @RolesAllowed({"ADMIN"})
     @Operation(

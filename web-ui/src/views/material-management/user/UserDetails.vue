@@ -5,10 +5,11 @@
     <!--      <h4>USER REGISTRATION</h4>-->
     <!--      <span class="m-gray-text">Provide some fake details, the data will be refreshed at certain interval</span>-->
     <!--    </div>-->
+    <Toast />
     <div>
       <span class="m-font-bold">USER ID: </span>
       <span style="color: var(--primary-color)">
-        {{ $props.rec.loginName ? $props.rec.loginName : "New" }}</span
+        {{ $props.rec.userId ? $props.rec.userId : "New" }}</span
       >
       &nbsp;
       <!--      <span class="m-font-bold">ROLE: </span> <span style="color: var(&#45;&#45;primary-color)"> {{ $props.rec.role }} </span>-->
@@ -21,63 +22,68 @@
     </transition>
     <div>
       <!-- ID & Password -->
-      <div v-if="!recData.loginName">
-        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Tên tài khoản
+      <div class="p-mt-3">
+        <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
+          >Tên đăng nhập <strong class="p-error">*</strong>
         </label>
         <InputText
           type="text"
           v-model="recData.loginName"
-          class="p-inputtext-sm"
+          class="p-inputtext-sm p-col-4"
+          v-if="!recData.userId"
         />
-      </div>
-      <div class="p-mt-3">
-        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1">
-          Mật khẩu
+        <InputText
+          type="text"
+          v-model="recData.loginName"
+          class="p-inputtext-sm p-col-4"
+          v-if="recData.userId"
+          disabled
+        />
+        <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
+          >Nhân viên 
         </label>
-        <Password
-          v-model="recData.password"
-          toggleMask
+         <Dropdown
+          style="width: 33.3333%"
           class="p-inputtext-sm"
-        ></Password>
-      </div>
-      <div class="p-mt-3">
-        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1">
-          Nhân viên
-        </label>
-        <Dropdown
-          class="p-inputtext-sm"
-          style="width: 200px"
           v-model="recData.employeeId"
           :options="emp"
           :filter="true"
           :showClear="true"
           optionLabel="fullName"
           optionValue="employeeId"
+          @change="getEmployeeById(recData.employeeId)"
         />
       </div>
       <div class="p-mt-3">
-        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1">
-          Quyền tài khoản
+        <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
+          >Tên đầy đủ <strong class="p-error">*</strong>
         </label>
-        <Dropdown
-          class="p-inputtext-sm"
-          style="width: 200px"
-          v-model="recData.role"
-          :options="emps"
-          :filter="true"
-          :showClear="true"
-          optionLabel="name"
-          optionValue="code"
+        <InputText
+          type="text"
+          v-model="recData.fullName"
+          class="p-inputtext-sm p-col-4"
+        />
+      </div>
+      <div class="p-mt-3">
+        <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
+          >Email 
+        </label>
+        <InputText
+          type="text"
+          v-model="recData.email"
+          class="p-inputtext-sm p-col-4"
+        />
+        <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
+          >Số điện thoại 
+        </label>
+        <InputText
+          type="text"
+          v-model="recData.phone"
+          class="p-inputtext-sm p-col-4"
         />
       </div>
     </div>
-
-    <!--    <div v-if="$props.isRegister" class="p-mt-2 p-d-flex p-flex-row p-jc-end" style="width:100%">-->
-    <!--      <Button label="LOGIN" @click="$router.push('/login')" class="p-button-sm p-button-outlined p-mr-1"></Button>-->
-    <!--      <Button icon="pi pi-check" iconPos="left" label="REGISTER" @click="onRegister()" class="p-button-sm"></Button>-->
-    <!--    </div>-->
-    <div class="p-mt-2 p-d-flex p-flex-row p-jc-end" style="width: 100%">
+    <div class="p-mt-5 p-d-flex p-flex-row p-jc-end" style="width: 100%">
       <Button
         label="CANCEL"
         @click="$emit('cancel')"
@@ -100,46 +106,108 @@ import { useRouter } from "vue-router";
 import UsersApi from "@/api/users-api";
 import EmployeeApi from "@/api/employee-api";
 import RoleApi from "@/api/material-management/role-api";
+import { useToast } from "primevue/usetoast";
 
 export default defineComponent({
   props: {
-    rec: { type: Object, required: true },
-    isCustomer: { type: Boolean, default: true, required: false },
-    isRegister: { type: Boolean, default: false, required: false },
+    rec: { type: Object, required: true }
   },
 
-  setup(props): unknown {
+  setup(props, { emit }): unknown {
     const showMessage = ref(false);
     const userMessage = ref("");
-    const recData = ref(props.rec);
+    const data = ref(props.rec);
+    let recData = data;
     const emp = ref([]);
-    const emps = ref([]);
+    const role = ref([]);
     const router = useRouter();
+    const changesApplied = ref(false);
+    const toast = useToast();
 
-    const onApplyChanges = () => {
-      userMessage.value = "Updating User Details is disabled";
-      showMessage.value = true;
-    };
-    const onRegister = async () => {
-      debugger;
-      const rawUserObj = JSON.parse(JSON.stringify(recData.value));
-      const resp = await UsersApi.registerUser(rawUserObj);
-      if (resp.data.msgType === "SUCCESS") {
-        router.push("/login");
-      } else {
-        userMessage.value = resp.data.msg; // 'Error during registration';
+    // const onApplyChanges = () => {
+    //   userMessage.value = "Updating User Details is disabled";
+    //   showMessage.value = true;
+    // };
+    // const onRegister = async () => {
+    //   const rawUserObj = JSON.parse(JSON.stringify(recData.value));
+    //   const resp = await UsersApi.registerUser(rawUserObj);
+    //   if (resp.data.msgType === "SUCCESS") {
+    //     router.push("/login");
+    //   } else {
+    //     userMessage.value = resp.data.msg; // 'Error during registration';
+    //     showMessage.value = true;
+    //   }
+    // };
+
+    const onApplyChanges = async () => {
+      debugger
+      const rawUsersObj = JSON.parse(JSON.stringify(recData.value));
+      let msg: any[];
+      msg = [];
+      if (!rawUsersObj.loginName) {
+        msg.push("tên đăng nhập");
+      }
+      if (!rawUsersObj.fullName) {
+        msg.push("tên đầy đủ");
+      }
+      if (msg.length > 0) {
+        userMessage.value = "Trường " + msg.join(", ") + "không được để trống!";
         showMessage.value = true;
+      } else {
+        debugger
+        delete rawUsersObj.index;
+        const check = await UsersApi.getUsersByLoginName(rawUsersObj);
+        if (check.data) {
+          userMessage.value = "Tên đăng nhập bị trùng. Vui lòng nhập lại!";
+          showMessage.value = true;
+        } else {
+          debugger
+          let resp;
+          if (rawUsersObj.userId) {
+            debugger
+            resp = await UsersApi.updateUsers(rawUsersObj);
+          } else {
+            resp = await UsersApi.addUsers(rawUsersObj);
+          }
+          if (resp.data.msgType === "SUCCESS") {
+            toast.add({
+              severity: "success",
+              summary: rawUsersObj.userId
+                ? "User Updated"
+                : "User Added",
+              detail: `${rawUsersObj.loginName} (${rawUsersObj.fullName})`,
+              life: 3000,
+            });
+            if (!rawUsersObj.userId) {
+              recData.value.id = "CREATED";
+            }
+            changesApplied.value = true;
+            emit("changed");
+          } else {
+            toast.add({
+              severity: "error",
+              summary: "Error",
+              detail: resp.data.msg,
+            });
+          }
+        }
       }
     };
+
+    const getEmployeeById = (employeeId:any) => {
+        EmployeeApi.getEmployeeById(employeeId).then(res => {
+          recData.value.fullName = res.data.fullName;
+          recData.value.email = res.data.email;
+          recData.value.phone = res.data.phone;
+        });
+    }
 
     onMounted(() => {
       lstEmp();
     });
 
     const lstEmp = async () => {
-      debugger;
       const resp = await EmployeeApi.getAll();
-      debugger;
       let lstEmps = [];
       if (resp.data) {
         lstEmps = resp.data.list;
@@ -147,12 +215,11 @@ export default defineComponent({
       emp.value = lstEmps;
 
       const resps = await RoleApi.getAll();
-      debugger;
       let lstRole = [];
       if (resps.data) {
         lstRole = resps.data.list;
       }
-      emps.value = lstRole;
+      role.value = lstRole;
     };
 
     return {
@@ -161,9 +228,10 @@ export default defineComponent({
       userMessage,
       recData,
       onApplyChanges,
-      onRegister,
+      changesApplied,
       emp,
-      emps,
+      role,
+      getEmployeeById
     };
   },
 });

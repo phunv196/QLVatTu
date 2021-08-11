@@ -50,12 +50,10 @@ export default {
   },
 
   async deleteFactory(factoryId: string): Promise<AxiosResponse> {
-    debugger;
     return api.delete(`/factorys/${factoryId}`);
   },
 
   async addFactory(factoryObj: Record<string, string | number>): Promise<AxiosResponse> {
-    debugger
     return api.post('/factorys', factoryObj);
   },
 
@@ -64,12 +62,10 @@ export default {
   },
 
   async getById(factoryId: string): Promise<AxiosResponse> {
-    debugger;
     return api.get(`/factorys/${factoryId}`);
   },
 
   async getAll(): Promise<AxiosResponse> {
-    debugger;
     return api.get(`/factorys/all`);
   },
 

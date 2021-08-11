@@ -464,9 +464,7 @@ export default defineComponent({
     });
 
     const lstEmp = async () => {
-      debugger;
       const resp = await EmployeeApi.getAll();
-      debugger;
       let lstEmps = [];
       if (resp.data) {
         lstEmps = resp.data.list;
@@ -475,9 +473,7 @@ export default defineComponent({
     };
 
     const lstWarehouse = async () => {
-      debugger;
       const resp = await WarehouseApi.getAll();
-      debugger;
       let lstWarehouses = [];
       if (resp.data) {
         lstWarehouses = resp.data.list;
@@ -486,9 +482,7 @@ export default defineComponent({
     };
 
     const lstSupplies = async () => {
-      debugger;
       const resp = await SuppliesApi.getAll();
-      debugger;
       let lstSuppliess = [];
       if (resp.data) {
         lstSuppliess = resp.data.list;

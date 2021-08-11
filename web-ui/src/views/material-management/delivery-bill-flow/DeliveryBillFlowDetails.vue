@@ -7,11 +7,15 @@
         {{ recData.deliveryBillFlowId ? recData.deliveryBillFlowId : "NEW" }}
       </span>
     </h4>
-
+    <transition name="p-message">
+      <Message v-if="showMessage" severity="error" @close="showMessage = false">
+        {{ userMessage }}</Message
+      >
+    </transition>
     <div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Vật tư
+          >Vật tư <strong class="p-error">*</strong>
         </label>
         <Dropdown
           style="width: 40%"
@@ -27,7 +31,7 @@
 
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Số lượng
+          >Số lượng <strong class="p-error">*</strong>
         </label>
         <InputText
           type="text"
@@ -79,7 +83,6 @@ export default defineComponent({
   },
 
   setup(props, { emit }): unknown {
-    debugger;
     const toast = useToast();
     const showMessage = ref(false);
     const userMessage = ref("");
@@ -87,7 +90,6 @@ export default defineComponent({
     const recData = ref(JSON.parse(JSON.stringify(props.rec))); // do not create direct refs to props to avoid making changes to props, instead use a cloned value of prop
     const recData2 = props.arrSupplies;
     const onApplyChanges = async () => {
-      debugger;
       const rawDeliveryBillFlowObj = JSON.parse(JSON.stringify(recData.value));
       delete rawDeliveryBillFlowObj.index;
       let msg: any[];
@@ -104,7 +106,6 @@ export default defineComponent({
         showMessage.value = true;
       } else {
         let resp;
-        debugger;
         if (rawDeliveryBillFlowObj.deliveryBillFlowId) {
           resp = await DeliveryBillFlowApi.updateDeliveryBillFlow(
             rawDeliveryBillFlowObj

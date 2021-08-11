@@ -57,9 +57,6 @@ public class OrderController extends BaseController {
         UserModel userFromToken = (UserModel) securityContext.getUserPrincipal();  // securityContext is defined in BaseController
         //Customers can query their own cart only
         if (userFromToken.getRole().equalsIgnoreCase(Constants.UserRoleConstants.ROLE_CUSTOMER)){
-            if (customerId>0) {
-                customerId = userFromToken.getCustomerId();
-            }
         }
         try {
             List<OrderWithNestedDetailModel> orderWithOrderLinesList = orderDao.getWithOrderLines(page, pageSize, orderId, customerId, paymentType, orderStatus);

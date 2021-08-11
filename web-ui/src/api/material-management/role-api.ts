@@ -24,7 +24,6 @@ export default {
   },
 
   async deleteRole(roleId: string): Promise<AxiosResponse> {
-    debugger;
     return api.delete(`/roles/${roleId}`);
   },
 
@@ -37,7 +36,6 @@ export default {
   },
 
   async getAll(): Promise<AxiosResponse> {
-    debugger;
     return api.get(`/roles/all`);
   },
 

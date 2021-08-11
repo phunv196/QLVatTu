@@ -1,10 +1,23 @@
 package com.app.dao;
 
 import com.app.dao.base.BaseHibernateDAO;
+import com.app.dao.base.CommonUtils;
+import com.app.model.category.SuppliesModel;
 import com.app.model.user.UserModel;
+import com.app.model.user.UserOutputModel;
+import jakarta.validation.ConstraintViolationException;
 import org.hibernate.*;
+import org.hibernate.transform.Transformers;
+
+import java.math.BigInteger;
+import java.util.List;
 
 public class UserDao extends BaseHibernateDAO {
+
+    public  Long getSequence() throws Exception {
+        Long id = getAutoIncrement("users");
+        return id == null ? 0 : id;
+    }
 
     public UserModel getById(String loginName){
         String hql = "from UserModel where loginName = :loginName";
@@ -13,67 +26,88 @@ public class UserDao extends BaseHibernateDAO {
         return  (UserModel)q.uniqueResult();
     }
 
-    public void delete(UserModel user, boolean deleteRelatedData ){
+    public UserModel getById(Integer id){
+        String hql = "from UserModel where user_id = :id";
+        Query q = createQuery(hql);
+        q.setParameter("id", id);
+        return  (UserModel)q.uniqueResult();
+    }
 
-       /* To cleanly remove an user
-          1. First delete the order-items and order that belong to the associated customer
-          2. Then delete the cart that belong to the user
-          3. Then delete the user
-          4. Finally delete the associated customer
-        */
-
-        String sqlDeleteOrderItems = "delete from order_items where order_id " +
-                " in (select id from orders where customer_id " +
-                "     in (select id from customers where id " +
-                "         in (Select customer_id from users where login_name = :loginName ) " +
-                "   )" +
-                ")";
-
-        String sqlDeleteOrders = "delete from orders where customer_id " +
-                " in (select id  from customers where id " +
-                "     in (Select customer_id from users where login_name = :loginName) " +
-                ")";
-
-        String sqlDeleteCart = "delete from cart where  login_name = :loginName";
+    public void delete(UserModel user ){
         String sqlUser = "delete from users where login_name = :loginName";
-        String sqlDeleteCustomer = "delete from customers where id = :customerId";
-        String sqlDeleteEmployee = "delete from employees where employee_id = :employeeId";
-
-        Query queryDeleteOrderItems = createSQLQuery(sqlDeleteOrderItems);
-        queryDeleteOrderItems.setParameter("loginName", user.getLoginName());
-
-        Query queryDeleteOrders = createSQLQuery(sqlDeleteOrders);
-        queryDeleteOrders.setParameter("loginName", user.getLoginName());
-
-        Query queryDeleteCart = createSQLQuery(sqlDeleteCart);
-        queryDeleteCart.setParameter("loginName", user.getLoginName());
-
         Query queryDeleteUser = createSQLQuery(sqlUser);
         queryDeleteUser.setParameter("loginName", user.getLoginName());
-
-        Query queryDeleteCustomer = createSQLQuery(sqlDeleteCustomer);
-        if (deleteRelatedData && user.getCustomerId() != null) {
-            queryDeleteCustomer.setParameter("customerId", user.getCustomerId());
-        }
-
-        Query queryDeleteEmployee = createSQLQuery(sqlDeleteEmployee);
-        if (deleteRelatedData && user.getEmployeeId() != null) {
-            queryDeleteEmployee.setParameter("employeeId", user.getEmployeeId());
-        }
-        if (deleteRelatedData && user.getCustomerId() != null) {
-            queryDeleteOrderItems.executeUpdate();
-            queryDeleteOrders.executeUpdate();
-        }
-        queryDeleteCart.executeUpdate();
         queryDeleteUser.executeUpdate();
+    }
 
-        // Delete associated customer
-        if (deleteRelatedData && user.getCustomerId() != null) {
-            queryDeleteCustomer.executeUpdate();
+    public List<UserOutputModel> getList(int from, int limit, String searchLoginName, String searchRole, String searchFullName,
+                                         String searchEmail, String searchPhone, Long searchEmployeeId)  throws HibernateException, ConstraintViolationException {
+
+        String sql = createSqlWhereString(searchLoginName, searchRole, searchFullName, searchEmail, searchPhone,
+                searchEmployeeId);
+        String sqlLimit = "";
+        if ( limit <= 0 || limit > 1000 ){
+            sqlLimit = " limit 1000 ";
+        } else {
+            sqlLimit = " limit " +  limit;
         }
-        // Delete associated employee
-        if (deleteRelatedData && user.getEmployeeId() != null) {
-            queryDeleteEmployee.executeUpdate();
+        if (from <= 0) {
+            from = 0;
+        } else {
+            from = (from - 1) * limit;
         }
+
+        sqlLimit = sqlLimit + " offset " + from;
+        String finalSql = "select u.user_id userId," +
+                " u.login_name loginName," +
+                " u.full_name fullName," +
+                " u.email email," +
+                " u.phone phone," +
+                " u.role role," +
+                " u.employee_id employeeId," +
+                " e.code employeeCode" +
+                " from users u " +
+                " left join employees e on e.employee_id = u.employee_id" ;
+        finalSql = finalSql + sql + " order by u.user_id " + sqlLimit;
+
+        SQLQuery q = createSQLQuery(finalSql);
+        if (!CommonUtils.isNullOrEmpty(searchLoginName))   { q.setParameter("searchLoginName", "%" + searchLoginName.toLowerCase() + "%"); }
+        if (!CommonUtils.isNullOrEmpty(searchFullName))   { q.setParameter("searchFullName", "%" + searchFullName.toLowerCase() + "%"); }
+        if (!CommonUtils.isNullOrEmpty(searchEmail))   { q.setParameter("searchEmail", "%" + searchEmail.toLowerCase() + "%"); }
+        if (!CommonUtils.isNullOrEmpty(searchPhone))   { q.setParameter("searchPhone", "%" + searchPhone.toLowerCase() + "%"); }
+        if (!CommonUtils.isNullOrEmpty(searchRole))    { q.setParameter("searchRole", searchRole.toLowerCase()); }
+        if (searchEmployeeId >0)   { q.setParameter("searchEmployeeId", searchEmployeeId); }
+        q.setResultTransformer(Transformers.aliasToBean(UserOutputModel.class));
+        setResultTransformer(q, UserOutputModel.class);
+
+        return q.list();
+    }
+
+
+    public BigInteger getCount(String searchLoginName, String searchRole, String searchFullName,
+                               String searchEmail, String searchPhone, Long searchEmployeeId) {
+        String sql = createSqlWhereString(searchLoginName, searchRole, searchFullName, searchEmail, searchPhone,
+                searchEmployeeId);
+        String countSql = "select count(*) from users u " + sql ;
+        SQLQuery q = createSQLQuery(countSql);
+        if (!CommonUtils.isNullOrEmpty(searchLoginName))   { q.setParameter("searchLoginName", "%" + searchLoginName.toLowerCase() + "%"); }
+        if (!CommonUtils.isNullOrEmpty(searchFullName))   { q.setParameter("searchFullName", "%" + searchFullName.toLowerCase() + "%"); }
+        if (!CommonUtils.isNullOrEmpty(searchEmail))   { q.setParameter("searchEmail", "%" + searchEmail.toLowerCase() + "%"); }
+        if (!CommonUtils.isNullOrEmpty(searchPhone))   { q.setParameter("searchPhone", "%" + searchPhone.toLowerCase() + "%"); }
+        if (!CommonUtils.isNullOrEmpty(searchRole))    { q.setParameter("searchRole", searchRole.toLowerCase()); }
+        if (searchEmployeeId >0)   { q.setParameter("searchEmployeeId", searchEmployeeId); }
+        return (BigInteger)q.uniqueResult();
+    }
+
+    private  String createSqlWhereString(String searchLoginName, String searchRole, String searchFullName,
+                                         String searchEmail, String searchPhone, Long searchEmployeeId){
+        String sqlWhere = " where  1 = 1 ";
+        if (!CommonUtils.isNullOrEmpty(searchLoginName))   { sqlWhere = sqlWhere + " and LOWER(u.login_name) like :searchLoginName "; }
+        if (!CommonUtils.isNullOrEmpty(searchFullName))   { sqlWhere = sqlWhere + " and LOWER(u.full_name) like :searchFullName "; }
+        if (!CommonUtils.isNullOrEmpty(searchEmail))   { sqlWhere = sqlWhere + " and LOWER(u.email) like :searchEmail "; }
+        if (!CommonUtils.isNullOrEmpty(searchPhone))   { sqlWhere = sqlWhere + " and LOWER(u.phone) like :searchPhone "; }
+        if (!CommonUtils.isNullOrEmpty(searchRole))    { sqlWhere = sqlWhere + " and LOWER(u.role) = :searchRole "; }
+        if (searchEmployeeId >0)   { sqlWhere = sqlWhere + " and u.empluyee_id = :searchEmployeeId "; }
+        return sqlWhere;
     }
 }

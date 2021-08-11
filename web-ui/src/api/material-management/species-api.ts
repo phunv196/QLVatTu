@@ -25,7 +25,6 @@ export default {
   },
 
   async deleteSpecies(speciesId: string): Promise<AxiosResponse> {
-    debugger;
     return api.delete(`/species/${speciesId}`);
   },
 
@@ -38,7 +37,6 @@ export default {
   },
 
   async getAll(): Promise<AxiosResponse> {
-    debugger;
     return api.get(`/species/all`);
   },
 

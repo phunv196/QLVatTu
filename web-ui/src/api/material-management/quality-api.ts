@@ -24,7 +24,6 @@ export default {
   },
 
   async deleteQuality(qualityId: string): Promise<AxiosResponse> {
-    debugger;
     return api.delete(`/qualitys/${qualityId}`);
   },
 
@@ -37,7 +36,6 @@ export default {
   },
 
   async getAll(): Promise<AxiosResponse> {
-    debugger;
     return api.get(`/qualitys/all`);
   },
 

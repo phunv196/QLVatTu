@@ -15,7 +15,7 @@
     <div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Mã nhân viên
+          >Mã nhân viên <strong class="p-error">*</strong>
         </label>
         <InputText
           type="text"
@@ -25,7 +25,7 @@
       </div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Họ và đệm
+          >Họ và đệm <strong class="p-error">*</strong>
         </label>
         <InputText
           type="text"
@@ -33,7 +33,7 @@
           class="p-inputtext-sm p-col-4"
         />
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Tên
+          >Tên <strong class="p-error">*</strong>
         </label>
         <InputText
           type="text"
@@ -43,7 +43,7 @@
       </div>
       <div class="p-mt-3 p-d-flex p-ai-center">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1">
-          Ngày sinh
+          Ngày sinh <strong class="p-error">*</strong>
         </label>
         <Datepicker
           class="p-inputtext-sm p-mr-1"
@@ -52,7 +52,7 @@
           style="height: 1.8rem; width: 323px"
         />
         <label class="p-d-inline-block m-label-size-2 p-text-right p-pr-1">
-          Giới tính
+          Giới tính <strong class="p-error">*</strong>
         </label>
         <SelectButton
           v-model="recData.sex"
@@ -67,7 +67,7 @@
       </div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1">
-          Email
+          Email <strong class="p-error">*</strong>
         </label>
         <InputText
           type="text"
@@ -86,7 +86,7 @@
 
       <div class="p-mt-3 p-d-flex p-ai-center">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Chức vụ
+          >Chức vụ <strong class="p-error">*</strong>
         </label>
         <Dropdown
           style="width: 33.3333%"
@@ -99,7 +99,7 @@
           optionValue="positionId"
         />
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Phòng ban
+          >Phòng ban <strong class="p-error">*</strong>
         </label>
         <Dropdown
           style="width: 33.3333%"
@@ -170,12 +170,10 @@ export default defineComponent({
     const showMessage = ref(false);
     const userMessage = ref("");
     const changesApplied = ref(false);
-    debugger;
     const recData = ref(JSON.parse(JSON.stringify(props.rec))); // do not create direct refs to props to avoid making changes to props, instead use a cloned value of prop
 
     const onApplyChanges = async () => {
       const rawEmpObj = JSON.parse(JSON.stringify(recData.value));
-      debugger
       delete rawEmpObj.index;
       delete rawEmpObj.strBitrh;
       // rawEmpObj.id = rawEmpObj.employeeId || "";
@@ -194,6 +192,12 @@ export default defineComponent({
       }
       if (!rawEmpObj.lastName) {
         msg.push("tên nhân viên");
+      }
+      if (!rawEmpObj.birth) {
+        msg.push("ngày sinh");
+      }
+      if (!rawEmpObj.sex) {
+        msg.push("giới tính");
       }
       if (!rawEmpObj.email) {
         msg.push("email");
@@ -254,9 +258,7 @@ export default defineComponent({
     });
 
     const lstPosition = async () => {
-      debugger;
       const resp = await positionApi.getAll();
-      debugger;
       let lstPositions = [];
       if (resp.data) {
         lstPositions = resp.data.list;
@@ -265,9 +267,7 @@ export default defineComponent({
     };
 
     const lstDepartment = async () => {
-      debugger;
       const resp = await departmentApi.getAll();
-      debugger;
       let lstDepartments = [];
       if (resp.data) {
         lstDepartments = resp.data.list;

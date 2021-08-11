@@ -71,13 +71,10 @@ export default defineComponent({
     const confirm = useConfirm();
     const toast = useToast();
     let currentPage = 1;
-    debugger
     const receiptId = ref(JSON.parse(JSON.stringify(props.requence)));
-debugger
     const getData = async (page: number, requestedPageSize: number, receiptFlowId = '') => {
       // isLoading.value = true;
       try {
-        debugger
         const resp = await ReceiptFlowApi.getReceiptFlows(page, requestedPageSize, receiptId.value);
         list.value = resp.data.list;
         // isLoading.value = false;
@@ -91,7 +88,6 @@ debugger
     };
 
     const confirmDialog = (rec: Record<string, unknown>) => {
-      debugger;
       confirm.require({
         message: `Do you want to remove ${rec.name} from product catalog ?`,
         header: 'Remove',
@@ -158,7 +154,6 @@ debugger
     };
 
     const onDeleteClick = (rec: Record<string, unknown>) => {
-      debugger;
       confirmDialog(rec);
     };
 

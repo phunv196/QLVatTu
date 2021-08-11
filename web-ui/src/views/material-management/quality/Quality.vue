@@ -170,7 +170,6 @@ export default defineComponent({
     };
 
     const confirmDialog = (rec: Record<string, unknown>) => {
-      debugger;
       confirm.require({
         message: `Do you want to remove ${rec.name} from product catalog ?`,
         header: "Remove",

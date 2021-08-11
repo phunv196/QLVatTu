@@ -18,7 +18,6 @@ export default {
   },
 
   async deleteReceiptFlow(receiptFlowId: string): Promise<AxiosResponse> {
-    debugger;
     return api.delete(`/receipt_flows/${receiptFlowId}`);
   },
 

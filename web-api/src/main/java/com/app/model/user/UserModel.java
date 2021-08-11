@@ -3,10 +3,7 @@ package com.app.model.user;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.security.Principal;
 
@@ -24,9 +21,6 @@ public class UserModel implements Serializable, Principal {
     @Column(name = "employee_id")
     private Integer employeeId;
 
-    @Column(name = "customer_id")
-    private Integer customerId;
-
     @Column(name = "full_name")
     private String fullName;
 
@@ -36,6 +30,8 @@ public class UserModel implements Serializable, Principal {
     @Column(name = "phone")
     private String phone;
 
+    @Transient
+    private String newPassword;
     //Constructors
     public UserModel(){}
 
@@ -45,11 +41,7 @@ public class UserModel implements Serializable, Principal {
         this.setLoginName(loginName);
         this.setPassword(password);
         this.setRole(role);
-        if (employeeId != null){
-            this.setEmployeeId(employeeId);
-        } else {
-            this.setCustomerId(customerId);
-        }
+        this.setEmployeeId(employeeId);
         this.setFullName(fullName);
         this.setEmail(email);
         this.setPhone(phone);
@@ -77,6 +69,14 @@ public class UserModel implements Serializable, Principal {
         this.userId = userId;
     }
 
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
     public String getLoginName() {return loginName;}
     public void setLoginName(String loginName) { this.loginName = loginName; }
 
@@ -88,9 +88,6 @@ public class UserModel implements Serializable, Principal {
 
     public Integer getEmployeeId() { return employeeId; }
     public void setEmployeeId(Integer employeeId) { this.employeeId = employeeId; }
-
-    public Integer getCustomerId() { return customerId; }
-    public void setCustomerId(Integer customerId) { this.customerId = customerId; }
 
     public String getFullName() {
         return fullName;

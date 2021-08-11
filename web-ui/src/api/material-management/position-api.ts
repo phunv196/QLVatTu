@@ -25,7 +25,6 @@ export default {
   },
 
   async deletePosition(positionId: string): Promise<AxiosResponse> {
-    debugger;
     return api.delete(`/positions/${positionId}`);
   },
 
@@ -38,7 +37,6 @@ export default {
   },
 
   async getAll(): Promise<AxiosResponse> {
-    debugger;
     return api.get(`/positions/all`);
   },
 

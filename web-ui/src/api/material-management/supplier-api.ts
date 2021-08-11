@@ -33,7 +33,6 @@ export default {
   },
 
   async deleteSupplier(supplierId: string): Promise<AxiosResponse> {
-    debugger;
     return api.delete(`/supplier/${supplierId}`);
   },
 
@@ -46,7 +45,6 @@ export default {
   },
 
   async getAll(): Promise<AxiosResponse> {
-    debugger;
     return api.get(`/supplier/all`);
   },
 

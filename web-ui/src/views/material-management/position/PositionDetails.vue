@@ -15,8 +15,8 @@
     <div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Mã chức vụ</label
-        >
+          >Mã chức vụ <strong class="p-error">*</strong>
+        </label>
         <InputText
           type="text"
           v-model="recData.code"
@@ -25,9 +25,13 @@
       </div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Tên chức vụ
+          >Tên chức vụ <strong class="p-error">*</strong>
         </label>
-        <InputText type="text" v-model="recData.name" class="p-inputtext-sm p-col-8" />
+        <InputText
+          type="text"
+          v-model="recData.name"
+          class="p-inputtext-sm p-col-8"
+        />
       </div>
       <div class="p-mt-3 p-d-flex p-ai-center">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1">
@@ -89,7 +93,6 @@ export default defineComponent({
     const recData = ref(JSON.parse(JSON.stringify(props.rec))); // do not create direct refs to props to avoid making changes to props, instead use a cloned value of prop
 
     const onApplyChanges = async () => {
-      debugger;
       const rawPositionObj = JSON.parse(JSON.stringify(recData.value));
       delete rawPositionObj.index;
       delete rawPositionObj.strDateWarehousing;
@@ -112,7 +115,6 @@ export default defineComponent({
           showMessage.value = true;
         } else {
           let resp;
-          debugger;
           if (rawPositionObj.positionId) {
             resp = await PositionApi.updatePosition(rawPositionObj);
           } else {

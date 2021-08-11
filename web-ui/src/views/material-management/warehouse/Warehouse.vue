@@ -140,7 +140,6 @@ export default defineComponent({
     const getData = async (page: number, requestedPageSize: number, warehouseId = '', code='', name='', email='', phone='') => {
       // isLoading.value = true;
       try {
-        debugger
         const resp = await WarehouseApi.getWarehouses(page, requestedPageSize, warehouseId,code,name,email,phone);
         let i = 1;
         list.value = resp.data.list.map((v: Record<string, unknown>) => {
@@ -166,7 +165,6 @@ export default defineComponent({
     };
 
     const confirmDialog = (rec: Record<string, unknown>) => {
-      debugger;
       confirm.require({
         message: `Do you want to remove ${rec.name} from product catalog ?`,
         header: 'Remove',
@@ -219,7 +217,6 @@ export default defineComponent({
     };
 
     const onDeleteClick = (rec: Record<string, unknown>) => {
-      debugger;
       confirmDialog(rec);
     };
 

@@ -183,7 +183,6 @@ export default defineComponent({
     ) => {
       // isLoading.value = true;
       try {
-        debugger;
         const resp = await DepartmentApi.getDepartment(
           page,
           requestedPageSize,
@@ -217,7 +216,6 @@ export default defineComponent({
     };
 
     const confirmDialog = (rec: Record<string, unknown>) => {
-      debugger;
       confirm.require({
         message: `Do you want to remove ${rec.name} from product catalog ?`,
         header: "Remove",
@@ -272,7 +270,6 @@ export default defineComponent({
     };
 
     const onDeleteClick = (rec: Record<string, unknown>) => {
-      debugger;
       confirmDialog(rec);
     };
 

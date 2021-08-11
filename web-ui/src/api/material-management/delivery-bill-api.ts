@@ -42,13 +42,10 @@ export default {
     if (searchFactory) {
       qsParams.searchFactory = searchFactory;
     }
-
-    debugger
     return api.get('/delivery_bills', { params: qsParams });
   },
 
   async deleteDeliveryBill(deliveryBillId: string): Promise<AxiosResponse> {
-    debugger;
     return api.delete(`/delivery_bills/${deliveryBillId}`);
   },
 
@@ -65,27 +62,22 @@ export default {
   },
 
   // async getAll(): Promise<AxiosResponse> {
-  //   debugger;
   //   return api.get(`/delivery_bills/all`);
   // },
 
   async getAllBySuppliesId(suppliesId: number): Promise<AxiosResponse> {
-    debugger;
     return api.get(`/delivery_bills/all/${suppliesId}`);
   },
 
   async checkId(deliveryBillId: string): Promise<AxiosResponse> {
-    debugger;
     return api.get(`/delivery_bills/equal/${deliveryBillId}`);
   },
 
   async getListSuppliersId(suppliersId: number): Promise<AxiosResponse> {
-    debugger;
     return api.get(`/delivery_bills/${suppliersId}`);
   },
 
   async deleteByDeliveryBillId(deliveryBillId: string): Promise<AxiosResponse> {
-    debugger;
     return api.delete(`/delivery_bills/delete_by_id/${deliveryBillId}`);
   },
   

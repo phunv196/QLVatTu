@@ -43,6 +43,10 @@ export default {
     return api.delete(`/employees/${employeeId}`);
   },
 
+  async getEmployeeById(employeeId: string): Promise<AxiosResponse> {
+    return api.get(`/employees/getEmployeeById/${employeeId}`);
+  },
+
   async addEmployee(employeeObj: Record<string, string | number>): Promise<AxiosResponse> {
     return api.post('/employees', employeeObj);
   },
@@ -56,7 +60,6 @@ export default {
   },
 
   async getEmployeeByCode(employeeObj: Record<string, string | number>): Promise<AxiosResponse> {
-    debugger
     return api.post('/employees/byCode', employeeObj);
   },
 

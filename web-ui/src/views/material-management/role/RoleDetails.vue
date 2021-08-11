@@ -16,7 +16,7 @@
     <div>
       <div class="p-mt-1">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Mã quyền</label
+          >Mã quyền <strong class="p-error">*</strong> </label
         >
         <InputText
           type="text"
@@ -26,7 +26,7 @@
       </div>
       <div class="p-mt-1">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Tên quyền
+          >Tên quyền <strong class="p-error">*</strong>
         </label>
         <InputText type="text" v-model="recData.name" class="p-inputtext-sm p-col-8" />
       </div>
@@ -90,7 +90,6 @@ export default defineComponent({
     const recData = ref(JSON.parse(JSON.stringify(props.rec))); // do not create direct refs to props to avoid making changes to props, instead use a cloned value of prop
 
     const onApplyChanges = async () => {
-      debugger;
       const rawRoleObj = JSON.parse(JSON.stringify(recData.value));
       let msg: any[];
       msg = [];
@@ -112,7 +111,6 @@ export default defineComponent({
           showMessage.value = true;
         } else {
           let resp;
-          debugger;
           if (rawRoleObj.roleId) {
             resp = await RoleApi.updateRole(rawRoleObj);
           } else {

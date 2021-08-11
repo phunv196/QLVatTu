@@ -19,8 +19,9 @@ public class UserOutputModel implements Serializable, Principal {
 
     private String fullName;
     private String email;
-    private Integer customerId;
+    private String phone;
     private Integer employeeId;
+    private String employeeCode;
     private String token;
 
     //Constructors
@@ -33,17 +34,15 @@ public class UserOutputModel implements Serializable, Principal {
         this.setFullName(user.getFullName());
         this.setEmail(user.getEmail());
         this.setEmployeeId(user.getEmployeeId());
-        this.setCustomerId(user.getCustomerId());
         this.setToken("");
     }
 
-    public UserOutputModel(Integer userId, String loginName, String role, String fullName, String email, Integer empId, Integer custId, String token){
+    public UserOutputModel(Integer userId, String loginName, String role, String fullName, String email, Integer empId, String token){
         this.setUserId(userId);
         this.setLoginName(loginName);
         this.setRole(role);
         this.setFullName(fullName);
         this.setEmail(email);
-        this.setCustomerId(custId);
         this.setEmployeeId(empId);
         this.setToken(token);
     }
@@ -60,6 +59,22 @@ public class UserOutputModel implements Serializable, Principal {
         this.userId = userId;
     }
 
+    public String getEmployeeCode() {
+        return employeeCode;
+    }
+
+    public void setEmployeeCode(String employeeCode) {
+        this.employeeCode = employeeCode;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     public String getLoginName() {return loginName;}
     public void setLoginName(String loginName) { this.loginName = loginName; }
 
@@ -71,9 +86,6 @@ public class UserOutputModel implements Serializable, Principal {
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
-
-    public Integer getCustomerId() { return customerId; }
-    public void setCustomerId(Integer customerId) { this.customerId = customerId; }
 
     public Integer getEmployeeId() { return employeeId; }
     public void setEmployeeId(Integer employeeId) { this.employeeId = employeeId; }

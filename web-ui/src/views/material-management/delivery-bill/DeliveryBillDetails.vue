@@ -15,8 +15,8 @@
     <div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-4 p-text-right p-mr-1"
-          >Mã phiếu xuất</label
-        >
+          >Mã phiếu xuất <strong class="p-error">*</strong>
+        </label>
         <InputText
           type="text"
           v-model="recData.code"
@@ -24,7 +24,7 @@
           style="width: 30%"
         />
         <label class="p-d-inline-block m-label-size-4 p-text-right p-mr-1"
-          >Tên phiếu xuất
+          >Tên phiếu xuất <strong class="p-error">*</strong>
         </label>
         <InputText
           type="text"
@@ -41,8 +41,8 @@
         <label
           class="p-d-inline-block m-label-size-4 p-text-right p-mr-1"
           style="padding-top: 10px"
-          >Ngày lập phiếu</label
-        >
+          >Ngày lập phiếu <strong class="p-error">*</strong>
+        </label>
         <Datepicker
           class="p-inputtext-sm"
           style="width: 320px"
@@ -52,7 +52,7 @@
       </div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-4 p-text-right p-mr-1"
-          >Phân xưởng
+          >Phân xưởng <strong class="p-error">*</strong>
         </label>
         <Dropdown
           style="width: 30%"
@@ -66,7 +66,7 @@
         />
 
         <label class="p-d-inline-block m-label-size-4 p-text-right p-mr-1"
-          >Kho
+          >Kho <strong class="p-error">*</strong>
         </label>
         <Dropdown
           style="width: 30%"
@@ -80,9 +80,7 @@
         />
       </div>
       <div class="p-mt-3 p-d-flex p-ai-center">
-        <label
-          class="p-d-inline-block m-label-size-4 p-text-right p-mr-1"
-        >
+        <label class="p-d-inline-block m-label-size-4 p-text-right p-mr-1">
           Ghi chú
         </label>
         <textarea
@@ -147,7 +145,6 @@ export default defineComponent({
     const changesApplied = ref(false);
     const recData = ref(JSON.parse(JSON.stringify(props.rec))); // do not create direct refs to props to avoid making changes to props, instead use a cloned value of prop
     const onApplyChanges = async () => {
-      debugger;
       const rawDeliveryBillObj = JSON.parse(JSON.stringify(recData.value));
       delete rawDeliveryBillObj.index;
       delete rawDeliveryBillObj.strDateDeliveryBill;
@@ -162,6 +159,9 @@ export default defineComponent({
       if (!rawDeliveryBillObj.dateDeliveryBill) {
         msg.push("ngày lập phiếu");
       }
+      if (!rawDeliveryBillObj.factoryId) {
+        msg.push("phân xưởng");
+      }
       if (!rawDeliveryBillObj.warehouseId) {
         msg.push("kho");
       }
@@ -170,46 +170,48 @@ export default defineComponent({
           "Trường " + msg.join(", ") + " không được để trống!";
         showMessage.value = true;
       } else {
-        const check = await DeliveryBillApi.getDeliveryBillByCode(rawDeliveryBillObj);
+        const check = await DeliveryBillApi.getDeliveryBillByCode(
+          rawDeliveryBillObj
+        );
         if (check.data) {
           userMessage.value = "Mã phiếu xuất bị trùng. Vui lòng nhập lại!";
           showMessage.value = true;
         } else {
-      let resp;
-      const checkId = await DeliveryBillApi.checkId(
-        rawDeliveryBillObj.deliveryBillId
-      );
-      debugger;
-      if (checkId.data) {
-        
-        resp = await DeliveryBillApi.updateDeliveryBill(rawDeliveryBillObj);
-      } else {
-        resp = await DeliveryBillApi.addDeliveryBill(rawDeliveryBillObj);
-      }
-      if (resp.data.msgType === "SUCCESS") {
-        toast.add({
-          severity: "success",
-          summary: rawDeliveryBillObj.deliveryBillId
-            ? "Product Updated"
-            : "Product Added",
-          detail: `${rawDeliveryBillObj.name} (${rawDeliveryBillObj.code})`,
-          life: 3000,
-        });
-        if (!rawDeliveryBillObj.deliveryBillId) {
-          recData.value.id = "CREATED";
+          let resp;
+          const checkId = await DeliveryBillApi.checkId(
+            rawDeliveryBillObj.deliveryBillId
+          );
+          if (checkId.data) {
+            resp = await DeliveryBillApi.updateDeliveryBill(rawDeliveryBillObj);
+          } else {
+            resp = await DeliveryBillApi.addDeliveryBill(rawDeliveryBillObj);
+          }
+          if (resp.data.msgType === "SUCCESS") {
+            toast.add({
+              severity: "success",
+              summary: rawDeliveryBillObj.deliveryBillId
+                ? "Product Updated"
+                : "Product Added",
+              detail: `${rawDeliveryBillObj.name} (${rawDeliveryBillObj.code})`,
+              life: 3000,
+            });
+            if (!rawDeliveryBillObj.deliveryBillId) {
+              recData.value.id = "CREATED";
+            }
+            changesApplied.value = true;
+            emit("changed");
+            setTimeout(() => {
+              onCancel();
+            }, 500);
+          } else {
+            toast.add({
+              severity: "error",
+              summary: "Error",
+              detail: resp.data.msg,
+            });
+          }
         }
-        changesApplied.value = true;
-        emit("changed");
-        setTimeout(() => {
-          onCancel();
-        }, 500);
-      } else {
-        toast.add({
-          severity: "error",
-          summary: "Error",
-          detail: resp.data.msg,
-        });
-      }}}
+      }
     };
 
     const onCancel = () => {

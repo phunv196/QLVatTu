@@ -14,20 +14,74 @@
     </div>
     <div style="flex:1"></div>
     <div class="p-d-flex p-flex-row p-jc-end" style="color:var(--fg-alt); font-size:0.75rem">
+      <div class="p-as-center p-ai-end p-jc-between p-mr-5" style="font-size: 1rem">
+        <Button
+        icon="pi pi-send"
+        iconPos="right"
+        label="Đổi mật khẩu"
+        @click="changePassword()"
+        style="background: #333333;"
+      ></Button>
+      </div>
       <div class="p-d-flex p-flex-column p-ai-end p-jc-between p-mr-2">
         <span> {{ $store.getters.role }} </span>
         <span> {{ $store.getters.userName }} </span>
       </div>
       <Button icon="pi pi-sign-out" class="p-button-rounded" @click="$router.push('/login')"/>
     </div>
+    <Toast />
+    <Dialog header="Đổi mật khẩu" v-model:visible="showSlideOut" :style="{width: '30vw' , height: '30vw', background: '#000000'}">
+            <div class="m-font-regular">
+              <transition name="p-message">
+                <Message v-if="showMessage" severity="info" @close="showMessage = false">
+                  {{ userMessage }}</Message
+                >
+              </transition>
+              <div class="p-mt-3">
+                <label class="p-d-inline-block m-label-size-5 p-text-left p-mr-1"
+                  >Tên đăng nhập: <strong style="font-size: 1rem"> {{ $store.getters.user }} </strong>
+                </label>
+              </div>
+              <div class="p-mt-3">
+                <label class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+                  >Mật khẩu cũ
+                </label>
+                <InputText
+                  type="text"
+                  v-model="password"
+                  class="p-inputtext-sm p-col-6"
+                />
+              </div>
+              <div class="p-mt-3">
+                <label class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+                  >Mật khẩu mới
+                </label>
+                <Password v-model="newPassword" toggleMask class="p-inputtext-sm " style="width: 50%;"></Password>
+              </div>
+              <div class="p-mt-3">
+                <label class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+                  >Nhập lại
+                </label>
+                <Password v-model="rePassword" toggleMask class="p-inputtext-sm" style="width: 50%;"></Password>
+              </div>
+            </div>
+            <template #footer>
+                <Button label="No" icon="pi pi-times" @click="closeBasic" class="p-button-text"/>
+                <Button label="Yes" icon="pi pi-check" @click="updatePassword" autofocus />
+            </template>
+            
+            <!-- <Register v-model:visible="showSlideOut"></Register> -->
+    </Dialog> 
   </div>
 </template>
 
 <script lang=ts>
-import { defineComponent } from 'vue';
+import {ref, defineComponent } from 'vue';
 import Logo from '@/components/Logo.vue';
 import Menubar from 'primevue/menubar';
-
+import { useToast } from "primevue/usetoast";
+import UsersApi from "@/api/users-api";
+import Register from '@/views/material-management/home/Register.vue'
 export default defineComponent({
   props: {
     label: { type: String, default: 'ORDER MANAGEMENT' },
@@ -36,6 +90,72 @@ export default defineComponent({
   components: {
     Logo,
     Menubar,
+    Register
+  },
+  setup(): unknown {
+    const showSlideOut = ref(false);
+    const password = ref('');
+    const newPassword = ref('');
+    const rePassword = ref('');
+    const showMessage = ref(false);
+    const userMessage = ref("");
+    const toast = useToast();
+    const changePassword = () => {
+      showSlideOut.value = true;
+    }
+    const closeBasic = () => {
+      showSlideOut.value = false;
+    }
+
+    const updatePassword = () => {
+      let msg: any[];
+      msg = [];
+
+      if (password.value.length < 1 ) {
+        msg.push("mật khẩu cũ chưa nhập");
+      }
+
+      if (rePassword.value !== newPassword.value) {
+        msg.push("mật khẩu mới không khớp");
+      }
+      if (newPassword.value.length < 8) {
+        msg.push("mật khẩu mới phải >= 8 ký tự");
+      }
+      if (msg.length > 0) {
+        userMessage.value = "Trường " + msg.join(", ") + ". Vui lòng nhập lại!";
+        showMessage.value = true;
+      } else {
+        UsersApi.changePassword({password: password.value, newPassword: newPassword.value }).then(res => {
+          if (res.data) {
+            showSlideOut.value = false;
+            toast.add({
+              severity: "success",
+              summary: "Success",
+              detail: "Đổi mật khẩu thành công!",
+              life: 3000,
+            });
+          } else {
+            userMessage.value = "Mật khẩu cũ không đúng. Vui lòng nhập lại!";
+          }
+        });
+      }
+    }
+
+
+    return {
+      showSlideOut,
+      tableData:[],
+      selectedRec:{},
+      isNew:false,
+      changePassword,
+      closeBasic,
+      updatePassword,
+      password,
+      showMessage,
+      userMessage,
+      newPassword,
+      rePassword,
+    }
   },
 });
 </script>

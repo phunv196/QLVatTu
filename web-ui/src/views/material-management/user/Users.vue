@@ -5,42 +5,125 @@
     <Sidebar
       v-model:visible="showSlideOut"
       position="right"
-      style="width: 700px"
+      style="width: 1000px"
     >
       <UserDetails
         :rec="selectedRec"
-        :isCustomer="isCustomer"
-        :isNew="isNewRec"
         @cancel="showSlideOut = false"
         @changed="getData()"
-      ></UserDetails>
+        :isNew="isNewRec"
+      >
+      </UserDetails>
     </Sidebar>
-    <h3>Manage Users</h3>
-    <div class="p-d-flex p-flex-row p-mb-3" style="width: 1300px">
+    <h3>Manage Employees</h3>
+    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1150px">
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Tên đăng nhập
+        </label>
         <InputText
           type="text"
-          v-model="searchCode"
+          v-model="searchLoginName"
           class="p-inputtext-sm"
-          style="width: 180px; margin: 1px 10px 0 10px"
+          style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
         />
+      </div>
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Tên đầy đủ
+        </label>
         <InputText
           type="text"
-          v-model="searchName"
+          v-model="searchFullName"
           class="p-inputtext-sm"
-          style="width: 180px; margin: 1px 10px 0 10px"
+          style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
         />
-      <Dropdown
-        class="p-inputtext-sm"
-        style="width: 200px"
-        v-model="searchEmployee"
-        :options="emp"
-        :filter="true"
-        :showClear="true"
-        optionLabel="fullName"
-        optionValue="employeeId"
-      />
-
-      <div style="display: inline-block; flex: 1"></div>
+      </div>
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Email
+        </label>
+        <InputText
+          type="text"
+          v-model="searchEmail"
+          class="p-inputtext-sm"
+          style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+        />
+      </div>
+    </div>
+    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1150px">
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Phone
+        </label>
+        <InputText
+          type="text"
+          v-model="searchPhone"
+          class="p-inputtext-sm"
+          style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+        />
+      </div>
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Quyền
+        </label>
+        <Dropdown
+          class="p-inputtext-sm"
+          style="width: 200px"
+          v-model="searchRole"
+          :options="role"
+          :filter="true"
+          :showClear="true"
+          optionLabel="name"
+          optionValue="code"
+        />
+      </div>
+      <div>
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
+          style="padding-top: 7px"
+          >Nhân viên
+        </label>
+        <Dropdown
+          class="p-inputtext-sm"
+          style="width: 200px"
+          v-model="searchEmployeeId"
+          :options="emp"
+          :filter="true"
+          :showClear="true"
+          optionLabel="fullName"
+          optionValue="employeeId"
+        />
+      </div>
+    </div>
+    <div
+      class="p-d-flex p-flex-row p-mb-3 p-jc-center"
+      style="width: 1150px; margin: 20px 0"
+    >
+      <Button
+        icon="pi pi-user"
+        iconPos="right"
+        label="Dowload Template"
+        @click="dowloadTemplate()"
+        class="p-ml-1 p-button-sm"
+      ></Button>
+      <Button
+        icon="pi pi-search"
+        iconPos="right"
+        label="Tìm kiếm"
+        @click="onSearchKeyup()"
+        class="p-ml-1 p-button-sm"
+      ></Button>
       <Button
         icon="pi pi-user"
         iconPos="right"
@@ -51,11 +134,14 @@
     </div>
     <DataTable
       :value="list"
-      :scrollable="true"
-      scrollHeight="500px"
+      :paginator="true"
+      :lazy="true"
+      :rows="pageSize"
+      :totalRecords="totalRecs"
       :loading="isLoading"
-      class="p-datatable-sm p-datatable-hoverable-rows m-border"
-      style="width: 1300px"
+      @page="onPageChange($event)"
+      class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4"
+      style="width: 1250px"
     >
       <Column
         field="index"
@@ -65,15 +151,13 @@
       ></Column>
       <Column
         field="loginName"
-        header="USER ID"
-        :sortable="true"
+        header="Tên đăng nhập"
         headerStyle="min-width:110px;"
         bodyStyle="min-width:110px;"
       ></Column>
       <Column
         field="role"
-        header="ROLE"
-        :sortable="true"
+        header="Quyền"
         headerStyle="min-width:110px"
         bodyStyle="min-width:110px;"
       ></Column>
@@ -84,20 +168,14 @@
         bodyStyle="min-width:260px;"
       ></Column>
       <Column
-        field="employeeId"
-        header="EMPLOYEE ID"
+        field="fullName"
+        header="Tên đầy đủ"
         headerStyle="min-width:110px"
         bodyStyle="min-width:110px;"
       ></Column>
       <Column
         field="employeeCode"
         header="Mã nhân viên"
-        headerStyle="min-width:110px"
-        bodyStyle="min-width:110px;"
-      ></Column>
-      <Column
-        field="fullName"
-        header="Tên nhân viên"
         headerStyle="min-width:110px"
         bodyStyle="min-width:110px;"
       ></Column>
@@ -143,39 +221,79 @@
 import { ref, onMounted, defineComponent } from "vue";
 import UserDetails from "@/views/material-management/user/UserDetails.vue";
 import UsersApi from "@/api/users-api"; // eslint-disable-line import/no-cycle
-import CustomerApi from "@/api/customer-api"; // eslint-disable-line import/no-cycle
-import EmployeeApi from "@/api/employee-api"; // eslint-disable-line import/no-cycle
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
+import { debounce } from "@/shared/utils";
+import EmployeeApi from "@/api/employee-api"; // eslint-disable-line import/no-cycle
+import RoleApi from "@/api/material-management/role-api"; // eslint-disable-line import/no-cycle
 
 export default defineComponent({
   setup(): unknown {
     const isLoading = ref(false);
     const showSlideOut = ref(false);
+    const pageSize = ref(10);
+    const totalPages = ref(0);
+    const totalRecs = ref(0);
     const selectedRec = ref({});
     const isNewRec = ref(false);
     const isCustomer = ref(false);
-    const searchEmployee = ref("");
-    const searchId = ref("");
     const list = ref([]);
-    let emp = ref([]);
+    const emp = ref([]);
+    const role = ref([]);
     const confirm = useConfirm();
     const toast = useToast();
+    let currentPage = 1;
+    const userId = ref("");
+    const searchLoginName = ref("");
+    const searchFullName = ref("");
+    const searchEmail = ref("");
+    const searchPhone = ref("");
+    const searchRole = ref("");
+    const searchEmployeeId = ref("");
 
-    const getData = async () => {
-      console.log("Loaded Data");
-      isLoading.value = true;
+    const getData = async (
+      page: number,
+      requestedPageSize: number,
+      userId = "",
+      searchFullName = "",
+      searchLoginName = "",
+      searchEmail = "",
+      searchPhone = "",
+      searchRole = "",
+      searchEmployeeId = ""
+    ) => {
+      // isLoading.value = true;
+      searchEmployeeId = searchEmployeeId === "null" ? "0" : searchEmployeeId;
+      searchRole = searchRole === "null" ? "" : searchRole;
       try {
-        let index = 0;
-        const resp = await UsersApi.getUsers(0, 1000);
-        isLoading.value = false;
+        const resp = await UsersApi.getUsers(
+          page,
+          requestedPageSize,
+          userId,
+          searchLoginName,
+          searchFullName,
+          searchEmail,
+          searchPhone,
+          searchRole,
+          searchEmployeeId
+        );
+        let i = 1;
         list.value = resp.data.list.map((v: Record<string, unknown>) => {
-          index++;
+          let index = 1;
+          if (page > 1) {
+            index = 10 * (currentPage - 1) + i++;
+          } else {
+            index = i++;
+          }
           return {
             ...v,
             index,
           };
         });
+        // isLoading.value = false;
+        currentPage = resp.data.currentPage;
+        totalPages.value = resp.data.totalPages;
+        totalRecs.value = resp.data.total;
       } catch (err) {
         console.log("REST ERROR: %O", err.response ? err.response : err);
         isLoading.value = false;
@@ -192,7 +310,7 @@ export default defineComponent({
           try {
             const resp = await UsersApi.deleteUser(rec.loginName as string);
             if (resp.data.msgType === "SUCCESS") {
-              getData();
+              getData(currentPage, pageSize.value);
               toast.add({
                 severity: "success",
                 summary: "Xóa user thành công",
@@ -221,42 +339,8 @@ export default defineComponent({
       });
     };
 
-    const onAddClick = () => {
-      isNewRec.value = true;
-      selectedRec.value = { loginName: "" };
-      showSlideOut.value = true;
-    };
-
     const onDeleteClick = (rec: Record<string, unknown>) => {
       confirmDialog(rec);
-    };
-
-    // const onEditClick = async (rec: Record<string, unknown>) => {
-    //   debugger
-    //   let resp;
-    //   try {
-    //     if (rec.role === 'SUPPORT' || rec.role === 'ADMIN') {
-    //       resp = await EmployeeApi.getEmployees(1, 1, rec.employeeId as string);
-    //     }
-    //     if (resp?.data.msgType === 'SUCCESS') {
-    //       selectedRec.value = { ...rec, ...resp.data.list[0] };
-    //       isNewRec.value = false;
-    //       showSlideOut.value = true;
-    //     }
-    //   } catch (e) {
-    //     toast.add({
-    //       severity: 'error',
-    //       summary: 'Error',
-    //       detail: 'Unable to connect to server',
-    //       life: 3000
-    //     });
-    //   }
-    // };
-
-    const onEditClick = async (rec: Record<string, unknown>) => {
-      debugger;
-      showSlideOut.value = true;
-      selectedRec.value = rec;
     };
 
     const onResetPasswordClick = async (rec: Record<string, unknown>) => {
@@ -273,7 +357,7 @@ export default defineComponent({
           try {
             const resp = await UsersApi.resetPasswordUser(rec.loginName as string);
             if (resp.data.msgType === "SUCCESS") {
-              getData();
+              getData(currentPage, pageSize.value);
               toast.add({
                 severity: "success",
                 summary:
@@ -303,15 +387,59 @@ export default defineComponent({
       });
     };
 
-    onMounted(() => {
-      getData();
+    const onPageChange = (event: Record<string, unknown>) => {
+      if (currentPage !== (event.page as number) + 1) {
+        currentPage = (event.page as number) + 1;
+        getData(
+          currentPage,
+          pageSize.value,
+          "",
+          `${searchFullName.value}`,
+          `${searchLoginName.value}`,
+          `${searchEmail.value}`,
+          `${searchPhone.value}`,
+          `${searchRole.value}`,
+          `${searchEmployeeId.value}`
+        );
+      }
+    };
+
+    const onSearchKeyup = debounce(
+      () =>
+        getData(
+          1,
+          pageSize.value,
+          "",
+          `${searchFullName.value}`,
+          `${searchLoginName.value}`,
+          `${searchEmail.value}`,
+          `${searchPhone.value}`,
+          `${searchRole.value}`,
+          `${searchEmployeeId.value}`
+        ),
+      400
+    );
+
+    const onAddClick = () => {
+      isNewRec.value = true;
+      selectedRec.value = { employeeId: "" };
+      showSlideOut.value = true;
+    };
+
+
+    const onEditClick = async (rec: Record<string, unknown>) => {
+      showSlideOut.value = true;
+      selectedRec.value = rec;
+    };
+
+    onMounted(async () => {
+      getData(1, pageSize.value);
       lstEmp();
+      lstRole();
     });
 
-    const lstEmp = async () => {
-      debugger;
+  const lstEmp = async () => {
       const resp = await EmployeeApi.getAll();
-      debugger;
       let lstEmps = [];
       if (resp.data) {
         lstEmps = resp.data.list;
@@ -319,124 +447,47 @@ export default defineComponent({
       emp.value = lstEmps;
     };
 
+    const lstRole = async () => {
+      const resp = await RoleApi.getAll();
+      let lstRoles = [];
+      if (resp.data) {
+        lstRoles = resp.data.list;
+      }
+      role.value = lstRoles;
+    };
+
     return {
       list,
       isLoading,
       showSlideOut,
+      pageSize,
+      totalPages,
+      totalRecs,
       selectedRec,
       isNewRec,
       isCustomer,
+      onSearchKeyup,
       onAddClick,
       onDeleteClick,
       onEditClick,
+      onPageChange,
       getData,
-      searchEmployee,
-      searchId,
-      emp,
+      userId,
+      searchLoginName,
+      searchFullName,
+      searchEmail,
+      searchPhone,
+      searchRole,
+      searchEmployeeId,
       onResetPasswordClick,
+      emp,
+      role
     };
   },
   components: {
     UserDetails,
   },
 });
-
-/** import Rest from '@/rest/Rest';
- import store from '@/store';
- import VueSlideoutPanel from 'vue-slideout-panel/src/VueSlideoutPanel'
- import UserDetails from '@/views/UserDetails'
- export default {
-  data:function(){
-    return {
-      loading:false,
-      showSlideOut:false,
-      tableData:[],
-      selectedRec:{},
-      isNew:false,
-    }
-  },
-  methods:{
-    getData(){
-      let me = this;
-      console.log("Loaded Data");
-      me.$data.loading=true;
-      Rest.getUsers(0,1000).then(function(resp){
-        me.$data.tableData = resp.data.list;
-        me.$data.loading=false;
-      })
-      .catch(function(err){
-        console.log("REST ERROR: %O", err.response?err.response:err);
-        me.$data.loading=false;
-      });
-    },
-    onDelete(rec){
-      let me = this;
-      me.$confirm('The action will remove <ul><li> All orders placed by the customer</li><li> Associated customer details </li> <li> Shopping Cart items by this user </li> </ul>  ', 'Confirm', {
-        confirmButtonText: 'OK',
-        cancelButtonText: 'Cancel',
-        type: 'warning',
-        dangerouslyUseHTMLString:true
-      }).then(() => {
-        return Rest.deleteUser(rec.loginName);
-      }).then((resp) => {
-        if (resp.data.msgType==="SUCCESS"){
-          me.$message({message: 'Successfully deleted', type:'success'});
-          me.getData()
-        }
-        else{
-          me.$message({message: 'Unable to delete, this could be due to the product being reffered in existing orders', type:'error', showClose:true, duration:6000});
-        }
-      })
-      .catch((resp) => {
-        me.$message({type:'info',message: 'Delete canceled'});
-      });
-    },
-    onEdit(rec){
-      let me = this;
-      let methodName = "";
-      let id ="";
-      if (rec.role==="CUSTOMER"){
-        methodName="getCustomers"
-        id = rec.customerId;
-      }
-      else if (rec.role==="SUPPORT" || rec.role==="ADMIN"){
-        methodName="getEmployees";
-        id = rec.employeeId;
-      }
-      if (!id){
-        return;
-      }
-      Rest[methodName](1,1,id).then(function(resp){
-        if (resp.data.msgType==="SUCCESS" && resp.data.list.length === 1){
-          me.$data.selectedRec  = {...rec, ...resp.data.list[0]};
-          me.$data.isNew = false;
-          me.$data.showSlideOut = true;
-        }
-      })
-      })
-      .catch(function(err){
-        me.$message({ message:'Unable to retrieve selected data', type:'error', showClose:true, duration:6000});
-        console.log("REST ERROR: %O", err.response?err.response:err);
-      });
-    },
-    onOpenAddProduct(){
-      this.$data.isNew = true;
-      this.$data.selectedRec  = {loginName:'NEW'};
-      this.$data.showSlideOut = true;
-    },
-    onContinueShopping(){
-      console.log("Continue Shopping clicked...")
-    },
-  },
- mounted(){
-    this.getData();
-  },
- components: {
-    UserDetails,
-    VueSlideoutPanel
-  },
- }
- */
 </script>
 <style lang="scss">
 @import "~@/assets/styles/_vars.scss";

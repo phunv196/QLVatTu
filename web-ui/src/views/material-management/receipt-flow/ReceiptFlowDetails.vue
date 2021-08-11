@@ -16,7 +16,7 @@
     <div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Vật tư
+          >Vật tư <strong class="p-error">*</strong>
         </label>
         <Dropdown
           style="width: 40%"
@@ -48,7 +48,7 @@
 
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Số lượng
+          >Số lượng <strong class="p-error">*</strong>
         </label>
         <InputNumber
           type="text"
@@ -108,7 +108,6 @@ export default defineComponent({
     const recData = ref(JSON.parse(JSON.stringify(props.rec))); // do not create direct refs to props to avoid making changes to props, instead use a cloned value of prop
 
     const onApplyChanges = async () => {
-      debugger;
       const rawReceiptFlowObj = JSON.parse(JSON.stringify(recData.value));
       let msg: any[];
       msg = [];
@@ -124,7 +123,6 @@ export default defineComponent({
         showMessage.value = true;
       } else {
         let resp;
-        debugger;
         delete rawReceiptFlowObj.index;
         if (rawReceiptFlowObj.receiptFlowId) {
           resp = await ReceiptFlowApi.updateReceiptFlow(rawReceiptFlowObj);

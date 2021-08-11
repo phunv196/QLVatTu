@@ -284,4 +284,23 @@ public class EmployeeController extends BaseController {
         Long rowCount = (Long)criteria.uniqueResult();
         return Response.ok(rowCount > 0).build();
     }
+
+
+    @GET
+    @Path("getEmployeeById/{employeeId}")
+    @RolesAllowed({"ADMIN"})
+    @Operation(
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response getEmployeeById(
+            @Parameter(description="Employee Id", example="1") @PathParam("employeeId") Long employeeId
+    ) {
+        Criteria criteria = employeeDao.createCriteria(EmployeeModel.class);
+        if (employeeId != null){
+            criteria.add(Restrictions.eq("employeeId", employeeId));
+        }
+        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
+        EmployeeModel model = (EmployeeModel) criteria.uniqueResult();
+        return Response.ok(model).build();
+    }
 }

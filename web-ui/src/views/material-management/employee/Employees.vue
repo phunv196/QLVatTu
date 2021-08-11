@@ -196,7 +196,6 @@ import { useToast } from "primevue/usetoast";
 import { debounce } from "@/shared/utils";
 import positionApi from "@/api/material-management/position-api";
 import departmentApi from "@/api/material-management/department-api";
-import { async } from "rxjs";
 import employeeApi from "@/api/employee-api";
 
 export default defineComponent({
@@ -249,7 +248,6 @@ export default defineComponent({
           searchPosition
         );
         let i = 1;
-        debugger;
         list.value = resp.data.list.map((v: Record<string, unknown>) => {
           let index = 1;
           if (page > 1) {
@@ -369,7 +367,6 @@ export default defineComponent({
     const onEditClick = async (rec: Record<string, unknown>) => {
       showSlideOut.value = true;
       selectedRec.value = rec;
-      debugger;
     };
 
     onMounted(async () => {
@@ -379,9 +376,7 @@ export default defineComponent({
     });
 
     const lstPosition = async () => {
-      debugger;
       const resp = await positionApi.getAll();
-      debugger;
       let lstPositions = [];
       if (resp.data) {
         lstPositions = resp.data.list;
@@ -390,9 +385,7 @@ export default defineComponent({
     };
 
     const lstDepartment = async () => {
-      debugger;
       const resp = await departmentApi.getAll();
-      debugger;
       let lstDepartments = [];
       if (resp.data) {
         lstDepartments = resp.data.list;
@@ -404,9 +397,17 @@ export default defineComponent({
       await employeeApi.dowloadTemplate().then((res) => {
         //window.open ("data:application/vnd.ms-excel;base64," + res.data);
         var contentType = "application/vnd.ms-excel";
+        const a = document.createElement('a');
         var blob1 = b64toBlob(res.data, contentType, "");
-        var blobUrl1 = URL.createObjectURL(blob1);
-        window.open(blobUrl1);
+        var url = URL.createObjectURL(blob1);
+        a.href = url;
+        a.download = "phunv.xls";
+        a.click();
+        setTimeout(() => {
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        }, 0);
+        //window.open(blobUrl1);
       });
     };
 

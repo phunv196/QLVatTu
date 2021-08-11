@@ -263,7 +263,6 @@ export default defineComponent({
       searchEmployee = searchEmployee === "null" ? "0" : searchEmployee;
       // isLoading.value = true;
       try {
-        debugger;
         const resp = await FactoryApi.getFactorys(
           page,
           requestedPageSize,
@@ -277,7 +276,6 @@ export default defineComponent({
           searchFormSuccessDate,
           searchToSuccessDate
         );
-        debugger;
         let i = 1;
         list.value = resp.data.list.map((v: Record<string, unknown>) => {
           const dt1 = new Date(v.dateConstruction as string);
@@ -316,7 +314,6 @@ export default defineComponent({
     };
 
     const confirmDialog = (rec: Record<string, unknown>) => {
-      debugger;
       confirm.require({
         message: `Do you want to remove ${rec.name} from product catalog ?`,
         header: "Remove",
@@ -365,7 +362,6 @@ export default defineComponent({
     };
 
     const onAddClick = async () => {
-      debugger;
       const resp = await EmployeeApi.getAll();
       let arrEmp: any;
       if (resp.data) {
@@ -378,7 +374,6 @@ export default defineComponent({
     };
 
     const onDeleteClick = (rec: Record<string, unknown>) => {
-      debugger;
       confirmDialog(rec);
     };
 
@@ -406,9 +401,7 @@ export default defineComponent({
     });
 
     const lstEmp = async () => {
-      debugger;
       const resp = await EmployeeApi.getAll();
-      debugger;
       let lstEmps = [];
       if (resp.data) {
         lstEmps = resp.data.list;
@@ -418,7 +411,6 @@ export default defineComponent({
 
     const onSearchKeyup = debounce(async () => {
       let msg = [];
-      debugger
       if (
         Date.parse(`${searchFormDate.value}`) >
         Date.parse(`${searchToDate.value}`)

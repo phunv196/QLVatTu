@@ -71,7 +71,6 @@ export default defineComponent({
       // isLoading.value = true;
       try {
         const resp = await OrderApi.getOrders(page, requestedPageSize);
-        debugger
         list.value = resp.data.list.map((v:Record<string, unknown>) => {
           const dt = new Date(v.orderDate as string);
           const strOrderDate = new Intl.DateTimeFormat(['ban', 'id'], { year: 'numeric', month: 'short', day: 'numeric' }).format(dt);

@@ -18,7 +18,6 @@ export default {
   },
 
   async deleteWarehouseCardFlow(warehouseCardFlowId: string): Promise<AxiosResponse> {
-    debugger;
     return api.delete(`/warehouse_card_flows/${warehouseCardFlowId}`);
   },
 

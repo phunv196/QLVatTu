@@ -15,21 +15,25 @@
     <div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-4 p-text-right p-mr-1"
-          >Mã phân xưởng</label
-        >
+          >Mã phân xưởng <strong class="p-error">*</strong>
+        </label>
         <InputText
           type="text"
           v-model="recData.code"
           class="p-inputtext-sm p-col-3 p-mr-2"
         />
         <label class="p-d-inline-block m-label-size-4 p-text-right p-mr-1"
-          >Tên phân xưởng
+          >Tên phân xưởng <strong class="p-error">*</strong>
         </label>
-        <InputText type="text" v-model="recData.name" class="p-inputtext-sm p-col-3" />
+        <InputText
+          type="text"
+          v-model="recData.name"
+          class="p-inputtext-sm p-col-3"
+        />
       </div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-4 p-text-right p-mr-1"
-          >Email
+          >Email <strong class="p-error">*</strong>
         </label>
         <InputText
           type="email"
@@ -37,11 +41,11 @@
           class="p-inputtext-sm p-col-3 p-mr-2"
         />
         <label class="p-d-inline-block m-label-size-4 p-text-right p-mr-1"
-          >Nhân viên phụ trách
+          >Nhân viên phụ trách <strong class="p-error">*</strong>
         </label>
         <Dropdown
           class="p-inputtext-sm"
-          style="width: 25%;"
+          style="width: 25%"
           v-model="recData.employeeId"
           :options="arr"
           :filter="true"
@@ -64,22 +68,23 @@
         <label
           class="p-d-inline-block m-label-size-4 p-text-right p-mr-1"
           style="padding-top: 10px"
-          >Ngày thi công
+          >Ngày thi công <strong class="p-error">*</strong>
         </label>
         <Datepicker
           class="p-inputtext-sm p-col-3 p-mr-1"
           v-model="recData.dateConstruction"
-          style="width: 242px;"
+          style="width: 242px"
           inputFormat="dd/MM/yyy"
         />
         <label
           class="p-d-inline-block m-label-size-4 p-text-right"
-          style="padding-top: 10px; margin: 0 7px 0 0px;"
-          >Ngày hoàn thành
+          style="padding-top: 10px; margin: 0 7px 0 0px"
+        >
+          Ngày hoàn thành <strong class="p-error">*</strong>
         </label>
         <Datepicker
           class="p-inputtext-sm p-col-3 p-mr-2"
-          style="width: 242px;"
+          style="width: 242px"
           v-model="recData.dateFinish"
           inputFormat="dd/MM/yyy"
         />
@@ -152,8 +157,6 @@ export default defineComponent({
       recData = dataRec;
     }
     const onApplyChanges = async () => {
-      debugger;
-
       const rawFactoryObj = JSON.parse(JSON.stringify(recData.value));
       delete rawFactoryObj.index;
       delete rawFactoryObj.strDateFinish;
@@ -197,7 +200,6 @@ export default defineComponent({
           showMessage.value = true;
         } else {
           let resp;
-          debugger;
           if (rawFactoryObj.factoryId) {
             resp = await FactoryApi.updateFactory(rawFactoryObj);
           } else {
@@ -241,7 +243,6 @@ export default defineComponent({
       onCancel,
     };
   },
-  components: {
-  },
+  components: {},
 });
 </script>

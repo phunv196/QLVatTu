@@ -78,7 +78,6 @@ export default defineComponent({
     const getData = async (page: number, requestedPageSize: number, warehouseCardFlowId = '') => {
       // isLoading.value = true;
       try {
-        debugger
         const resp = await WarehouseCardFlowApi.getWarehouseCardFlows(page, requestedPageSize, warehouseCardId.value);
         let i = 1;
         list.value = resp.data.list.map((v: Record<string, unknown>) => {
@@ -104,7 +103,6 @@ export default defineComponent({
     };
 
     const confirmDialog = (rec: Record<string, unknown>) => {
-      debugger;
       confirm.require({
         message: `Do you want to remove ${rec.name} from product catalog ?`,
         header: 'Remove',
@@ -151,7 +149,6 @@ export default defineComponent({
     };
 
     const onAddClick = async () => {
-      debugger
       const Rece = await ReceiptApi.getAllBySuppliesId(supplies.value)
       let itemReceipt: any;
       if(Rece.data.list){
@@ -171,7 +168,6 @@ export default defineComponent({
     };
 
     const onDeleteClick = (rec: Record<string, unknown>) => {
-      debugger;
       confirmDialog(rec);
     };
 

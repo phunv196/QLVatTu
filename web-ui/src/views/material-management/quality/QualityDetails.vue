@@ -15,7 +15,7 @@
     <div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Mã chất lượng</label
+          >Mã chất lượng <strong class="p-error">*</strong> </label
         >
         <InputText
           type="text"
@@ -25,7 +25,7 @@
       </div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Tên chất lượng
+          >Tên chất lượng <strong class="p-error">*</strong>
         </label>
         <InputText type="text" v-model="recData.name" class="p-inputtext-sm p-col-8" />
       </div>
@@ -90,7 +90,6 @@ export default defineComponent({
     const recData = ref(JSON.parse(JSON.stringify(props.rec))); // do not create direct refs to props to avoid making changes to props, instead use a cloned value of prop
 
     const onApplyChanges = async () => {
-      debugger;
       const rawQualityObj = JSON.parse(JSON.stringify(recData.value));
       let msg: any[];
       msg = [];
@@ -105,20 +104,18 @@ export default defineComponent({
           "Trường " + msg.join(", ") + " không được để trống!";
         showMessage.value = true;
       } else {
-        delete rawQualityObj.strDateWarehousing;
+        delete rawQualityObj.index;
         const check = await QualityApi.getQualityByCode(rawQualityObj);
         if (check.data) {
           userMessage.value = "Mã chất lượng bị trùng. Vui lòng nhập lại!";
           showMessage.value = true;
         } else {
           let resp;
-          debugger;
           if (rawQualityObj.qualityId) {
             resp = await QualityApi.updateQuality(rawQualityObj);
           } else {
             resp = await QualityApi.addQuality(rawQualityObj);
           }
-          debugger;
           if (resp.data.msgType === "SUCCESS") {
             toast.add({
               severity: "success",

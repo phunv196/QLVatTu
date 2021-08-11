@@ -15,31 +15,39 @@
     <div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-4 p-text-right p-mr-2"
-          >Mã nhà cung cấp</label
-        >
+          >Mã nhà cung cấp <strong class="p-error">*</strong>
+        </label>
         <InputText
           type="text"
           v-model="recData.code"
           class="p-inputtext-sm p-col-3 p-mr-1"
         />
         <label class="p-d-inline-block m-label-size-4 p-text-right p-mr-2"
-          >Tên nhà cung cấp
+          >Tên nhà cung cấp <strong class="p-error">*</strong>
         </label>
-        <InputText type="text" v-model="recData.name" class="p-inputtext-sm p-col-3" />
+        <InputText
+          type="text"
+          v-model="recData.name"
+          class="p-inputtext-sm p-col-3"
+        />
       </div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-4 p-text-right p-mr-2"
-          >Email</label
-        >
+          >Email <strong class="p-error">*</strong>
+        </label>
         <InputText
           type="text"
           v-model="recData.email"
           class="p-inputtext-sm p-col-3 p-mr-1"
         />
         <label class="p-d-inline-block m-label-size-4 p-text-right p-mr-2"
-          >Số điện thoại
+          >Số điện thoại <strong class="p-error">*</strong>
         </label>
-        <InputText type="text" v-model="recData.phone" class="p-inputtext-sm p-col-3" />
+        <InputText
+          type="text"
+          v-model="recData.phone"
+          class="p-inputtext-sm p-col-3"
+        />
       </div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-4 p-text-right p-mr-2"
@@ -111,7 +119,6 @@ export default defineComponent({
     const recData = ref(JSON.parse(JSON.stringify(props.rec))); // do not create direct refs to props to avoid making changes to props, instead use a cloned value of prop
 
     const onApplyChanges = async () => {
-      debugger;
       const rawSupplierObj = JSON.parse(JSON.stringify(recData.value));
       let msg: any[];
       msg = [];
@@ -139,7 +146,6 @@ export default defineComponent({
           showMessage.value = true;
         } else {
           let resp;
-          debugger;
           if (rawSupplierObj.supplierId) {
             resp = await SupplierApi.updateSupplier(rawSupplierObj);
           } else {

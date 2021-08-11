@@ -59,7 +59,6 @@ import Logo from '@/components/Logo.vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import UsersApi from '@/api/users-api'; // eslint-disable-line import/no-cycle
-import { async } from 'rxjs';
 
 export default defineComponent({
   setup(): unknown {

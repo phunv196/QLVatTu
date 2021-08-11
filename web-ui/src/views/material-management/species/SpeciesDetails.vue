@@ -15,19 +15,23 @@
     <div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-2"
-          >Mã chủng loại</label
-        >
+          >Mã chủng loại <strong class="p-error">*</strong>
+        </label>
         <InputText
           type="text"
           v-model="recData.code"
-          class="p-inputtext-sm p-col-8 "
+          class="p-inputtext-sm p-col-8"
         />
       </div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-2"
-          >Tên chủng loại
+          >Tên chủng loại <strong class="p-error">*</strong>
         </label>
-        <InputText type="text" v-model="recData.name" class="p-inputtext-sm p-col-8" />
+        <InputText
+          type="text"
+          v-model="recData.name"
+          class="p-inputtext-sm p-col-8"
+        />
       </div>
       <div class="p-mt-3 p-d-flex p-ai-center">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-2">
@@ -89,7 +93,6 @@ export default defineComponent({
     const recData = ref(JSON.parse(JSON.stringify(props.rec))); // do not create direct refs to props to avoid making changes to props, instead use a cloned value of prop
 
     const onApplyChanges = async () => {
-      debugger;
       const rawSpeciesObj = JSON.parse(JSON.stringify(recData.value));
       let msg: any[];
       msg = [];
@@ -111,7 +114,6 @@ export default defineComponent({
           showMessage.value = true;
         } else {
           let resp;
-          debugger;
           if (rawSpeciesObj.speciesId) {
             resp = await SpeciesApi.updateSpecies(rawSpeciesObj);
           } else {

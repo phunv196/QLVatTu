@@ -15,8 +15,8 @@
     <div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Mã phiếu nhập</label
-        >
+          >Mã phiếu nhập <strong class="p-error">*</strong>
+        </label>
         <InputText
           type="text"
           v-model="recData.code"
@@ -24,7 +24,7 @@
           style="width: 30%"
         />
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Tên phiếu nhập
+          >Tên phiếu nhập <strong class="p-error">*</strong>
         </label>
         <InputText
           type="text"
@@ -38,8 +38,8 @@
         <label
           class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
           style="padding-top: 10px"
-          >Ngày lập phiếu</label
-        >
+          >Ngày lập phiếu <strong class="p-error">*</strong>
+        </label>
         <Datepicker
           class="p-inputtext-sm"
           style="width: 320px"
@@ -49,7 +49,7 @@
         <label
           class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
           style="padding-top: 10px; margin-right: 10px"
-          >Kho
+          >Kho <strong class="p-error">*</strong>
         </label>
         <Dropdown
           style="width: 30%; left: 5px"
@@ -126,7 +126,6 @@ export default defineComponent({
     const recData = ref(JSON.parse(JSON.stringify(props.rec))); // do not create direct refs to props to avoid making changes to props, instead use a cloned value of prop
 
     const onApplyChanges = async () => {
-      debugger;
       const rawReceiptObj = JSON.parse(JSON.stringify(recData.value));
       const checkId = await ReceiptApi.checkId(rawReceiptObj.receiptId);
       let msg: any[];
@@ -156,7 +155,6 @@ export default defineComponent({
           showMessage.value = true;
         } else {
           let resp;
-          debugger;
           if (checkId.data) {
             resp = await ReceiptApi.updateReceipt(rawReceiptObj);
           } else {

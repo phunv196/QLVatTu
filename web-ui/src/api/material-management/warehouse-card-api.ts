@@ -44,7 +44,6 @@ export default {
   },
 
   async deleteWarehouseCard(warehouseCardId: string): Promise<AxiosResponse> {
-    debugger;
     return api.delete(`/warehouse_cards/${warehouseCardId}`);
   },
 
@@ -57,7 +56,6 @@ export default {
   },
 
   async getAll(): Promise<AxiosResponse> {
-    debugger;
     return api.get(`/warehouse_cards/all`);
   },
 
@@ -66,17 +64,14 @@ export default {
   },
 
   async checkId(warehouseCardId: string): Promise<AxiosResponse> {
-    debugger;
     return api.get(`/warehouse_cards/equal/${warehouseCardId}`);
   },
 
   async deleteByWarehouseCardId(warehouseCardId: string): Promise<AxiosResponse> {
-    debugger;
     return api.delete(`/warehouse_cards/delete_by_id/${warehouseCardId}`);
   },
   
   async getWarehouseCardByCode(warehouseCardObj: Record<string, string | number>): Promise<AxiosResponse> {
-    debugger
     return api.post('/warehouse_cards/byCode', warehouseCardObj);
   },
 };

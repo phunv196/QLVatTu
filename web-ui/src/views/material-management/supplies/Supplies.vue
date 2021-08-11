@@ -282,7 +282,6 @@ export default defineComponent({
       searchFormPrice = searchFormPrice === "null" ? "0" : searchFormPrice;
       searchToPrice = searchToPrice === "null" ? "0" : searchToPrice;
       try {
-        debugger;
         const resp = await SuppliesApi.getSupplies(
           page,
           requestedPageSize,
@@ -319,7 +318,6 @@ export default defineComponent({
     };
 
     const confirmDialog = (rec: Record<string, unknown>) => {
-      debugger;
       confirm.require({
         message: `Do you want to remove ${rec.name} from product catalog ?`,
         header: "Remove",
@@ -380,19 +378,16 @@ export default defineComponent({
     };
 
     const onAddClick = async () => {
-      debugger;
       isNewRec.value = true;
       selectedRec.value = { suppliesId: "" };
       showSlideOut.value = true;
     };
 
     const onDeleteClick = (rec: Record<string, unknown>) => {
-      debugger;
       confirmDialog(rec);
     };
 
     const onEditClick = async (rec: Record<string, unknown>) => {
-      debugger;
       showSlideOut.value = true;
       selectedRec.value = rec;
     };
@@ -405,9 +400,7 @@ export default defineComponent({
     });
 
     const lstSupplier = async () => {
-      debugger;
       const resp = await SupplierApi.getAll();
-      debugger;
       let lstSuppliers = [];
       if (resp.data) {
         lstSuppliers = resp.data.list;
@@ -416,9 +409,7 @@ export default defineComponent({
     };
 
     const lstQuality = async () => {
-      debugger;
       const resp = await QualityApi.getAll();
-      debugger;
       let lstQualitys = [];
       if (resp.data) {
         lstQualitys = resp.data.list;
@@ -427,9 +418,7 @@ export default defineComponent({
     };
 
     const lstSpecies = async () => {
-      debugger;
       const resp = await SpeciesApi.getAll();
-      debugger;
       let lstSpeciess = [];
       if (resp.data) {
         lstSpeciess = resp.data.list;

@@ -41,7 +41,6 @@ export default {
   },
 
   async deleteReceipt(receiptId: string): Promise<AxiosResponse> {
-    debugger;
     return api.delete(`/receipts/${receiptId}`);
   },
 
@@ -54,12 +53,10 @@ export default {
   },
 
   async getAll(): Promise<AxiosResponse> {
-    debugger;
     return api.get(`/receipts/all`);
   },
 
   async getAllBySuppliesId(suppliesId:number): Promise<AxiosResponse> {
-    debugger;
     return api.get(`/receipts/all/${suppliesId}`);
   },
 
@@ -68,12 +65,10 @@ export default {
   },
 
   async checkId(receiptId: string): Promise<AxiosResponse> {
-    debugger;
     return api.get(`/receipts/equal/${receiptId}`);
   },
 
   async deleteByReceiptsId(receiptId: string): Promise<AxiosResponse> {
-    debugger;
     return api.delete(`/receipts/delete_by_id/${receiptId}`);
   },
 

@@ -18,20 +18,21 @@ public class UserViewModel implements Serializable, Principal {
     @Column(name = "password") private String password;
     @Schema(allowableValues="ADMIN, SUPPORT, CUSTOMER") private String role;
     @Column(name = "employee_id") private Integer employeeId;
-    @Column(name = "customer_id") private Integer customerId;
+    @Column(name = "phone") private String phone;
     @Column(name = "full_name")   private String fullName;
     @Column(name = "email")       private String email;
 
     public UserViewModel(){}
 
-    public UserViewModel(Integer userId, String loginName, String role, String fullName, String email, Integer empId, Integer custId){
+
+    public UserViewModel(Integer userId, String loginName, String role, String name, String email, Integer empId, String phone) {
         this.setUserId(userId);
         this.setLoginName(loginName);
         this.setRole(role);
-        this.setFullName(fullName);
+        this.setFullName(name);
         this.setEmail(email);
         this.setEmployeeId(empId);
-        this.setCustomerId(custId);
+        this.setPhone(phone);
     }
 
     @JsonIgnore // This getter is duplicate of getId but is must for all classes that implements java.security.Principal
@@ -57,8 +58,13 @@ public class UserViewModel implements Serializable, Principal {
     public Integer getEmployeeId() { return employeeId; }
     public void setEmployeeId(Integer employeeId) { this.employeeId = employeeId; }
 
-    public Integer getCustomerId() { return customerId; }
-    public void setCustomerId(Integer customerId) { this.customerId = customerId; }
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
     public String getFullName() { return fullName; }
     public void setFullName(String fullName) { this.fullName = fullName; }

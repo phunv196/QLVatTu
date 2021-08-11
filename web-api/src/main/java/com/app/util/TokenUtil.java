@@ -1,6 +1,7 @@
-package com.app.util;
+ package com.app.util;
 
 import com.app.model.user.UserModel;
+import com.app.model.user.UserViewModel;
 import io.jsonwebtoken.ClaimJwtException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -63,7 +64,5 @@ public class TokenUtil {
         long remainingMinutes =ChronoUnit.MINUTES.between( Instant.now() , claims.getExpiration().toInstant() );
         return (remainingMinutes < 30)?true:false;
     }
-
-
 
 }

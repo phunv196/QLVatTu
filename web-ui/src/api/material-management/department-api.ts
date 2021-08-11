@@ -32,7 +32,6 @@ export default {
   },
 
   async deleteDepartment(departmentId: string): Promise<AxiosResponse> {
-    debugger;
     return api.delete(`/department/${departmentId}`);
   },
 
@@ -45,7 +44,6 @@ export default {
   },
 
   async getAll(): Promise<AxiosResponse> {
-    debugger;
     return api.get(`/department/all`);
   },
   async getDepartmentByCode(departmentObj: Record<string, string | number>): Promise<AxiosResponse> {

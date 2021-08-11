@@ -67,7 +67,6 @@ public class AuthenticationController extends BaseController {
                 user.getFullName(),
                 user.getEmail(),
                 user.getEmployeeId(),
-                user.getCustomerId(),
                 strToken
             );
             LoginResponse successResp = new LoginResponse(usrOutput);

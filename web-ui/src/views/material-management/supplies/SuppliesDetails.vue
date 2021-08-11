@@ -15,8 +15,8 @@
     <div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-left p-mr-1"
-          >Mã vật tư</label
-        >
+          >Mã vật tư <strong class="p-error">*</strong>
+        </label>
         <InputText
           type="text"
           v-model="recData.code"
@@ -26,7 +26,7 @@
       </div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-left p-mr-1"
-          >Tên vvật tư
+          >Tên vvật tư <strong class="p-error">*</strong>
         </label>
         <InputText
           type="text"
@@ -67,7 +67,7 @@
       </div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-left p-mr-1"
-          >Nhà cung cấp
+          >Nhà cung cấp <strong class="p-error">*</strong>
         </label>
         <Dropdown
           style="width: 30%"
@@ -82,7 +82,7 @@
       </div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-left p-mr-1"
-          >Đơn vị tính
+          >Đơn vị tính <strong class="p-error">*</strong>
         </label>
         <Dropdown
           class="p-inputtext-sm"
@@ -95,7 +95,7 @@
       </div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-left p-mr-1"
-          >Giá
+          >Giá <strong class="p-error">*</strong>
         </label>
         <InputText
           type="text"
@@ -153,7 +153,6 @@ export default defineComponent({
   },
 
   setup(props, { emit }): unknown {
-    debugger;
     const userMessage = ref("");
     const arrQuality = ref([]);
     const arrSpecies = ref([]);
@@ -233,9 +232,7 @@ export default defineComponent({
     });
 
     const lstSupplier = async () => {
-      debugger;
       const resp = await SupplierApi.getAll();
-      debugger;
       let lstSuppliers = [];
       if (resp.data) {
         lstSuppliers = resp.data.list;
@@ -244,9 +241,7 @@ export default defineComponent({
     };
 
     const lstQuality = async () => {
-      debugger;
       const resp = await QualityApi.getAll();
-      debugger;
       let lstQualitys = [];
       if (resp.data) {
         lstQualitys = resp.data.list;
@@ -255,9 +250,7 @@ export default defineComponent({
     };
 
     const lstSpecies = async () => {
-      debugger;
       const resp = await SpeciesApi.getAll();
-      debugger;
       let lstSpeciess = [];
       if (resp.data) {
         lstSpeciess = resp.data.list;
