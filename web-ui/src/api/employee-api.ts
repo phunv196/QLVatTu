@@ -66,4 +66,7 @@ export default {
   async dowloadTemplate(): Promise<AxiosResponse> {
     return api.get('/employees/dowloadTemplate',);
   },
+  async uploadFile(file: any): Promise<AxiosResponse> {
+    return api.post('/employees/uploadFile',file);
+  },
 };

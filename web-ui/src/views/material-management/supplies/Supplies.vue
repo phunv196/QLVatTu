@@ -238,7 +238,6 @@ import SupplierApi from "@/api/material-management/supplier-api";
 import QualityApi from "@/api/material-management/quality-api";
 import SpeciesApi from "@/api/material-management/species-api";
 import { debounce } from "@/shared/utils";
-import { async } from "rxjs";
 
 export default defineComponent({
   setup(): unknown {

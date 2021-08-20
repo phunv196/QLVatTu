@@ -10,7 +10,7 @@ export default {
       commitJwtTokenToStore(respData.token, respData.userId, respData.loginName, respData.role, respData.fullName);
       return resp;
     }
-    return Promise.reject(resp.data ? resp.data : resp);
+    return resp.data;
   },
 
   async addUsers(userObj: Record<string, string|number>): Promise<AxiosResponse> {
@@ -82,5 +82,8 @@ export default {
 
   async resetPasswordUser(loginName: string): Promise<AxiosResponse> {
     return api.get(`/users/${loginName}`);
+  },
+  async getById(userId: number): Promise<AxiosResponse> {
+    return api.get(`/users/byId/${userId}`);
   },
 };

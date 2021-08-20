@@ -239,6 +239,10 @@ h1, h2, h3 {
 }
 
 // Toast
+.p-toast {
+  z-index: 1000000000 !important;
+}
+
 .p-toast.p-component {
   font-size: 0.8rem;
 }
@@ -396,3 +400,6 @@ h1, h2, h3 {
   width: 160%;
 }
 
+.p-dialog-mask {
+  z-index: 1000000000 !important;
+}

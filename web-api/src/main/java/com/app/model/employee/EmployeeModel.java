@@ -30,6 +30,7 @@ public class EmployeeModel {
 
     @Transient
     private String departmentName;
+
     public EmployeeModel(){};
 
     public EmployeeModel(Long employeeId, String code, String lastName, String firstName, String fullName,

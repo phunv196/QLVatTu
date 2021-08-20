@@ -2,7 +2,7 @@ package com.app.api.controllers;
 
 import com.app.api.BaseController;
 import com.app.dao.EmployeeDao;
-import com.app.dao.base.CommonUtils;
+import com.app.util.base.CommonUtils;
 import com.app.model.BaseResponse;
 import com.app.model.employee.EmployeeModel;
 import com.app.model.employee.EmployeeModel.EmployeeResponse;
@@ -18,14 +18,11 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.ResponseBuilder;
 import org.apache.commons.io.FileUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.io.File;
@@ -59,7 +56,8 @@ public class EmployeeController extends BaseController {
         @Parameter(description="Search by name or email - Use % for wildcard like '%ra%'", example="%ra%") @QueryParam("search") String search,
         @Parameter(description="Page No, Starts from 1 ", example="1") @DefaultValue("1")  @QueryParam("page")  int page,
         @Parameter(description="Items in each page", example="20") @DefaultValue("20") @QueryParam("page-size") int pageSize
-    ) {
+    ) throws Exception {
+//        service.processExport(req);
         EmployeeResponse resp = new EmployeeResponse();
         try {
             if (employeeId == null) {
@@ -203,9 +201,14 @@ public class EmployeeController extends BaseController {
     )
     public Response dowloadTemplate() throws Exception {
         String path = "C:/Users/Admin/Downloads/31072021_brief_list.xls";
+        String path1 = "C:/Users/Admin/Downloads/phunv.xls";
         File file = new File(path);
         byte[] fileContent = FileUtils.readFileToByteArray(file);
         String encodedString = Base64.getEncoder().encodeToString(fileContent);
+
+
+        byte[] decodedBytes = Base64.getDecoder().decode(encodedString);
+        FileUtils.writeByteArrayToFile(new File(path1), decodedBytes);
         return Response.ok(encodedString).build();
     }
 
@@ -302,5 +305,25 @@ public class EmployeeController extends BaseController {
         // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
         EmployeeModel model = (EmployeeModel) criteria.uniqueResult();
         return Response.ok(model).build();
+    }
+
+    @POST
+    @Path("uploadFile")
+    @RolesAllowed({"ADMIN", "SUPPORT"})
+    @Operation(
+            summary = "Add an employee",
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response uploadFile(EmployeeModel emp) {
+        BaseResponse resp = new BaseResponse();
+        try {
+            employeeDao.beginTransaction();
+            employeeDao.save(emp);
+            employeeDao.commitTransaction();
+            resp.setSuccessMessage("Employee Added");
+        } catch (HibernateException | ConstraintViolationException e) {
+            resp.setErrorMessage("Cannot add employee - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+        }
+        return Response.ok(resp).build();
     }
 }

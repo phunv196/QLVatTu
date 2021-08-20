@@ -160,8 +160,8 @@
       style="width: 1350px"
     >
       <Column
-        field="factoryId"
-        header="ID phân xưởng"
+        field="index"
+        header="STT"
         headerStyle="width:90px;"
       ></Column>
       <Column

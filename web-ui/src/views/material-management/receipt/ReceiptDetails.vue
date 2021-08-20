@@ -14,7 +14,7 @@
     </transition>
     <div>
       <div class="p-mt-3">
-        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
+        <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
           >Mã phiếu nhập <strong class="p-error">*</strong>
         </label>
         <InputText
@@ -23,7 +23,7 @@
           class="p-inputtext-sm p-mr-1"
           style="width: 30%"
         />
-        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
+        <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
           >Tên phiếu nhập <strong class="p-error">*</strong>
         </label>
         <InputText
@@ -36,7 +36,7 @@
       <div class="p-mt-3"></div>
       <div class="p-mt-3-date">
         <label
-          class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
+          class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
           style="padding-top: 10px"
           >Ngày lập phiếu <strong class="p-error">*</strong>
         </label>
@@ -47,7 +47,7 @@
           inputFormat="dd/MM/yyy"
         />
         <label
-          class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
+          class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
           style="padding-top: 10px; margin-right: 10px"
           >Kho <strong class="p-error">*</strong>
         </label>
@@ -63,7 +63,7 @@
         />
       </div>
       <div class="p-mt-3 p-d-flex p-ai-center">
-        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1">
+        <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1">
           Ghi chú
         </label>
         <textarea
@@ -71,7 +71,7 @@
           v-model="recData.description"
           class="p-inputtext-sm"
           maxlength="500"
-          style="width: 70%"
+          style="width: 72.5%"
         />
       </div>
     </div>
@@ -174,6 +174,9 @@ export default defineComponent({
             }
             changesApplied.value = true;
             emit("changed");
+            setTimeout(() => {
+              onCancel();
+            }, 500);
           } else {
             toast.add({
               severity: "error",

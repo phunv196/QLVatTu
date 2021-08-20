@@ -32,7 +32,7 @@ import Menu from 'primevue/menu';
 import Chart from 'primevue/chart';
 import RadioButton from 'primevue/radiobutton';
 import Datepicker from 'vue3-datepicker';
-
+import FileUpload from 'primevue/fileupload';
 // Event Bus
 import mitt from 'mitt';
 
@@ -82,6 +82,7 @@ app.component('Menu', Menu);
 app.component('Chart', Chart);
 app.component('RadioButton', RadioButton);
 app.component('Datepicker', Datepicker);
+app.component('FileUpload', FileUpload);
 
 // app.config.globalProperties.$AppEvent = AppEvent;
 app.mount('#app');

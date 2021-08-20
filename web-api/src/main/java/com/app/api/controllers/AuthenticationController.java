@@ -1,7 +1,7 @@
 package com.app.api.controllers;
 
 import com.app.api.BaseController;
-import com.app.dao.base.BaseHibernateDAO;
+import com.app.util.base.BaseHibernateDAO;
 import com.app.model.BaseResponse;
 import com.app.model.user.LoginModel;
 import com.app.model.user.LoginModel.LoginResponse;
@@ -72,8 +72,8 @@ public class AuthenticationController extends BaseController {
             LoginResponse successResp = new LoginResponse(usrOutput);
             return Response.status(Response.Status.OK).entity(successResp).build();
         }
-
-        resp.setTypeAndMessage(BaseResponse.MessageTypeEnum.AUTH_FAILED, "Incorrect username/password");
-        return Response.status(Response.Status.UNAUTHORIZED).entity(resp).build();
+//        resp.setTypeAndMessage(BaseResponse.MessageTypeEnum.AUTH_FAILED, "Incorrect username/password");
+//        return Response.status(Response.Status.UNAUTHORIZED).entity(resp).build();
+        return Response.ok(false).build();
     }
 }

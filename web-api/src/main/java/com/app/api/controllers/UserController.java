@@ -2,17 +2,12 @@ package com.app.api.controllers;
 
 import com.app.api.BaseController;
 import com.app.dao.UserDao;
-import com.app.dao.base.CommonUtils;
 import com.app.model.BaseResponse;
-import com.app.model.category.SupplierModel;
-import com.app.model.category.SuppliesModel;
-import com.app.model.employee.EmployeeModel;
 import com.app.model.user.LoginModel.LoginResponse;
 import com.app.model.user.UserModel;
 import com.app.model.user.UserOutputModel;
 import com.app.model.user.UserOutputModel.UserListResponse;
 import com.app.model.user.UserOutputModel.UserResponse;
-import com.app.model.user.UserRegistrationModel;
 import com.app.util.Constants;
 import com.app.util.PlainTextPasswordEncoder;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,7 +16,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.*;
@@ -30,13 +24,11 @@ import jakarta.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.criterion.Example;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 @Path("users")
@@ -344,6 +336,27 @@ public class UserController extends BaseController {
         criteria.setProjection(Projections.rowCount());
 
         return Response.ok(true).build();
+    }
+
+    @GET
+    @Path("byId/{userId}")
+    @RolesAllowed({"ADMIN"})
+    @Operation(
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response byId(
+            @Parameter(description="User ID", example="mdaniel") @PathParam("userId") Integer userId
+    ) {
+        BaseResponse resp = new BaseResponse();
+        try {
+            UserModel foundProd  = userDao.getById(userId);
+            UserOutputModel model = new UserOutputModel();
+            CommonUtils.copyProperties(model, foundProd);
+            return Response.ok(model).build();
+        } catch (HibernateException | ConstraintViolationException | NullPointerException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            resp.setErrorMessage("Cannot update User - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            return Response.ok(resp).build();
+        }
     }
 
 }

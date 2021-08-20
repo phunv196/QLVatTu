@@ -40,9 +40,9 @@
           disabled
         />
         <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
-          >Nhân viên 
+          >Nhân viên
         </label>
-         <Dropdown
+        <Dropdown
           style="width: 33.3333%"
           class="p-inputtext-sm"
           v-model="recData.employeeId"
@@ -66,7 +66,7 @@
       </div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
-          >Email 
+          >Email
         </label>
         <InputText
           type="text"
@@ -74,7 +74,7 @@
           class="p-inputtext-sm p-col-4"
         />
         <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
-          >Số điện thoại 
+          >Số điện thoại
         </label>
         <InputText
           type="text"
@@ -84,18 +84,27 @@
       </div>
     </div>
     <div class="p-mt-5 p-d-flex p-flex-row p-jc-end" style="width: 100%">
-      <Button
-        label="CANCEL"
-        @click="$emit('cancel')"
-        class="p-button-sm p-button-outlined p-mr-1"
-      ></Button>
-      <Button
-        icon="pi pi-check"
-        iconPos="left"
-        label="APPLY CHANGES"
-        @click="onApplyChanges()"
-        class="p-button-sm"
-      ></Button>
+      <template v-if="changesApplied">
+        <Button
+          label="CLOSE"
+          @click="$emit('cancel')"
+          class="p-button-sm"
+        ></Button>
+      </template>
+      <template v-else>
+        <Button
+          label="CANCEL"
+          @click="$emit('cancel')"
+          class="p-button-sm p-button-outlined p-mr-1"
+        ></Button>
+        <Button
+          icon="pi pi-check"
+          iconPos="left"
+          label="APPLY CHANGES"
+          @click="onApplyChanges()"
+          class="p-button-sm"
+        ></Button>
+      </template>
     </div>
   </div>
 </template>
@@ -110,37 +119,25 @@ import { useToast } from "primevue/usetoast";
 
 export default defineComponent({
   props: {
-    rec: { type: Object, required: true }
+    rec: { type: Object,
+           required: true },
   },
 
   setup(props, { emit }): unknown {
     const showMessage = ref(false);
     const userMessage = ref("");
     const data = ref(props.rec);
-    let recData = data;
+    let recData = ref(props.rec);
+    UsersApi.getById(data.value.userId).then(res => {
+      recData.value = res.data
+    });
     const emp = ref([]);
     const role = ref([]);
     const router = useRouter();
     const changesApplied = ref(false);
     const toast = useToast();
 
-    // const onApplyChanges = () => {
-    //   userMessage.value = "Updating User Details is disabled";
-    //   showMessage.value = true;
-    // };
-    // const onRegister = async () => {
-    //   const rawUserObj = JSON.parse(JSON.stringify(recData.value));
-    //   const resp = await UsersApi.registerUser(rawUserObj);
-    //   if (resp.data.msgType === "SUCCESS") {
-    //     router.push("/login");
-    //   } else {
-    //     userMessage.value = resp.data.msg; // 'Error during registration';
-    //     showMessage.value = true;
-    //   }
-    // };
-
     const onApplyChanges = async () => {
-      debugger
       const rawUsersObj = JSON.parse(JSON.stringify(recData.value));
       let msg: any[];
       msg = [];
@@ -154,17 +151,14 @@ export default defineComponent({
         userMessage.value = "Trường " + msg.join(", ") + "không được để trống!";
         showMessage.value = true;
       } else {
-        debugger
         delete rawUsersObj.index;
         const check = await UsersApi.getUsersByLoginName(rawUsersObj);
         if (check.data) {
           userMessage.value = "Tên đăng nhập bị trùng. Vui lòng nhập lại!";
           showMessage.value = true;
         } else {
-          debugger
           let resp;
           if (rawUsersObj.userId) {
-            debugger
             resp = await UsersApi.updateUsers(rawUsersObj);
           } else {
             resp = await UsersApi.addUsers(rawUsersObj);
@@ -172,9 +166,7 @@ export default defineComponent({
           if (resp.data.msgType === "SUCCESS") {
             toast.add({
               severity: "success",
-              summary: rawUsersObj.userId
-                ? "User Updated"
-                : "User Added",
+              summary: rawUsersObj.userId ? "User Updated" : "User Added",
               detail: `${rawUsersObj.loginName} (${rawUsersObj.fullName})`,
               life: 3000,
             });
@@ -183,6 +175,9 @@ export default defineComponent({
             }
             changesApplied.value = true;
             emit("changed");
+            setTimeout(() => {
+              onCancel();
+            }, 500);
           } else {
             toast.add({
               severity: "error",
@@ -194,13 +189,13 @@ export default defineComponent({
       }
     };
 
-    const getEmployeeById = (employeeId:any) => {
-        EmployeeApi.getEmployeeById(employeeId).then(res => {
-          recData.value.fullName = res.data.fullName;
-          recData.value.email = res.data.email;
-          recData.value.phone = res.data.phone;
-        });
-    }
+    const getEmployeeById = (employeeId: any) => {
+      EmployeeApi.getEmployeeById(employeeId).then((res) => {
+        recData.value.fullName = res.data.fullName;
+        recData.value.email = res.data.email;
+        recData.value.phone = res.data.phone;
+      });
+    };
 
     onMounted(() => {
       lstEmp();
@@ -222,16 +217,21 @@ export default defineComponent({
       role.value = lstRole;
     };
 
+    const onCancel = () => {
+      emit("cancel");
+    };
+
     return {
       router,
       showMessage,
       userMessage,
       recData,
+      onCancel,
       onApplyChanges,
       changesApplied,
       emp,
       role,
-      getEmployeeById
+      getEmployeeById,
     };
   },
 });

@@ -168,6 +168,9 @@ export default defineComponent({
             }
             changesApplied.value = true;
             emit("changed");
+            setTimeout(() => {
+              onCancel();
+            }, 500);
           } else {
             toast.add({
               severity: "error",

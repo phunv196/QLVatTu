@@ -139,8 +139,8 @@
       style="width: 1350px"
     >
       <Column
-        field="receiptId"
-        header="ID phiếu nhập"
+        field="index"
+        header="STT"
         headerStyle="width:90px;"
       ></Column>
       <Column

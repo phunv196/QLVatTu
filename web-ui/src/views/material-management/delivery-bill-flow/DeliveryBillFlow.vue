@@ -1,6 +1,5 @@
 <template>
   <div>
-    <ConfirmDialog position="top"></ConfirmDialog>
     <Toast/>
     <Sidebar v-model:visible="showSlideOut" position="right" style="width:700px">
       <DeliveryBillFlowDetails :rec="selectedRec" @cancel="showSlideOut = false" @changed="getData()"

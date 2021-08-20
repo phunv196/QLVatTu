@@ -104,12 +104,21 @@
           optionLabel="name"
           optionValue="positionId"
         />
+        <input type="file" ref="file" @change="selectFile" />
       </div>
     </div>
     <div
       class="p-d-flex p-flex-row p-mb-3 p-jc-center"
       style="width: 1150px; margin: 20px 0"
     >
+      <FileUpload
+        name="demo[]"
+        url="./upload"
+        :maxFileSize="1000000"
+        :fileLimit="3"
+        @select="test($event)"
+        @uploader="myUploader"
+      />
       <Button
         icon="pi pi-user"
         iconPos="right"
@@ -397,7 +406,7 @@ export default defineComponent({
       await employeeApi.dowloadTemplate().then((res) => {
         //window.open ("data:application/vnd.ms-excel;base64," + res.data);
         var contentType = "application/vnd.ms-excel";
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         var blob1 = b64toBlob(res.data, contentType, "");
         var url = URL.createObjectURL(blob1);
         a.href = url;
@@ -437,6 +446,37 @@ export default defineComponent({
       return blob;
     };
 
+    const test = (event: any) => {
+      console.log(event.files);
+      let formData = new FormData();
+      formData.append("file", event.files[0]);
+      getBase64(event.files[0]).then((res) => {
+        debugger;
+        let data:any = res;
+        let da = data.slice(37, data.length)
+        var contentType = "application/vnd.ms-excel";
+        const a = document.createElement("a");
+        var blob1 = b64toBlob(da, contentType, "");
+        var url = URL.createObjectURL(blob1);
+        a.href = url;
+        a.download = "phunv.xls";
+        a.click();
+        setTimeout(() => {
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        }, 0);
+      });
+    };
+
+    const getBase64 = (file: any) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+      });
+    };
+
     return {
       list,
       isLoading,
@@ -462,6 +502,7 @@ export default defineComponent({
       searchDepartment,
       searchPosition,
       dowloadTemplate,
+      test,
     };
   },
   components: {
