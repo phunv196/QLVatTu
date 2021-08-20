@@ -2,7 +2,7 @@ package com.app.api.controllers;
 
 import com.app.api.BaseController;
 import com.app.dao.EmployeeDao;
-import com.app.util.base.CommonUtils;
+import com.app.dao.base.CommonUtils;
 import com.app.model.BaseResponse;
 import com.app.model.employee.EmployeeModel;
 import com.app.model.employee.EmployeeModel.EmployeeResponse;

@@ -111,10 +111,10 @@
       style="width: 1150px; margin: 20px 0"
     >
       <Button
-        icon="pi pi-user"
+        icon="pi pi-download"
         iconPos="right"
-        label="Dowload Template"
-        @click="dowloadTemplate()"
+        label="Báo cáo"
+        @click="exportExcell()"
         class="p-ml-1 p-button-sm"
       ></Button>
       <Button
@@ -420,6 +420,10 @@ export default defineComponent({
       400
     );
 
+    const exportExcell = () => {
+
+    }
+
     const onAddClick = () => {
       isNewRec.value = true;
       selectedRec.value = { employeeId: "" };
@@ -481,7 +485,8 @@ export default defineComponent({
       searchEmployeeId,
       onResetPasswordClick,
       emp,
-      role
+      role,
+      exportExcell
     };
   },
   components: {

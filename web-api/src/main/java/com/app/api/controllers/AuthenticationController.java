@@ -1,7 +1,7 @@
 package com.app.api.controllers;
 
 import com.app.api.BaseController;
-import com.app.util.base.BaseHibernateDAO;
+import com.app.dao.base.BaseHibernateDAO;
 import com.app.model.BaseResponse;
 import com.app.model.user.LoginModel;
 import com.app.model.user.LoginModel.LoginResponse;
