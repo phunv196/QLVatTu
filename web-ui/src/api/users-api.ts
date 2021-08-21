@@ -10,7 +10,7 @@ export default {
       commitJwtTokenToStore(respData.token, respData.userId, respData.loginName, respData.role, respData.fullName);
       return resp;
     }
-    return Promise.reject(resp.data ? resp.data : resp);
+    return resp.data;
   },
 
   async addUsers(userObj: Record<string, string|number>): Promise<AxiosResponse> {
@@ -76,11 +76,45 @@ export default {
     return api.get('/users', { params: qsParams });
   },
 
+  async export(
+    loginName = "",
+    fullName = "",
+    email = "",
+    phone = "",
+    role = "",
+    employeeId = ""): Promise<AxiosResponse> {
+    const qsParams: Record<string, number | string> = {};
+    if (loginName) {
+      qsParams.loginName = loginName;
+    }
+    if (fullName) {
+      qsParams.fullName = fullName;
+    }
+    if (email) {
+      qsParams.email = email;
+    }
+    if (phone) {
+      qsParams.phone = phone;
+    }
+    if (role) {
+      qsParams.role = role;
+    }
+    if (employeeId) {
+      qsParams.employeeId = employeeId;
+    }
+
+    return api.post('/users/export', qsParams );
+  },
+
   async deleteUser(loginName: string): Promise<AxiosResponse> {
     return api.delete(`/users/${loginName}`);
   },
 
-  async resetPasswordUser(loginName: string): Promise<AxiosResponse> {
-    return api.get(`/users/${loginName}`);
+  async resetPasswordUser(userId:number): Promise<AxiosResponse> {
+    return api.get(`/users/resetPasswordUser/${userId}`);
+  },
+  
+  async getById(userId: number): Promise<AxiosResponse> {
+    return api.get(`/users/byId/${userId}`);
   },
 };

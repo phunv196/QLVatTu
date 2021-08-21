@@ -30,6 +30,24 @@ export default {
     return api.get('/warehouses', { params: qsParams });
   },
 
+  async export(
+  code = '', name = '', email = '', phone = ''): Promise<AxiosResponse> {
+    const qsParams: Record<string, number | string> = {};
+    if (code) {
+      qsParams.code = code;
+    }
+    if (name) {
+      qsParams.name = name;
+    }
+    if (email) {
+      qsParams.email = email;
+    }
+    if (phone) {
+      qsParams.phone = phone;
+    }
+    return api.post('/warehouses/export', qsParams);
+  },
+
   async deleteWarehouse(warehouseId: string): Promise<AxiosResponse> {
     return api.delete(`/warehouses/${warehouseId}`);
   },

@@ -49,6 +49,43 @@ export default {
     return api.get('/factorys', { params: qsParams });
   },
 
+  async export(
+    searchCode = "",
+    searchName = "",
+    searchEmail = "",
+    searchEmployee = "",
+    searchFormDate = "",
+    searchToDate = "",
+    searchFormSuccessDate = "",
+    searchToSuccessDate = ""): Promise<AxiosResponse> {
+    const qsParams: Record<string, number | string> = {};
+    if (searchCode) {
+      qsParams.code = searchCode;
+    }
+    if (searchName) {
+      qsParams.name = searchName;
+    }
+    if (searchEmail) {
+      qsParams.email = searchEmail;
+    }
+    if (searchEmployee) {
+      qsParams.employeeId = searchEmployee;
+    }
+    if (searchFormDate) {
+      qsParams.formDate = searchFormDate;
+    }
+    if (searchToDate) {
+      qsParams.toDate = searchToDate;
+    }
+    if (searchFormSuccessDate) {
+      qsParams.formSuccessDate = searchFormSuccessDate;
+    }
+    if (searchToSuccessDate) {
+      qsParams.toSuccessDate = searchToSuccessDate;
+    }
+    return api.post('/factorys/export', qsParams);
+  },
+
   async deleteFactory(factoryId: string): Promise<AxiosResponse> {
     return api.delete(`/factorys/${factoryId}`);
   },

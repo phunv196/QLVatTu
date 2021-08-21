@@ -72,8 +72,8 @@ public class AuthenticationController extends BaseController {
             LoginResponse successResp = new LoginResponse(usrOutput);
             return Response.status(Response.Status.OK).entity(successResp).build();
         }
-
-        resp.setTypeAndMessage(BaseResponse.MessageTypeEnum.AUTH_FAILED, "Incorrect username/password");
-        return Response.status(Response.Status.UNAUTHORIZED).entity(resp).build();
+//        resp.setTypeAndMessage(BaseResponse.MessageTypeEnum.AUTH_FAILED, "Incorrect username/password");
+//        return Response.status(Response.Status.UNAUTHORIZED).entity(resp).build();
+        return Response.ok(false).build();
     }
 }

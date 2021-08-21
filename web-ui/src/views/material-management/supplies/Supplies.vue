@@ -150,6 +150,13 @@
       style="width: 1350px; margin: 20px 0"
     >
       <Button
+        icon="pi pi-download"
+        iconPos="right"
+        label="Báo cáo"
+        @click="exportExcell()"
+        class="p-ml-1 p-button-sm"
+      ></Button>
+      <Button
         icon="pi pi-search"
         iconPos="right"
         label="Tìm kiếm"
@@ -237,8 +244,7 @@ import { useToast } from "primevue/usetoast";
 import SupplierApi from "@/api/material-management/supplier-api";
 import QualityApi from "@/api/material-management/quality-api";
 import SpeciesApi from "@/api/material-management/species-api";
-import { debounce } from "@/shared/utils";
-import { async } from "rxjs";
+import { debounce, exportFile } from "@/shared/utils";
 
 export default defineComponent({
   setup(): unknown {
@@ -377,6 +383,22 @@ export default defineComponent({
       }
     };
 
+    const exportExcell = async () => {
+      await SuppliesApi.export(
+        `${searchCode.value}`,
+        `${searchName.value}`,
+        `${searchSupplier.value}`,
+        `${searchSpecies.value}`,
+        `${searchFormPrice.value}`,
+        `${searchToPrice.value}`,
+        `${searchQuality.value}`,
+        `${searchUnit.value}`
+      ).then((res) => {
+        const data = res.data.data;
+        exportFile(data.data, data.fileName);
+      });
+    };
+
     const onAddClick = async () => {
       isNewRec.value = true;
       selectedRec.value = { suppliesId: "" };
@@ -429,7 +451,7 @@ export default defineComponent({
     const onSearchKeyup = debounce(async () => {
       if (
         parseInt(`${searchFormPrice.value}`) >
-        parseInt(`${searchToPrice.value}`)
+        parseInt(`${searchToPrice.value}`) && parseInt(`${searchToPrice.value}`) > 0
       ) {
         toast.add({
           severity: "warn",
@@ -481,6 +503,7 @@ export default defineComponent({
       searchQuality,
       searchUnit,
       onSearchKeyup,
+      exportExcell
     };
   },
   components: {

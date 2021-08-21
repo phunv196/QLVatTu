@@ -25,6 +25,43 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 public class Constants {
     public static final String URL_PRODUCTION = "http://localhost:8081/";
 
+    /**
+     * Cac trang tra ve chung.
+     */
+    public interface PAGE_FORWARD {
+
+        //Trang chua link download
+        String DOWNLOAD_LINK = "downloadLink";
+        //Trang chua ket qua gui mail
+        String SEND_MAIL_RESULT = "sendMailResult";
+        //Trang xu ly ma tra ve
+        String SAVE_RESULT = "saveResult";
+        //Trang xu ly submit form iframe
+        String SUBMIT_RESULT = "submitResult";
+        //Trang thong bao loi het session
+        String SESSION_TIME_OUT = "sessionTimeout";
+        //Trang thong bao file khong con ton tai tren he thong
+        String FILE_NOT_FOUND = "fileNotFound";
+        //Trang loi
+        String ERROR_PAGE = "error";
+        String PERMISSION_INVALID = "permissionInvalid";
+        String CSRF_TOKEN_PAGE = "CSRFToken";
+        String IMPORT_ERROR_LIST = "importErrorList";
+    }
+
+    /**
+     * Cac code tra ve.
+     */
+    public interface MESSAGE_CODE {
+
+        //Thanh cong
+        Long SUCCESS = 0L;
+        //Loi
+        Long ERROR = 1L;
+        //Canh bao
+        Long WARNING = 2L;
+    }
+
     public static class UserRoleConstants {
         public final static String ROLE_ADMIN     = "ADMIN";
         public final static String ROLE_CUSTOMER  = "CUSTOMER";
@@ -323,13 +360,26 @@ public class Constants {
      * Cac hang so dung chung.
      */
     public interface COMMON {
+        //Dinh dang ngay
+        String DATE_FORMAT = "MMM dd yyyy";
+        String SQLDATE_FORMAT = "yyyy-MM-dd";
+        String DATE_TIME_FORMAT = "dd/MM/yyyy HH:mm:ss";
+        //Thu muc chua file tam de import
+        String IMPORT_CONFIG = "/share/importConfig/";
+        String IMPORT_TEMPLATE = "/share/importTemplate/";
+        //Thu muc xuat bao cao
+        String TEMPLATE_FOLDER = "/share/exportTemplate/";
+
+        String TEMPLATE_EXPORT_FOLDER = "web-api/src/main/resources/file/template-export-excel/";
+        String FOLDER_EXPORT = "web-api/src/main/resources/file/folder-export-excel/";
+
+        String TEMP = "/share/temp/";
         String FONT_FOLDER = CommonUtils.getConfig("fontFolder");
         String FONT_TIMES_NEW_ROMAN = "Times-New-Roman.ttf";
         String MARKET_COMPANY_ID = "MARKET_COMPANY_ID";
         String EXPORT_FOLDER = CommonUtils.getConfig("exportFolder");
         //Thu muc chua file tam de import
         String IMPORT_FOLDER = "/share/import/";
-        String DATE_TIME_FORMAT = "dd/MM/yyyy HH:mm:ss";
         String BRIEF_TYPE_FILE_UPLOAD = CommonUtils.getConfig("briefTypeFileUpload");
         String BRIEF_FOLDER = CommonUtils.getConfig("briefFolderUpload");
         String MANAGER_CODES = CommonUtils.getConfig("managerCodes");

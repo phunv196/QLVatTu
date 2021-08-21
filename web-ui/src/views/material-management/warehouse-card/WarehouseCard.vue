@@ -6,10 +6,11 @@
       v-model:visible="showSlideOut"
       position="right"
       style="width: 1100px"
+      @hide="getData()"
     >
       <WarehouseCardDetails
         :rec="selectedRec"
-        @cancel="showSlideOut = false"
+        @cancel="showSlideOut = false; getData()"
         @changed="getData()"
         :arrSupplies="arrSupplies"
         :arrWarehouse="arrWarehouse"
@@ -24,12 +25,12 @@
           style="padding-top: 7px"
           >Mã thẻ kho
         </label>
-          <InputText
-            type="text"
-            v-model="searchCode"
-            class="p-inputtext-sm"
-            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
-          />
+        <InputText
+          type="text"
+          v-model="searchCode"
+          class="p-inputtext-sm"
+          style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+        />
       </div>
       <div>
         <label
@@ -37,12 +38,12 @@
           style="padding-top: 7px"
           >Tên thẻ kho
         </label>
-          <InputText
-            type="text"
-            v-model="searchName"
-            class="p-inputtext-sm"
-            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
-          />
+        <InputText
+          type="text"
+          v-model="searchName"
+          class="p-inputtext-sm"
+          style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+        />
       </div>
       <div>
         <label
@@ -86,13 +87,13 @@
           style="padding-top: 7px"
           >Tạo từ ngày
         </label>
-          <InputText
-            type="date"
-            v-model="searchFormDate"
-            class="p-inputtext-sm"
-            placeholder="dd/mm/yyyy"
-            style="width: 200px; height: 30px"
-          />
+        <InputText
+          type="date"
+          v-model="searchFormDate"
+          class="p-inputtext-sm"
+          placeholder="dd/mm/yyyy"
+          style="width: 200px; height: 30px"
+        />
       </div>
       <div>
         <label
@@ -100,13 +101,13 @@
           style="padding-top: 7px"
           >Đến ngày
         </label>
-          <InputText
-            type="date"
-            v-model="searchToDate"
-            class="p-inputtext-sm"
-            placeholder="dd/mm/yyyy"
-            style="width: 200px; height: 30px"
-          />
+        <InputText
+          type="date"
+          v-model="searchToDate"
+          class="p-inputtext-sm"
+          placeholder="dd/mm/yyyy"
+          style="width: 200px; height: 30px"
+        />
       </div>
       <div>
         <label
@@ -130,6 +131,13 @@
       class="p-d-flex p-flex-row p-mb-3 p-jc-center"
       style="width: 1500px; margin: 20px 0"
     >
+      <Button
+        icon="pi pi-download"
+        iconPos="right"
+        label="Báo cáo"
+        @click="exportExcell()"
+        class="p-ml-1 p-button-sm"
+      ></Button>
       <Button
         icon="pi pi-search"
         iconPos="right"
@@ -156,11 +164,7 @@
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4"
       style="width: 1500px"
     >
-      <Column
-        field="index"
-        header="STT"
-        headerStyle="width:70px;"
-      ></Column>
+      <Column field="index" header="STT" headerStyle="width:70px;"></Column>
       <Column
         field="code"
         header="Mã thẻ kho"
@@ -251,7 +255,7 @@ import { useToast } from "primevue/usetoast";
 import SuppliesApi from "@/api/material-management/supplies-api";
 import WarehouseApi from "@/api/material-management/warehouse-api";
 import EmployeeApi from "@/api/employee-api";
-import { debounce } from "@/shared/utils";
+import { debounce, exportFile } from "@/shared/utils";
 export default defineComponent({
   setup(): unknown {
     const isLoading = ref(false);
@@ -307,7 +311,7 @@ export default defineComponent({
           searchToDate,
           searchSupplies
         );
-        let i =1;
+        let i = 1;
         list.value = resp.data.list.map((v: Record<string, unknown>) => {
           const dt = new Date(v.dateCreated as string);
           const strDateCreated = new Intl.DateTimeFormat(["ban", "id"], {
@@ -317,14 +321,14 @@ export default defineComponent({
           }).format(dt);
           let index = 1;
           if (page > 1) {
-            index = (10 * (currentPage - 1)) + i++
+            index = 10 * (currentPage - 1) + i++;
           } else {
             index = i++;
           }
           return {
             ...v,
             strDateCreated,
-            index
+            index,
           };
         });
         // isLoading.value = false;
@@ -381,13 +385,17 @@ export default defineComponent({
     const onPageChange = (event: Record<string, unknown>) => {
       if (currentPage !== (event.page as number) + 1) {
         currentPage = (event.page as number) + 1;
-        getData(currentPage, pageSize.value, `${searchName.value}`,
+        getData(
+          currentPage,
+          pageSize.value,
+          `${searchName.value}`,
           `${searchCode.value}`,
           `${searchEmployee.value}`,
           `${searchWarehouse.value}`,
           `${searchFormDate.value.toString()}`,
           `${searchToDate.value.toString()}`,
-          `${searchSupplies.value}`,);
+          `${searchSupplies.value}`
+        );
       }
     };
 
@@ -451,10 +459,25 @@ export default defineComponent({
           `${searchWarehouse.value}`,
           `${searchFormDate.value.toString()}`,
           `${searchToDate.value.toString()}`,
-          `${searchSupplies.value}`,
+          `${searchSupplies.value}`
         ),
       400
     );
+
+    const exportExcell = async () => {
+      await WarehouseCardApi.export(
+        `${searchName.value}`,
+          `${searchCode.value}`,
+          `${searchEmployee.value}`,
+          `${searchWarehouse.value}`,
+          `${searchFormDate.value.toString()}`,
+          `${searchToDate.value.toString()}`,
+          `${searchSupplies.value}`
+      ).then((res) => {
+        const data = res.data.data;
+        exportFile(data.data, data.fileName);
+      });
+    };
 
     onMounted(() => {
       getData(0, pageSize.value);
@@ -518,6 +541,7 @@ export default defineComponent({
       searchToDate,
       searchSupplies,
       onSearchKeyup,
+      exportExcell
     };
   },
   components: {

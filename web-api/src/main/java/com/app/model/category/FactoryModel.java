@@ -25,10 +25,50 @@ public class FactoryModel {
     @Column(name = "date_finish")      private Date  dateFinish;
 
     @Transient
+    private String formDate;
+    @Transient
+    private String toDate;
+    @Transient
+    private String formSuccessDate;
+    @Transient
+    private String toSuccessDate;
+    @Transient
     private String employeeName;
 
     //Getters and Setters
 
+
+    public String getFormDate() {
+        return formDate;
+    }
+
+    public void setFormDate(String formDate) {
+        this.formDate = formDate;
+    }
+
+    public String getToDate() {
+        return toDate;
+    }
+
+    public void setToDate(String toDate) {
+        this.toDate = toDate;
+    }
+
+    public String getFormSuccessDate() {
+        return formSuccessDate;
+    }
+
+    public void setFormSuccessDate(String formSuccessDate) {
+        this.formSuccessDate = formSuccessDate;
+    }
+
+    public String getToSuccessDate() {
+        return toSuccessDate;
+    }
+
+    public void setToSuccessDate(String toSuccessDate) {
+        this.toSuccessDate = toSuccessDate;
+    }
 
     public String getEmployeeName() {
         return employeeName;

@@ -1,43 +1,49 @@
-package com.app.api.controllers;
+﻿package com.app.api.controllers;
 
 import com.app.api.BaseController;
 import com.app.dao.UserDao;
 import com.app.dao.base.CommonUtils;
+import com.app.dao.base.converter.DynamicExport;
 import com.app.model.BaseResponse;
-import com.app.model.category.SupplierModel;
-import com.app.model.category.SuppliesModel;
-import com.app.model.employee.EmployeeModel;
+import com.app.model.ExportModel;
+import com.app.model.ExportModel.ExportResponse;
 import com.app.model.user.LoginModel.LoginResponse;
 import com.app.model.user.UserModel;
 import com.app.model.user.UserOutputModel;
 import com.app.model.user.UserOutputModel.UserListResponse;
 import com.app.model.user.UserOutputModel.UserResponse;
-import com.app.model.user.UserRegistrationModel;
 import com.app.util.Constants;
 import com.app.util.PlainTextPasswordEncoder;
+import com.app.util.TemplateResouces;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.criterion.Example;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.Base64;
+import java.util.Date;
 import java.util.List;
+
+import static com.app.util.Constants.COMMON.FOLDER_EXPORT;
+import static com.app.util.Constants.COMMON.TEMPLATE_EXPORT_FOLDER;
 
 @Path("users")
 @Tag(name = "Users")
@@ -46,61 +52,6 @@ import java.util.List;
 public class UserController extends BaseController {
     static final String PASSWORD = "123456a@";
     UserDao userDao = new UserDao();
-
-//    @GET
-//    @RolesAllowed({"ADMIN", "SUPPORT"})
-//    @Operation(
-//      summary = "Get list of users",
-//      responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = UserListResponse.class)))}
-//    )
-//    public Response getUserList(
-//      @Parameter (description="Page No, Starts from 1 ", example="1") @DefaultValue("1")  @QueryParam("page") int page,
-//      @Parameter(description="Items in each page", example="20") @DefaultValue("20") @QueryParam("page-size") int pageSize,
-//      @Parameter(description="User Id") @QueryParam("user-id") String loginName,
-//      @Parameter(description="Role", schema=@Schema(allowableValues={"ADMIN", "SUPPORT", "CUSTOMER"})) @QueryParam("role") String role
-//    ) {
-//        // Fill hibernate search by example user (Hibernate Query-by-example way of searching )
-//        int recordFrom=0;
-//        UserModel searchUser = new UserModel();
-//        if (StringUtils.isNotBlank(loginName)){ searchUser.setLoginName(loginName); }
-//        if (StringUtils.isNotBlank(role)){ searchUser.setRole(role); }
-//        //if (StringUtils.isNotBlank(firstName)){ searchUser.setFirstName(firstName); }
-//        if (page<=0){
-//            page = 1;
-//        }
-//        if (pageSize<=0 || pageSize > 1000){
-//            pageSize =20;
-//        }
-//        recordFrom = (page-1) * pageSize;
-//
-//        Example userExample = Example.create(searchUser);
-//        Criteria criteria = userDao.createCriteria(UserModel.class);
-//        criteria.add(userExample);
-//
-//        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
-//        criteria.setProjection(Projections.rowCount());
-//        Long totalRows = (Long)criteria.uniqueResult();
-//
-//        // Execute the Main Query
-//        criteria.setProjection(null);
-//        criteria.setFirstResult( (int) (long)recordFrom);
-//        criteria.setMaxResults(  (int) (long)pageSize);
-//        List<UserModel> userList = criteria.list();
-//
-//        // Fill the result into userOutput list
-//        criteria.setProjection(null);
-//        List<UserOutputModel> userFoundList = new ArrayList<>();
-//        for (UserModel tmpUser : userList) {
-//            UserOutputModel usrOutput = new UserOutputModel(tmpUser);
-//            userFoundList.add(usrOutput);
-//        }
-//
-//        UserListResponse resp = new UserListResponse();
-//        resp.setList(userFoundList);
-//        resp.setPageStats(totalRows.intValue(), pageSize, page,"");
-//        resp.setSuccessMessage("List of users");
-//        return Response.ok(resp).build();
-//    }
 
     @GET
     @RolesAllowed({"ADMIN"})
@@ -115,14 +66,14 @@ public class UserController extends BaseController {
             @Parameter(description = "Order Id") @QueryParam("searchFullName") String searchFullName,
             @Parameter(description = "Order Id") @QueryParam("searchEmail") String searchEmail,
             @Parameter(description = "Order Id") @QueryParam("searchPhone") String searchPhone,
-            @Parameter(description = "Order Id") @QueryParam("searchEmployeeId") Long searchEmployeeId,
+            @Parameter(description = "Order Id") @QueryParam("searchEmployeeId") Integer searchEmployeeId,
             @Parameter(description = "Page No, Starts from 1 ", example = "1") @DefaultValue("1") @QueryParam("page") int page,
             @Parameter(description = "Items in each page", example = "20") @DefaultValue("10") @QueryParam("page-size") int pageSize
     ) {
         UserListResponse resp = new UserListResponse();
         try {
             if (searchEmployeeId == null) {
-                searchEmployeeId = 0l;
+                searchEmployeeId = 0;
             }
             List<UserOutputModel> modelList = userDao.getList(page, pageSize, searchLoginName, searchRole, searchFullName,
                     searchEmail, searchPhone, searchEmployeeId);
@@ -312,6 +263,7 @@ public class UserController extends BaseController {
         return Response.ok(rowCount > 0).build();
     }
 
+
     @POST
     @Path("changePassword")
     @RolesAllowed({"ADMIN"})
@@ -344,6 +296,100 @@ public class UserController extends BaseController {
         criteria.setProjection(Projections.rowCount());
 
         return Response.ok(true).build();
+    }
+
+    @GET
+    @Path("resetPasswordUser/{userId}")
+    @RolesAllowed({"ADMIN"})
+    @Operation(
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response resetPasswordUser(
+            @Parameter(description="User ID", example="mdaniel") @PathParam("userId") Integer userId
+    ) {
+        UserModel model = userDao.getById(userId);
+        BaseResponse resp = new BaseResponse();
+        try {
+            UserModel user  = userDao.getById(userId);
+            if (user != null) {
+                user.setPassword(PlainTextPasswordEncoder.encode(PASSWORD, userId.toString()));
+                userDao.beginTransaction();
+                userDao.update(user);
+                userDao.commitTransaction();
+                resp.setSuccessMessage(String.format("Reset password thành công với (Tên đăng nhập:%s)", user.getLoginName()));
+                return Response.ok(resp).build();
+            } else {
+                resp.setErrorMessage(String.format("Không tìm thấy user với Id (getUserId:%s)", userId));
+                return Response.ok(resp).build();
+            }
+        } catch (HibernateException | ConstraintViolationException e) {
+            resp.setErrorMessage("Cannot update User - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            return Response.ok(resp).build();
+        }
+    }
+    @POST
+    @Path("export")
+    @RolesAllowed({"ADMIN"})
+    @Operation(
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response export(
+            UserModel model
+    ) throws Exception {
+        ExportResponse resp = new ExportResponse();
+        String fileName = "danh_sach_user.xls";
+        DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_EXPORT_FOLDER + fileName), 6, false);
+        List<UserOutputModel> models = userDao.getListExport(model.getLoginName(), model.getRole(),
+                model.getFullName(), model.getEmail(), model.getPhone(), model.getEmployeeId());
+        int stt = 1;
+        if(models != null && !models.isEmpty()) {
+            for (int i = 0 ; i < models.size() ; i++){
+                UserOutputModel user = models.get(i);
+                int index = 0;
+                dynamicExport.increaseRow();
+                dynamicExport.setEntry(stt++, index++);
+                dynamicExport.setText(user.getLoginName(), index++);
+                dynamicExport.setText(user.getRole(), index++);
+                dynamicExport.setText(user.getEmployeeCode(), index++);
+                dynamicExport.setText(user.getFullName(), index++);
+                dynamicExport.setText(user.getEmail(), index++);
+                dynamicExport.setText(user.getPhone(), index++);
+            }
+        }
+        // Set ten file xuat ra excel
+        String prefixOutPutFile = new SimpleDateFormat("yyyyMMddHHmmss_").format(new Date()) + "_";
+        String fileExport = FOLDER_EXPORT + prefixOutPutFile +  "danh_sach_user";
+        String filePath = dynamicExport.exportFile(fileExport, req);
+        File file = new File(filePath);
+        byte[] fileContent = FileUtils.readFileToByteArray(file);
+        String encodedString = Base64.getEncoder().encodeToString(fileContent);
+        String[] fileNameNew = filePath.split("/");
+        ExportModel exportModel = new ExportModel();
+        exportModel.setFileName(fileNameNew[fileNameNew.length - 1]);
+        exportModel.setData(encodedString);
+        resp.setData(exportModel);
+        return Response.ok(resp).build();
+    }
+
+    @GET
+    @Path("byId/{userId}")
+    @RolesAllowed({"ADMIN"})
+    @Operation(
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response byId(
+            @Parameter(description="User ID", example="mdaniel") @PathParam("userId") Integer userId
+    ) {
+        BaseResponse resp = new BaseResponse();
+        try {
+            UserModel foundProd  = userDao.getById(userId);
+            UserOutputModel model = new UserOutputModel();
+            CommonUtils.copyProperties(model, foundProd);
+            return Response.ok(model).build();
+        } catch (HibernateException | ConstraintViolationException | NullPointerException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            resp.setErrorMessage("Cannot update User - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            return Response.ok(resp).build();
+        }
     }
 
 }

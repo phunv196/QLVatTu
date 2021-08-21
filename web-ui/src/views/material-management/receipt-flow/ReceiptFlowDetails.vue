@@ -29,23 +29,6 @@
           optionValue="suppliesId"
         />
       </div>
-
-      <!-- <div class="p-mt-3">
-        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Nhà sản xuất
-        </label>
-        <Dropdown
-          style="width: 40%"
-          class="p-inputtext-sm"
-          v-model="recData.supplierId"
-          :options="arrSupplier"
-          :filter="true"
-          :showClear="true"
-          optionLabel="name"
-          optionValue="supplierId"
-        />
-      </div> -->
-
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
           >Số lượng <strong class="p-error">*</strong>
@@ -143,6 +126,9 @@ export default defineComponent({
           }
           changesApplied.value = true;
           emit("changed");
+          setTimeout(() => {
+              onCancel();
+            }, 500);
         } else {
           toast.add({
             severity: "error",

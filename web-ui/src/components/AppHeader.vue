@@ -66,11 +66,9 @@
               </div>
             </div>
             <template #footer>
-                <Button label="No" icon="pi pi-times" @click="closeBasic" class="p-button-text"/>
-                <Button label="Yes" icon="pi pi-check" @click="updatePassword" autofocus />
+                <Button label="Hủy" icon="pi pi-times" @click="closeBasic" class="p-button-text"/>
+                <Button label="Đổi mật khẩu" icon="pi pi-check" @click="updatePassword" autofocus />
             </template>
-            
-            <!-- <Register v-model:visible="showSlideOut"></Register> -->
     </Dialog> 
   </div>
 </template>

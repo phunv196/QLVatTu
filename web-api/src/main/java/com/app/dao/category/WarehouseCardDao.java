@@ -2,6 +2,7 @@ package com.app.dao.category;
 
 import com.app.dao.base.BaseHibernateDAO;
 import com.app.dao.base.CommonUtils;
+import com.app.model.category.SuppliesModel;
 import com.app.model.category.WarehouseCardModel;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.HibernateException;
@@ -10,6 +11,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 public class WarehouseCardDao extends BaseHibernateDAO {
@@ -185,4 +187,54 @@ public class WarehouseCardDao extends BaseHibernateDAO {
         return (BigInteger)q.uniqueResult();
     }
 
+    public List<WarehouseCardModel> getListExport(String code, String name, Long employeeId,
+                              Long warehouseId, Long suppliesId, String formDate, String toDate) throws Exception {
+        StringBuilder querySelect = new StringBuilder("select wc.warehouse_card_id warehouseCardId," +
+                " wc.code code," +
+                " wc.name name," +
+                " wc.description description," +
+                " wc.date_created dateCreated," +
+                " wc.employee_id employeeId," +
+                " e.full_name fullName," +
+                " wc.supplies_id suppliesId," +
+                " s.code suppliesCode," +
+                " s.name suppliesName," +
+                " s.price suppliesPrice," +
+                " wc.warehouse_id warehouseId," +
+                " w.code warehouseCode," +
+                " w.name warehouseName," +
+                " (select COUNT(*) from warehouse_card_flow wcf where wcf.delivery_bill_id IS NOT NULL " +
+                " and wcf.warehouse_card_id = wc.warehouse_card_id ) countDeliveryBill," +
+                " (select COUNT(*) from warehouse_card_flow wcf where wcf.receipt_id IS NOT NULL " +
+                " and wcf.warehouse_card_id = wc.warehouse_card_id ) countReceipt," +
+                " (select sum(amount) from warehouse_card_flow wcf where wcf.delivery_bill_id IS NOT NULL " +
+                " and wcf.warehouse_card_id = wc.warehouse_card_id ) amountDeliveryBill," +
+                " (select sum(amount) from warehouse_card_flow wcf where wcf.receipt_id IS NOT NULL " +
+                " and wcf.warehouse_card_id = wc.warehouse_card_id ) amountReceipt, " +
+                " ((select sum(amount) from warehouse_card_flow wcf where wcf.delivery_bill_id IS NOT NULL " +
+                " and wcf.warehouse_card_id = wc.warehouse_card_id ) - (select sum(amount) from warehouse_card_flow wcf where wcf.receipt_id IS NOT NULL " +
+                " and wcf.warehouse_card_id = wc.warehouse_card_id ) ) amountInventory " +
+                " from warehouse_card wc " +
+                " left join supplies s on s.supplies_id = wc.supplies_id" +
+                " left join employees e on e.employee_id = wc.employee_id" +
+                " left join warehouse w on w.warehouse_id = wc.warehouse_id");
+        List<Object> paramList = new ArrayList<>();
+        StringBuilder strCondition = new StringBuilder(" WHERE 1 = 1");
+        CommonUtils.filter(code, strCondition, paramList, "wc.code");
+        CommonUtils.filter(name, strCondition, paramList, "wc.name");
+        CommonUtils.filter(employeeId, strCondition, paramList, "wc.employee_id");
+        CommonUtils.filter(warehouseId, strCondition, paramList, "wc.warehouse_id");
+        CommonUtils.filter(suppliesId, strCondition, paramList, "s.supplies_id");
+        CommonUtils.filterBetweenDate(CommonUtils.convertStringToDateOther(formDate),CommonUtils.convertStringToDateOther(toDate)
+                , strCondition, paramList, "wc.date_created","wc.date_created");
+        querySelect.append(strCondition);
+        querySelect.append(" ORDER BY wc.warehouse_card_id ");
+        SQLQuery q = createSQLQuery(querySelect.toString());
+        for (int i = 0; i < paramList.size(); i++) {
+            q.setParameter(i, paramList.get(i));
+        }
+        q.setResultTransformer(Transformers.aliasToBean(WarehouseCardModel.class));
+        setResultTransformer(q, WarehouseCardModel.class);
+        return q.list();
+     }
 }

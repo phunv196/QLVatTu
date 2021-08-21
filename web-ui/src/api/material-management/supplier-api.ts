@@ -2,7 +2,8 @@ import api from '@/api/api-service';
 import { AxiosResponse } from 'axios';
 
 export default {
-  async getSupplier(page = 1, pageSize = 20, supplierId = '', code = '', name = '', email = '', phone = ''): Promise<AxiosResponse> {
+  async getSupplier(page = 1, pageSize = 20, supplierId = '',
+   code = '', name = '', email = '', phone = ''): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
     if (page) {
       qsParams.page = page;
@@ -30,6 +31,28 @@ export default {
 
 
     return api.get('/supplier', { params: qsParams });
+  },
+
+  async export(
+    searchCode = "",
+    searchName = "",
+    searchEmail = "",
+    searchPhone = "",
+  ): Promise<AxiosResponse> {
+    const qsParams: Record<string, number | string> = {};
+    if (searchCode) {
+      qsParams.code = searchCode;
+    }
+    if (searchName) {
+      qsParams.name = searchName;
+    }
+    if (searchEmail) {
+      qsParams.email = searchEmail;
+    }
+    if (searchPhone) {
+      qsParams.phone = searchPhone;
+    }
+    return api.post('/supplier/export', qsParams);
   },
 
   async deleteSupplier(supplierId: string): Promise<AxiosResponse> {

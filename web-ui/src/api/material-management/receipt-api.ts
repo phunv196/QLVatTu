@@ -40,6 +40,35 @@ export default {
     return api.get('/receipts', { params: qsParams });
   },
 
+  async export(
+  searchCode = "",
+  searchName = "",
+  searchEmployee = "",
+  searchWarehouse = "",
+  searchFormDate = "",
+  searchToDate = ""): Promise<AxiosResponse> {
+    const qsParams: Record<string, number | string> = {};
+    if (searchCode) {
+      qsParams.code = searchCode;
+    }
+    if (searchName) {
+      qsParams.name = searchName;
+    }
+    if (searchEmployee) {
+      qsParams.employeeId = searchEmployee;
+    }
+    if (searchWarehouse) {
+      qsParams.warehouseId = searchWarehouse;
+    }
+    if (searchFormDate) {
+      qsParams.formDate = searchFormDate;
+    }
+    if (searchToDate) {
+      qsParams.toDate = searchToDate;
+    }
+    return api.post('/receipts/export', qsParams);
+  },
+
   async deleteReceipt(receiptId: string): Promise<AxiosResponse> {
     return api.delete(`/receipts/${receiptId}`);
   },

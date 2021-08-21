@@ -1,6 +1,7 @@
 <template>
   <div class="m-login">
     <div class="left">
+    <Toast />
     <div>
       <span class="display:flex" >
         <Logo style="display:inline-block;width:50px;height:50px; margin-bottom:50px;"></Logo>
@@ -17,7 +18,7 @@
           </span>
           <div class="p-d-flex p-flex-row p-jc-center p-mt-3 ">
 <!--            <Button label="Register" @click="onRegisterClick" class="p-mr-1 p-button-sm p-button-raised" style="border-color:#777; background-color:#777;"/>-->
-            <Button label="Login" @click="onLoginClick" :disabled="loginDisabled" class="p-button-sm p-button-raised" style="width: 30%"/>
+            <Button label="Login" @click="onLoginClick" class="p-button-sm p-button-raised" style="width: 30%"/>
           </div>
           <!-- Localization is Disaabled as the vue-i18n is still in beta -->
 <!--          <div class="p-d-flex p-flex-row p-jc-end p-mt-2 p-ai-center" >-->
@@ -59,6 +60,7 @@ import Logo from '@/components/Logo.vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import UsersApi from '@/api/users-api'; // eslint-disable-line import/no-cycle
+import { useToast } from "primevue/usetoast";
 
 export default defineComponent({
   setup(): unknown {
@@ -68,15 +70,22 @@ export default defineComponent({
     const password = ref('password');
     const loginDisabled = ref(false);
     const win = window;
+    const toast = useToast();
 
     const onLoginClick = async () => {
       loginDisabled.value = true;
       const resp = await UsersApi.login(username.value, password.value);
-      loginDisabled.value = false;
-      if (resp.data.msgType === 'SUCCESS') {
-        router.push('/home');
+      if (resp) {
+        if (resp.data.msgType === 'SUCCESS') {
+          router.push('/home');
+        }
       } else {
-        console.log('Unable to login');
+        toast.add({
+              severity: "error",
+              summary: "Error",
+              detail: "Tài khoản hoặc mật khẩu không đúng. Vui lòng nhập lại!",
+              life: 3000,
+            });
       }
     };
 
@@ -94,38 +103,6 @@ export default defineComponent({
       // store.commit('baseUrl', `${window.location.origin}/`);
     });
 
-    const convertBase64ToExcel = () => {
-
-		//window.open ("data:application/vnd.ms-excel;base64," + data);
-    // var contentType = 'application/vnd.ms-excel';
-		// var blob1 = b64toBlob(data, contentType, '');
-		// var blobUrl1 = URL.createObjectURL(blob1);
-		// window.open(blobUrl1);
-		}
-
-	  // const b64toBlob = (b64Data:any, contentType:any , sliceSize:any) => {
-		// contentType = contentType || '';
-	  // var	sliceSize = sliceSize || 512;
-		// var byteCharacters = atob(b64Data);
-		// var byteArrays = [];
-
-		// for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-		// var slice = byteCharacters.slice(offset, offset + sliceSize);
-
-		// var byteNumbers = new Array(slice.length);
-		// for (var i = 0; i < slice.length; i++) {
-		// byteNumbers[i] = slice.charCodeAt(i);
-		// }
-
-		// var byteArray = new Uint8Array(byteNumbers);
-
-		// byteArrays.push(byteArray);
-		// }
-
-		// var blob = new Blob(byteArrays, {type: contentType});
-		// return blob;
-		// }
-
 
     return {
       loginDisabled,
@@ -134,7 +111,6 @@ export default defineComponent({
       onLoginClick,
       onRegisterClick,
       onApiDocsClick,
-      convertBase64ToExcel
     };
   },
   components: {

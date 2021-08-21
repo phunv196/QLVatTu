@@ -30,6 +30,10 @@ public class EmployeeModel {
 
     @Transient
     private String departmentName;
+
+    @Transient
+    private String sexString;
+
     public EmployeeModel(){};
 
     public EmployeeModel(Long employeeId, String code, String lastName, String firstName, String fullName,
@@ -53,6 +57,15 @@ public class EmployeeModel {
     }
 
 // Getter and Setters
+
+
+    public String getSexString() {
+        return sexString;
+    }
+
+    public void setSexString(String sexString) {
+        this.sexString = sexString;
+    }
 
     public String getLastName() { return lastName; }
     public void setLastName(String lastName) { this.lastName = lastName; }

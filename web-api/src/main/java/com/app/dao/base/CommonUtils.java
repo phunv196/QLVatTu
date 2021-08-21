@@ -5,6 +5,7 @@
 package com.app.dao.base;
 
 import com.app.dao.base.converter.*;
+import com.app.util.Constants;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.ConvertUtilsBean;
@@ -23,6 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.PreparedStatement;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
@@ -116,6 +118,15 @@ public class CommonUtils {
     }
 
     /**
+     * Check list object is null.
+     *
+     * @return
+     */
+    public static boolean isNullOrEmpty(List data) {
+        return (data == null || data.isEmpty());
+    }
+
+    /**
      * Lay gia tri tu file config.properties.
      *
      * @param key Khoa
@@ -205,6 +216,29 @@ public class CommonUtils {
             return null;
         } else {
             String pattern = Constants.COMMON.DATE_FORMAT;
+            SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
+            dateFormat.setLenient(false);
+            try {
+                return dateFormat.parse(date);
+            } catch (Exception ex) {
+                LOGGER.debug(ex.toString());
+                return null;
+            }
+        }
+    }
+
+    /**
+     * Chuyen doi tuong String thanh doi tuong Date.
+     *
+     * @param date Xau ngay, co dinh dang duoc quy trinh trong file Constants
+     * @return Doi tuong Date
+     * @throws Exception Exception
+     */
+    public static Date convertStringToDateOther(String date) throws Exception {
+        if (date == null || date.trim().isEmpty()) {
+            return null;
+        } else {
+            String pattern = Constants.COMMON.SQLDATE_FORMAT;
             SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
             dateFormat.setLenient(false);
             try {
@@ -1799,5 +1833,412 @@ public class CommonUtils {
             return true;
         }
         return false;
+    }
+
+    /**
+     * kiem tra 1 xau rong hay null khong
+     *
+     * @param str         : xau
+     * @param queryString
+     * @param paramList
+     * @param field
+     */
+    public static void filter(String str, StringBuilder queryString, List<Object> paramList, String field) {
+        if ((str != null) && !"".equals(str.trim())) {
+            queryString.append(" AND LOWER(").append(field).append(") LIKE ? ESCAPE '/'");
+            str = str.replace("  ", " ");
+            str = "%" + str.trim().toLowerCase().replace("/", "//").replace("_", "/_").replace("%", "/%") + "%";
+            paramList.add(str);
+        }
+    }
+
+    /**
+     * kiem tra 1 xau rong hay null khong
+     *
+     * @param str         : xau
+     * @param queryString
+     * @param paramList
+     * @param
+     */
+    public static void filterAndOrString(String str, StringBuilder queryString, List<Object> paramList, String field1, String field2) {
+        if ((str != null) && !"".equals(str.trim())) {
+            queryString.append(" AND ( LOWER(").append(field1).append(") LIKE ? ESCAPE '/'");
+            queryString.append(" OR  LOWER(").append(field2).append(") LIKE ? ESCAPE '/'");
+            queryString.append(" ) ");
+            str = str.replace("  ", " ");
+            str = "%" + str.trim().toLowerCase().replace("/", "//").replace("_", "/_").replace("%", "/%") + "%";
+            paramList.add(str);
+            paramList.add(str);
+        }
+    }
+
+    /**
+     * kiem tra 1 xau rong hay null khong
+     *
+     * @param str         : xau
+     * @param queryString
+     * @param paramList
+     * @param field
+     */
+    public static void filterEqual(String str, StringBuilder queryString, List<Object> paramList, String field) {
+        if ((str != null) && !"".equals(str.trim())) {
+            queryString.append(" AND LOWER(").append(field).append(") = ? ");
+            str = str.replace("  ", " ");
+            str = str.trim().toLowerCase();
+            paramList.add(str);
+        }
+    }
+
+    /**
+     * kiem tra 1 so rong hay null khong
+     *
+     * @param n           So
+     * @param queryString
+     * @param paramList
+     * @param field
+     */
+    public static void filter(Long n, StringBuilder queryString, List<Object> paramList, String field) {
+        if ((n != null) && (n > 0L)) {
+            queryString.append(" AND ").append(field).append(" = ? ");
+            paramList.add(n);
+        }
+    }
+
+    /**
+     * kiem tra 1 so rong hay null khong
+     *
+     * @param n           So
+     * @param queryString
+     * @param paramList
+     * @param field
+     */
+    public static void filterWithZero(Long n, StringBuilder queryString, List<Object> paramList, String field) {
+        if ((n != null) && (n >= 0L)) {
+            queryString.append(" AND ").append(field).append(" = ? ");
+            paramList.add(n);
+        }
+    }
+
+    /**
+     * kiem tra 1 so rong hay null khong
+     *
+     * @param n           So
+     * @param queryString
+     * @param paramList
+     * @param field
+     */
+    public static void filter(Double n, StringBuilder queryString, List<Object> paramList, String field) {
+        if ((n != null) && (n > 0L)) {
+            queryString.append(" AND ").append(field).append(" = ? ");
+            paramList.add(n);
+        }
+    }
+
+    /**
+     * kiem tra 1 so rong hay null khong
+     *
+     * @param n           So
+     * @param queryString
+     * @param paramList
+     * @param field
+     */
+    public static void filter(Boolean n, StringBuilder queryString, List<Object> paramList, String field) {
+        if (n != null) {
+            queryString.append(" AND ").append(field).append(" = ? ");
+            paramList.add(n);
+        }
+    }
+
+    /**
+     * kiem tra 1 Integer rong hay null khong
+     *
+     * @param n           So
+     * @param queryString
+     * @param paramList
+     * @param field
+     */
+    public static void filter(Integer n, StringBuilder queryString, List<Object> paramList, String field) {
+        if ((n != null) && (n > 0)) {
+            queryString.append(" AND ").append(field).append(" = ? ");
+            paramList.add(n);
+        }
+    }
+
+    /**
+     * kiem tra 1 xau rong hay null khong
+     *
+     * @param date        So
+     * @param queryString
+     * @param field
+     * @param paramList
+     */
+    public static void filter(Date date, StringBuilder queryString, List<Object> paramList, String field) {
+        if ((date != null)) {
+            queryString.append(" AND ").append(field).append(" = ? ");
+            paramList.add(date);
+        }
+    }
+
+    /**
+     * kiem tra 1 xau rong hay null khong
+     *
+     * @param arrIds
+     * @param queryString
+     * @param paramList
+     * @param field
+     */
+    public static void filterSelectInL(String arrIds, StringBuilder queryString, List<Object> paramList, String field) {
+        if (!CommonUtils.isNullOrEmpty(arrIds)) {
+            queryString.append(" AND ").append(field).append(" IN (-1 ");
+            String[] ids = arrIds.split(",");
+            for (String strId : ids) {
+                queryString.append(", ?");
+                paramList.add(Long.parseLong(strId.trim()));
+            }
+            queryString.append(" ) ");
+        }
+    }
+
+    /**
+     * kiem tra list id
+     *
+     * @param queryString
+     * @param paramList
+     * @param field
+     */
+    public static void filterSelectInL(List<Long> ids, StringBuilder queryString, List<Object> paramList, String field) {
+        if (!CommonUtils.isNullOrEmpty(ids)) {
+            queryString.append(" AND ").append(field).append(" IN (-1 ");
+            for (Long id : ids) {
+                queryString.append(", ?");
+                paramList.add(id);
+            }
+            queryString.append(" ) ");
+        }
+    }
+
+    /**
+     * Kiem tra lon hon hoac bang.
+     *
+     * @param obj         So
+     * @param queryString
+     * @param paramList
+     * @param field
+     */
+    public static void filterGe(Object obj, StringBuilder queryString, List<Object> paramList, String field) {
+        if (obj != null && !"".equals(obj)) {
+            queryString.append(" AND ").append(field).append(" >= ? ");
+            paramList.add(obj);
+        }
+    }
+
+    /**
+     * Kiem tra GIAO
+     *     So
+     * @param queryString
+     * @param paramList
+     */
+    public static void filterBetweenDate(Object obj1, Object obj2, StringBuilder queryString, List<Object> paramList, String field1, String field2) {
+        if ((obj1 != null && !"".equals(obj1)) && (obj2 == null || "".equals(obj2))) {
+            queryString.append(" AND ").append(field1).append(" >= ? ");
+            paramList.add(obj1);
+        } else if ((obj1 == null || "".equals(obj1)) && (obj2 != null && !"".equals(obj2))){
+            queryString.append(" AND ").append(field2).append(" <= ? ");
+            paramList.add(obj2);
+        } else if ((obj1 != null && !"".equals(obj1)) && (obj2 != null && !"".equals(obj2))) {
+            queryString.append(" AND ( ").append(field2).append(" >= ? ");
+            paramList.add(obj1);
+            queryString.append(" OR ").append(field2).append(" IS NULL ) ");
+            queryString.append(" AND ").append(field1).append(" <= ? ");
+            paramList.add(obj2);
+        }
+    }
+
+    /**
+     * Kiem tra GIAO
+     *
+       So
+     * @param queryString
+     * @param paramList
+     * @param field
+     */
+    public static void filterFromDateToDate(Object obj1, Object obj2, StringBuilder queryString, List<Object> paramList, String field) {
+        if ((obj1 != null && !"".equals(obj1)) && (obj2 == null || "".equals(obj2))) {
+            queryString.append(" AND ( ").append(field).append(" >= DATE(?) ");
+            queryString.append(" OR ").append(field).append(" IS NULL ) ");
+            paramList.add(obj1);
+        } else if ((obj1 == null || "".equals(obj1)) && (obj2 != null && !"".equals(obj2))){
+            queryString.append(" AND ( ").append(field).append(" <= DATE(?) ");
+            queryString.append(" OR ").append(field).append(" IS NULL ) ");
+            paramList.add(obj2);
+        } else if ((obj1 != null && !"".equals(obj1)) && (obj2 != null && !"".equals(obj2))) {
+            queryString.append(" AND ( ").append(field).append(" >= DATE(?) ");
+            paramList.add(obj1);
+            queryString.append(" AND  ").append(field).append(" <= DATE(?) ) ");
+            paramList.add(obj2);
+            queryString.append(" OR ").append(field).append(" IS NULL  ");
+        }
+    }
+
+    /**
+     * Kiem tra nho hon hoac bang.
+     *
+     * @param obj         So
+     * @param queryString
+     * @param paramList
+     * @param field
+     */
+    public static void filterLe(Object obj, StringBuilder queryString, List<Object> paramList, String field) {
+        if (obj != null && !"".equals(obj)) {
+            queryString.append(" AND ").append(field).append(" <= ? ");
+            paramList.add(obj);
+        }
+    }
+
+    /**
+     * filter for inserting preparedStatement
+     *
+     * @param value
+     * @param index
+     * @param preparedStatement
+     * @throws Exception
+     */
+    public static void filter(String value, PreparedStatement preparedStatement, int index) throws Exception {
+
+        if (value != null) {
+            preparedStatement.setString(index, value.trim());
+        } else {
+            preparedStatement.setNull(index, java.sql.Types.NULL);
+        }
+    }
+
+    /**
+     *
+     * @param value
+     * @param preparedStatement
+     * @param index
+     * @throws Exception
+     */
+    public static void filter(Double value, PreparedStatement preparedStatement, int index) throws Exception {
+
+        if (value != null) {
+            preparedStatement.setDouble(index, value);
+        } else {
+            preparedStatement.setNull(index, java.sql.Types.NULL);
+        }
+    }
+
+    /**
+     *
+     * @param value
+     * @param preparedStatement
+     * @param index
+     * @throws Exception
+     */
+    public static void filter(Long value, PreparedStatement preparedStatement, int index) throws Exception {
+
+        if (value != null) {
+            preparedStatement.setLong(index, value);
+        } else {
+            preparedStatement.setNull(index, java.sql.Types.NULL);
+        }
+    }
+
+    /**
+     *
+     * @param value
+     * @param preparedStatement
+     * @param index
+     * @throws Exception
+     */
+    public static void filter(Object value, PreparedStatement preparedStatement, int index) throws Exception {
+        if (value != null) {
+            if (value instanceof Date) {
+                Date temp = (Date) value;
+                preparedStatement.setObject(index, new java.sql.Timestamp(temp.getTime()));
+            } else {
+                preparedStatement.setObject(index, value);
+            }
+
+        } else {
+            preparedStatement.setNull(index, java.sql.Types.NULL);
+        }
+    }
+
+    /**
+     *
+     * @param value
+     * @param preparedStatement
+     * @param index
+     * @throws Exception
+     */
+    public static void filter(java.sql.Date value, PreparedStatement preparedStatement, int index) throws Exception {
+
+        if (value != null) {
+            preparedStatement.setDate(index, value);
+        } else {
+            preparedStatement.setNull(index, java.sql.Types.NULL);
+        }
+    }
+
+    /**
+     * kiem tra mot chuoi co chua ky tu Unicode khong
+     *
+     * @param str
+     * @return
+     */
+    public static boolean containUnicode(String str) {
+        String signChars = "ăâđêôơưàảãạáằẳẵặắầẩẫậấèẻẽẹéềểễệếìỉĩịíòỏõọóồổỗộốờởỡợớùủũụúừửữựứỳỷỹỵý";
+        if ("".equals(str)) {
+            return false;
+        } else {
+            int count = 0;
+            String subStr;
+            while (count < str.length()) {
+                subStr = str.substring(count, count + 1);
+                if (signChars.contains(subStr)) {
+                    return true;
+                }
+                count++;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * kiem tra mot chuoi co chua ky tu Unicode khong
+     *
+     * @param str
+     * @return
+     */
+    public static boolean containPhoneNumber(String str) {
+        String signChars = "0123456789";
+        if ("".equals(str)) {
+            return false;
+        } else {
+            int count = 0;
+            String subStr;
+            while (count < str.length()) {
+                subStr = str.substring(count, count + 1);
+                if (!signChars.contains(subStr)) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * replaceSpecialKeys
+     *
+     * @param str String
+     * @return String
+     */
+    public static String replaceSpecialKeys(String str) {
+        str = str.replace("  ", " ");
+        str = "%" + str.trim().toLowerCase().replace("/", "//").replace("_", "/_").replace("%", "/%") + "%";
+        return str;
     }
 }

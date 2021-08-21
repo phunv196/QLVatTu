@@ -1,14 +1,17 @@
-package com.app.dao;
+﻿package com.app.dao;
 
 import com.app.dao.base.BaseHibernateDAO;
+import com.app.dao.base.CommonUtils;
 import com.app.model.category.FactoryModel;
 import com.app.model.employee.EmployeeModel;
+import com.app.model.user.UserOutputModel;
 import org.hibernate.*;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.transform.Transformers;
 
 import java.math.BigInteger;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeeDao extends BaseHibernateDAO {
@@ -58,6 +61,10 @@ public class EmployeeDao extends BaseHibernateDAO {
                 " e.phone phone," +
                 " e.birth birth," +
                 " e.sex sex," +
+                " (case" +
+                "   when e.sex = 1 then 'Nữ'" +
+                "   when e.sex = 2 then 'Nam'" +
+                "   END)  ," +
                 " e.email email," +
                 " e.department_id departmentId, " +
                 " d.name departmentName, " +
@@ -114,5 +121,48 @@ public class EmployeeDao extends BaseHibernateDAO {
         if (searchPosition > 0)   { sqlWhere = sqlWhere + " and e.position_id = :searchPosition "; }
 
         return sqlWhere;
+    }
+
+    public List<EmployeeModel> getListExport(String code, String fullName, String email, String phone, Long departmentId, Long positionId) {
+        StringBuilder querySelect = new StringBuilder(
+                "select e.employee_id employeeId," +
+                " e.code code," +
+                " e.first_name firstName," +
+                " e.last_name lastName," +
+                " e.full_name fullName," +
+                " e.phone phone," +
+                " e.birth birth," +
+                " e.sex sex," +
+                " (case" +
+                "   when e.sex = 1 then 'Nữ'" +
+                "   when e.sex = 2 then 'Nam'" +
+                "   END) sexString," +
+                " e.email email," +
+                " e.department_id departmentId, " +
+                " d.name departmentName, " +
+                " e.position_id positionId, " +
+                " p.name positionName, " +
+                " e.address address " +
+                " from employees e " +
+                " left join department d on e.department_id = d.department_id" +
+                " left join position p on e.position_id = p.position_id");
+
+        List<Object> paramList = new ArrayList<>();
+        StringBuilder strCondition = new StringBuilder(" WHERE 1 = 1");
+        CommonUtils.filter(code, strCondition, paramList, "e.code");
+        CommonUtils.filter(fullName, strCondition, paramList, "e.full_name");
+        CommonUtils.filter(email, strCondition, paramList, "e.email");
+        CommonUtils.filter(phone, strCondition, paramList, "e.phone");
+        CommonUtils.filter(departmentId, strCondition, paramList, "e.deparment_id");
+        CommonUtils.filter(positionId, strCondition, paramList, "e.position_id");
+        querySelect.append(strCondition);
+        querySelect.append(" ORDER BY e.employee_id ");
+        SQLQuery q = createSQLQuery(querySelect.toString());
+        for (int i = 0; i < paramList.size(); i++) {
+            q.setParameter(i, paramList.get(i));
+        }
+        q.setResultTransformer(Transformers.aliasToBean(EmployeeModel.class));
+        setResultTransformer(q, EmployeeModel.class);
+        return q.list();
     }
 }

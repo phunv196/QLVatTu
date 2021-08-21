@@ -56,3 +56,43 @@ export function debounce<F extends(...params: unknown[]) => void>(fn: F, delay: 
     timeoutId = window.setTimeout(() => fn.apply(this, args), delay);
   } as F;
 }
+
+export function exportFile(data: any, fileName: string) {
+  var contentType = "application/vnd.ms-excel";
+  const a = document.createElement("a");
+  var blob1 = b64toBlob(data, contentType, "");
+  var url = URL.createObjectURL(blob1);
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  setTimeout(() => {
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  }, 0);
+}
+
+function b64toBlob (b64Data: any, contentType: any, sliceSize: any){
+  contentType = contentType || "";
+  var sliceSize = sliceSize || 512;
+  var byteCharacters = atob(b64Data);
+  var byteArrays = [];
+
+  for (
+    var offset = 0;
+    offset < byteCharacters.length;
+    offset += sliceSize
+  ) {
+    var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+    var byteNumbers = new Array(slice.length);
+    for (var i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i);
+    }
+
+    var byteArray = new Uint8Array(byteNumbers);
+
+    byteArrays.push(byteArray);
+  }
+  var blob = new Blob(byteArrays, { type: contentType });
+  return blob;
+};

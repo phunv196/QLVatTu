@@ -10,6 +10,7 @@ import org.hibernate.*;
 import org.hibernate.transform.Transformers;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserDao extends BaseHibernateDAO {
@@ -41,7 +42,7 @@ public class UserDao extends BaseHibernateDAO {
     }
 
     public List<UserOutputModel> getList(int from, int limit, String searchLoginName, String searchRole, String searchFullName,
-                                         String searchEmail, String searchPhone, Long searchEmployeeId)  throws HibernateException, ConstraintViolationException {
+                                         String searchEmail, String searchPhone, Integer searchEmployeeId)  throws HibernateException, ConstraintViolationException {
 
         String sql = createSqlWhereString(searchLoginName, searchRole, searchFullName, searchEmail, searchPhone,
                 searchEmployeeId);
@@ -83,9 +84,8 @@ public class UserDao extends BaseHibernateDAO {
         return q.list();
     }
 
-
     public BigInteger getCount(String searchLoginName, String searchRole, String searchFullName,
-                               String searchEmail, String searchPhone, Long searchEmployeeId) {
+                               String searchEmail, String searchPhone, Integer searchEmployeeId) {
         String sql = createSqlWhereString(searchLoginName, searchRole, searchFullName, searchEmail, searchPhone,
                 searchEmployeeId);
         String countSql = "select count(*) from users u " + sql ;
@@ -100,7 +100,7 @@ public class UserDao extends BaseHibernateDAO {
     }
 
     private  String createSqlWhereString(String searchLoginName, String searchRole, String searchFullName,
-                                         String searchEmail, String searchPhone, Long searchEmployeeId){
+                                         String searchEmail, String searchPhone, Integer searchEmployeeId){
         String sqlWhere = " where  1 = 1 ";
         if (!CommonUtils.isNullOrEmpty(searchLoginName))   { sqlWhere = sqlWhere + " and LOWER(u.login_name) like :searchLoginName "; }
         if (!CommonUtils.isNullOrEmpty(searchFullName))   { sqlWhere = sqlWhere + " and LOWER(u.full_name) like :searchFullName "; }
@@ -109,5 +109,38 @@ public class UserDao extends BaseHibernateDAO {
         if (!CommonUtils.isNullOrEmpty(searchRole))    { sqlWhere = sqlWhere + " and LOWER(u.role) = :searchRole "; }
         if (searchEmployeeId >0)   { sqlWhere = sqlWhere + " and u.empluyee_id = :searchEmployeeId "; }
         return sqlWhere;
+    }
+
+
+    public List<UserOutputModel> getListExport(String searchLoginName, String searchRole, String searchFullName,
+                                         String searchEmail, String searchPhone, Integer searchEmployeeId)  throws HibernateException, ConstraintViolationException {
+
+        StringBuilder querySelect = new StringBuilder("select u.user_id userId," +
+                " u.login_name loginName," +
+                " u.full_name fullName," +
+                " u.email email," +
+                " u.phone phone," +
+                " u.role role," +
+                " u.employee_id employeeId," +
+                " e.code employeeCode" +
+                " from users u " +
+                " left join employees e on e.employee_id = u.employee_id" );
+        List<Object> paramList = new ArrayList<>();
+        StringBuilder strCondition = new StringBuilder(" WHERE 1 = 1");
+        CommonUtils.filter(searchLoginName, strCondition, paramList, "u.login_name");
+        CommonUtils.filter(searchRole, strCondition, paramList, "u.role");
+        CommonUtils.filter(searchFullName, strCondition, paramList, "u.login_name");
+        CommonUtils.filter(searchEmail, strCondition, paramList, "u.email");
+        CommonUtils.filter(searchPhone, strCondition, paramList, "u.phone");
+        CommonUtils.filter(searchEmployeeId, strCondition, paramList, "u.employee_id");
+        querySelect.append(strCondition);
+        querySelect.append(" ORDER BY u.login_name ");
+        SQLQuery q = createSQLQuery(querySelect.toString());
+        for (int i = 0; i < paramList.size(); i++) {
+            q.setParameter(i, paramList.get(i));
+        }
+        q.setResultTransformer(Transformers.aliasToBean(UserOutputModel.class));
+        setResultTransformer(q, UserOutputModel.class);
+        return q.list();
     }
 }

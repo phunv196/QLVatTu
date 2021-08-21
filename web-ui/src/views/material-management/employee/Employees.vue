@@ -104,17 +104,26 @@
           optionLabel="name"
           optionValue="positionId"
         />
+        <input type="file" ref="file" @change="selectFile" />
       </div>
     </div>
     <div
       class="p-d-flex p-flex-row p-mb-3 p-jc-center"
       style="width: 1150px; margin: 20px 0"
     >
+      <FileUpload
+        name="demo[]"
+        url="./upload"
+        :maxFileSize="1000000"
+        :fileLimit="3"
+        @select="test($event)"
+        @uploader="myUploader"
+      />
       <Button
-        icon="pi pi-user"
+        icon="pi pi-download"
         iconPos="right"
-        label="Dowload Template"
-        @click="dowloadTemplate()"
+        label="Báo cáo"
+        @click="exportExcell()"
         class="p-ml-1 p-button-sm"
       ></Button>
       <Button
@@ -154,7 +163,8 @@
         headerStyle="width:120px;"
       ></Column>
       <Column field="fullName" header="Họ và tên"></Column>
-      <Column field="strBitrh" header="ngày sinh"></Column>
+      <Column field="strBitrh" header="Ngày sinh"></Column>
+      <Column field="sexString" header="Giới tính"></Column>
       <Column field="phone" header="Điện thoại"></Column>
       <Column field="email" header="EMAIL" headerStyle="width:210px"></Column>
       <Column
@@ -193,7 +203,7 @@ import EmployeeDetails from "@/views/material-management/employee/EmployeeDetail
 import EmployeeApi from "@/api/employee-api"; // eslint-disable-line import/no-cycle
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
-import { debounce } from "@/shared/utils";
+import { debounce, exportFile } from "@/shared/utils";
 import positionApi from "@/api/material-management/position-api";
 import departmentApi from "@/api/material-management/department-api";
 import employeeApi from "@/api/employee-api";
@@ -393,11 +403,25 @@ export default defineComponent({
       department.value = lstDepartments;
     };
 
+    const exportExcell = async () => {
+      await employeeApi.export(
+        `${searchCode.value}`,
+        `${searchName.value}`,
+        `${searchEmail.value}`,
+        `${searchPhone.value}`,
+        `${searchDepartment.value}`,
+        `${searchPosition.value}`
+      ).then((res) => {
+        const data = res.data.data;
+        exportFile(data.data, data.fileName);
+      });
+    };
+
     const dowloadTemplate = async () => {
       await employeeApi.dowloadTemplate().then((res) => {
         //window.open ("data:application/vnd.ms-excel;base64," + res.data);
         var contentType = "application/vnd.ms-excel";
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         var blob1 = b64toBlob(res.data, contentType, "");
         var url = URL.createObjectURL(blob1);
         a.href = url;
@@ -437,6 +461,36 @@ export default defineComponent({
       return blob;
     };
 
+    const test = (event: any) => {
+      console.log(event.files);
+      let formData = new FormData();
+      formData.append("file", event.files[0]);
+      getBase64(event.files[0]).then((res) => {
+        let data:any = res;
+        let da = data.slice(37, data.length)
+        var contentType = "application/vnd.ms-excel";
+        const a = document.createElement("a");
+        var blob1 = b64toBlob(da, contentType, "");
+        var url = URL.createObjectURL(blob1);
+        a.href = url;
+        a.download = "phunv.xls";
+        a.click();
+        setTimeout(() => {
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        }, 0);
+      });
+    };
+
+    const getBase64 = (file: any) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+      });
+    };
+
     return {
       list,
       isLoading,
@@ -461,7 +515,8 @@ export default defineComponent({
       searchPhone,
       searchDepartment,
       searchPosition,
-      dowloadTemplate,
+      exportExcell,
+      test,
     };
   },
   components: {

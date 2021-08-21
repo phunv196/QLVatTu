@@ -111,10 +111,10 @@
       style="width: 1150px; margin: 20px 0"
     >
       <Button
-        icon="pi pi-user"
+        icon="pi pi-download"
         iconPos="right"
-        label="Dowload Template"
-        @click="dowloadTemplate()"
+        label="Báo cáo"
+        @click="exportExcell()"
         class="p-ml-1 p-button-sm"
       ></Button>
       <Button
@@ -223,9 +223,10 @@ import UserDetails from "@/views/material-management/user/UserDetails.vue";
 import UsersApi from "@/api/users-api"; // eslint-disable-line import/no-cycle
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
-import { debounce } from "@/shared/utils";
+import { debounce, exportFile } from "@/shared/utils";
 import EmployeeApi from "@/api/employee-api"; // eslint-disable-line import/no-cycle
 import RoleApi from "@/api/material-management/role-api"; // eslint-disable-line import/no-cycle
+import { async } from "rxjs";
 
 export default defineComponent({
   setup(): unknown {
@@ -355,7 +356,9 @@ export default defineComponent({
         acceptIcon: "pi pi-check",
         accept: async () => {
           try {
-            const resp = await UsersApi.resetPasswordUser(rec.loginName as string);
+            const resp = await UsersApi.resetPasswordUser(
+              rec.userId as number
+            );
             if (resp.data.msgType === "SUCCESS") {
               getData(currentPage, pageSize.value);
               toast.add({
@@ -420,12 +423,25 @@ export default defineComponent({
       400
     );
 
+    const exportExcell = async () => {
+      await UsersApi.export(
+        `${searchLoginName.value}`,
+        `${searchFullName.value}`,
+        `${searchEmail.value}`,
+        `${searchPhone.value}`,
+        `${searchRole.value}`,
+        `${searchEmployeeId.value}`
+      ).then((res) => {
+        const data = res.data.data;
+        exportFile(data.data, data.fileName);
+      });
+    };
+
     const onAddClick = () => {
       isNewRec.value = true;
       selectedRec.value = { employeeId: "" };
       showSlideOut.value = true;
     };
-
 
     const onEditClick = async (rec: Record<string, unknown>) => {
       showSlideOut.value = true;
@@ -438,7 +454,7 @@ export default defineComponent({
       lstRole();
     });
 
-  const lstEmp = async () => {
+    const lstEmp = async () => {
       const resp = await EmployeeApi.getAll();
       let lstEmps = [];
       if (resp.data) {
@@ -481,7 +497,8 @@ export default defineComponent({
       searchEmployeeId,
       onResetPasswordClick,
       emp,
-      role
+      role,
+      exportExcell,
     };
   },
   components: {

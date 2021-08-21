@@ -45,6 +45,40 @@ export default {
     return api.get('/delivery_bills', { params: qsParams });
   },
 
+  async export(
+    searchCode = "",
+    searchName = "",
+    searchEmployee = "",
+    searchWarehouse = "",
+    searchFormDate = "",
+    searchToDate = "",
+    searchFactory = ""
+  ): Promise<AxiosResponse> {
+    const qsParams: Record<string, number | string | Date> = {};
+    if (searchCode) {
+      qsParams.code = searchCode;
+    }
+    if (searchName) {
+      qsParams.name = searchName;
+    }
+    if (searchEmployee) {
+      qsParams.employeeId = searchEmployee;
+    }
+    if (searchWarehouse) {
+      qsParams.warehouseId = searchWarehouse;
+    }
+    if (searchFormDate) {
+      qsParams.formDate = searchFormDate;
+    }
+    if (searchToDate) {
+      qsParams.toDate = searchToDate;
+    }
+    if (searchFactory) {
+      qsParams.factoryId = searchFactory;
+    }
+    return api.post('/delivery_bills/export', qsParams);
+  },
+
   async deleteDeliveryBill(deliveryBillId: string): Promise<AxiosResponse> {
     return api.delete(`/delivery_bills/${deliveryBillId}`);
   },
