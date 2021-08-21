@@ -3,6 +3,7 @@ package com.app.dao.category;
 import com.app.dao.base.BaseHibernateDAO;
 import com.app.dao.base.CommonUtils;
 import com.app.model.category.DeliveryBillModel;
+import com.app.model.category.SuppliesModel;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -10,6 +11,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -171,6 +173,49 @@ public class DeliveryBillDao extends BaseHibernateDAO {
 
         //q.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP);
         //List rowList = q.list();
+        q.setResultTransformer(Transformers.aliasToBean(DeliveryBillModel.class));
+        setResultTransformer(q, DeliveryBillModel.class);
+        return q.list();
+    }
+
+    public List<DeliveryBillModel> getListExport(String code, String name, Long employeeId,
+                             Long warehouseId, String formDate, String toDate, Long factoryId) throws Exception{
+        StringBuilder querySelect = new StringBuilder("select db.delivery_bill_id deliveryBillId," +
+                " db.code code," +
+                " db.name name," +
+                " db.date_delivery_bill dateDeliveryBill," +
+                " db.description description," +
+                " db.warehouse_id warehouseId," +
+                " w.code warehouseCode," +
+                " w.name warehouseName," +
+                " db.factory_id factoryId, " +
+                " f.code factoryCode, " +
+                " f.name factoryName, " +
+                " db.employee_id employeeId," +
+                " e.full_name fullName, " +
+                " (select sum(d.amount * s.price) " +
+                " from delivery_bill_flow d" +
+                " join supplies s on d.supplies_id = s.supplies_id " +
+                " where d.delivery_bill_id = db.delivery_bill_id ) sumMoney " +
+                " from delivery_bill db " +
+                " left join factory f on f.factory_id = db.factory_id" +
+                " left join employees e on e.employee_id = db.employee_id" +
+                " left join warehouse w on w.warehouse_id = db.warehouse_id");
+        List<Object> paramList = new ArrayList<>();
+        StringBuilder strCondition = new StringBuilder(" WHERE 1 = 1");
+        CommonUtils.filter(code, strCondition, paramList, "r.code");
+        CommonUtils.filter(name, strCondition, paramList, "r.name");
+        CommonUtils.filter(employeeId, strCondition, paramList, "r.employee_id");
+        CommonUtils.filter(warehouseId, strCondition, paramList, "r.warehouse_id");
+        CommonUtils.filterBetweenDate(CommonUtils.convertStringToDateOther(formDate),CommonUtils.convertStringToDateOther(toDate)
+                , strCondition, paramList, "db.date_delivery_bill","db.date_delivery_bill");
+        querySelect.append(strCondition);
+        CommonUtils.filter(factoryId, strCondition, paramList, "db.factory_id");
+        querySelect.append(" ORDER BY db.delivery_bill_id ");
+        SQLQuery q = createSQLQuery(querySelect.toString());
+        for (int i = 0; i < paramList.size(); i++) {
+            q.setParameter(i, paramList.get(i));
+        }
         q.setResultTransformer(Transformers.aliasToBean(DeliveryBillModel.class));
         setResultTransformer(q, DeliveryBillModel.class);
         return q.list();

@@ -82,14 +82,14 @@
       <template v-if="changesApplied">
         <Button
           label="CLOSE"
-          @click="$emit('cancel')"
+          @click="onCancel()"
           class="p-button-sm"
         ></Button>
       </template>
       <template v-else>
         <Button
           label="CANCEL"
-          @click="$emit('cancel')"
+          @click="onCancel()"
           class="p-button-sm p-button-outlined p-mr-1"
         ></Button>
         <Button
@@ -189,6 +189,7 @@ export default defineComponent({
     };
 
     const onCancel = () => {
+      emit("changed");
       emit("cancel");
     };
 

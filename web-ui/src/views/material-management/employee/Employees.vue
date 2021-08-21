@@ -120,10 +120,10 @@
         @uploader="myUploader"
       />
       <Button
-        icon="pi pi-user"
+        icon="pi pi-download"
         iconPos="right"
-        label="Dowload Template"
-        @click="dowloadTemplate()"
+        label="Báo cáo"
+        @click="exportExcell()"
         class="p-ml-1 p-button-sm"
       ></Button>
       <Button
@@ -163,7 +163,8 @@
         headerStyle="width:120px;"
       ></Column>
       <Column field="fullName" header="Họ và tên"></Column>
-      <Column field="strBitrh" header="ngày sinh"></Column>
+      <Column field="strBitrh" header="Ngày sinh"></Column>
+      <Column field="sexString" header="Giới tính"></Column>
       <Column field="phone" header="Điện thoại"></Column>
       <Column field="email" header="EMAIL" headerStyle="width:210px"></Column>
       <Column
@@ -202,7 +203,7 @@ import EmployeeDetails from "@/views/material-management/employee/EmployeeDetail
 import EmployeeApi from "@/api/employee-api"; // eslint-disable-line import/no-cycle
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
-import { debounce } from "@/shared/utils";
+import { debounce, exportFile } from "@/shared/utils";
 import positionApi from "@/api/material-management/position-api";
 import departmentApi from "@/api/material-management/department-api";
 import employeeApi from "@/api/employee-api";
@@ -402,6 +403,20 @@ export default defineComponent({
       department.value = lstDepartments;
     };
 
+    const exportExcell = async () => {
+      await employeeApi.export(
+        `${searchCode.value}`,
+        `${searchName.value}`,
+        `${searchEmail.value}`,
+        `${searchPhone.value}`,
+        `${searchDepartment.value}`,
+        `${searchPosition.value}`
+      ).then((res) => {
+        const data = res.data.data;
+        exportFile(data.data, data.fileName);
+      });
+    };
+
     const dowloadTemplate = async () => {
       await employeeApi.dowloadTemplate().then((res) => {
         //window.open ("data:application/vnd.ms-excel;base64," + res.data);
@@ -451,7 +466,6 @@ export default defineComponent({
       let formData = new FormData();
       formData.append("file", event.files[0]);
       getBase64(event.files[0]).then((res) => {
-        debugger;
         let data:any = res;
         let da = data.slice(37, data.length)
         var contentType = "application/vnd.ms-excel";
@@ -501,7 +515,7 @@ export default defineComponent({
       searchPhone,
       searchDepartment,
       searchPosition,
-      dowloadTemplate,
+      exportExcell,
       test,
     };
   },

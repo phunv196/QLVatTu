@@ -134,6 +134,13 @@
       style="width: 1350px; margin: 20px 0"
     >
       <Button
+        icon="pi pi-download"
+        iconPos="right"
+        label="Báo cáo"
+        @click="exportExcell()"
+        class="p-ml-1 p-button-sm"
+      ></Button>
+      <Button
         icon="pi pi-search"
         iconPos="right"
         label="Tìm kiếm"
@@ -159,11 +166,7 @@
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4"
       style="width: 1350px"
     >
-      <Column
-        field="index"
-        header="STT"
-        headerStyle="width:90px;"
-      ></Column>
+      <Column field="index" header="STT" headerStyle="width:90px;"></Column>
       <Column
         field="code"
         header="Mã phân xưởng"
@@ -219,7 +222,7 @@ import FactoryDetails from "@/views/material-management/factory/FactoryDetails.v
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import EmployeeApi from "@/api/employee-api";
-import { debounce } from "@/shared/utils";
+import { debounce, exportFile } from "@/shared/utils";
 
 export default defineComponent({
   setup(): unknown {
@@ -447,6 +450,22 @@ export default defineComponent({
       }
     }, 400);
 
+    const exportExcell = async () => {
+      await FactoryApi.export(
+         `${searchCode.value}`,
+          `${searchName.value}`,
+          `${searchEmail.value}`,
+          `${searchEmployee.value}`,
+          `${searchFormDate.value}`,
+          `${searchToDate.value}`,
+          `${searchFormSuccessDate.value}`,
+          `${searchToSuccessDate.value}`
+      ).then((res) => {
+        const data = res.data.data;
+        exportFile(data.data, data.fileName);
+      });
+    };
+
     return {
       list,
       isLoading,
@@ -474,6 +493,7 @@ export default defineComponent({
       searchEmail,
       searchEmployee,
       onSearchKeyup,
+      exportExcell
     };
   },
   components: {

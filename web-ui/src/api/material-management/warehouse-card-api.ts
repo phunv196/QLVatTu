@@ -3,12 +3,12 @@ import { AxiosResponse } from 'axios';
 
 export default {
   async getWarehouseCards(page = 1, pageSize = 20, warehouseCardId = '', searchCode = "",
-  searchName = "",
-  searchEmployee = "",
-  searchWarehouse = "",
-  searchFormDate = "",
-  searchToDate = "",
-  searchSupplies = ""): Promise<AxiosResponse> {
+    searchName = "",
+    searchEmployee = "",
+    searchWarehouse = "",
+    searchFormDate = "",
+    searchToDate = "",
+    searchSupplies = ""): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
     if (page) {
       qsParams.page = page;
@@ -43,6 +43,39 @@ export default {
     return api.get('/warehouse_cards', { params: qsParams });
   },
 
+  async export(
+    searchCode = "",
+    searchName = "",
+    searchEmployee = "",
+    searchWarehouse = "",
+    searchFormDate = "",
+    searchToDate = "",
+    searchSupplies = ""): Promise<AxiosResponse> {
+    const qsParams: Record<string, number | string> = {};
+    if (searchCode) {
+      qsParams.code = searchCode;
+    }
+    if (searchName) {
+      qsParams.name = searchName;
+    }
+    if (searchEmployee) {
+      qsParams.employeeId = searchEmployee;
+    }
+    if (searchWarehouse) {
+      qsParams.warehouseId = searchWarehouse;
+    }
+    if (searchFormDate) {
+      qsParams.formDate = searchFormDate;
+    }
+    if (searchToDate) {
+      qsParams.toDate = searchToDate;
+    }
+    if (searchSupplies) {
+      qsParams.suppliesId = searchSupplies;
+    }
+    return api.post('/warehouse_cards/export', qsParams);
+  },
+
   async deleteWarehouseCard(warehouseCardId: string): Promise<AxiosResponse> {
     return api.delete(`/warehouse_cards/${warehouseCardId}`);
   },
@@ -70,7 +103,7 @@ export default {
   async deleteByWarehouseCardId(warehouseCardId: string): Promise<AxiosResponse> {
     return api.delete(`/warehouse_cards/delete_by_id/${warehouseCardId}`);
   },
-  
+
   async getWarehouseCardByCode(warehouseCardObj: Record<string, string | number>): Promise<AxiosResponse> {
     return api.post('/warehouse_cards/byCode', warehouseCardObj);
   },

@@ -2,13 +2,13 @@ package com.app.api.controllers.category;
 
 import com.app.api.BaseController;
 import com.app.dao.base.CommonUtils;
+import com.app.dao.base.converter.DynamicExport;
 import com.app.dao.category.SupplierDao;
 import com.app.model.BaseResponse;
-import com.app.model.category.QualityModel;
-import com.app.model.category.SpeciesModel;
-import com.app.model.category.SupplierModel;
+import com.app.model.ExportModel;
+import com.app.model.category.*;
 import com.app.model.category.SupplierModel.SupplierResponse;
-import com.app.model.category.SuppliesModel;
+import com.app.util.TemplateResouces;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,13 +20,21 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Base64;
+import java.util.Date;
 import java.util.List;
+
+import static com.app.util.Constants.COMMON.FOLDER_EXPORT;
+import static com.app.util.Constants.COMMON.TEMPLATE_EXPORT_FOLDER;
 
 @Path("supplier")
 @Tag(name = "Supplier")
@@ -206,5 +214,50 @@ public class SupplierController extends BaseController {
         criteria.setProjection(Projections.rowCount());
         Long rowCount = (Long)criteria.uniqueResult();
         return Response.ok(rowCount > 0).build();
+    }
+
+    @POST
+    @Path("export")
+    @RolesAllowed({"ADMIN"})
+    @Operation(
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response export(
+            SupplierModel supplier
+    ) throws Exception {
+        ExportModel.ExportResponse resp = new ExportModel.ExportResponse();
+        String fileName = "danh_sach_nha_cung_cap.xls";
+        Integer startDataRow = 6;
+        DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_EXPORT_FOLDER + fileName), startDataRow, false);
+        List<SupplierModel> models = supplierDao.getListExport(supplier.getCode(), supplier.getName(), supplier.getEmail(),
+                supplier.getPhone());
+        int stt = 1;
+        if(models != null && !models.isEmpty()) {
+            for (int i = 0 ; i < models.size() ; i++){
+                SupplierModel model = models.get(i);
+                int index = 0;
+                dynamicExport.increaseRow();
+                dynamicExport.setEntry(stt++, index++);
+                dynamicExport.setText(model.getCode(), index++);
+                dynamicExport.setText(model.getName(), index++);
+                dynamicExport.setText(model.getEmail(), index++);
+                dynamicExport.setText(model.getPhone(), index++);
+                dynamicExport.setText(model.getAddress(), index++);
+            }
+        }
+        dynamicExport.setCellFormat(startDataRow, 0, dynamicExport.getLastRow(), 5, DynamicExport.BORDER_FORMAT);
+        // Set ten file xuat ra excel
+        String prefixOutPutFile = new SimpleDateFormat("yyyyMMddHHmmss_").format(new Date()) + "_";
+        String fileExport = FOLDER_EXPORT + prefixOutPutFile +  "danh_sach_nha_cung_cap";
+        String filePath = dynamicExport.exportFile(fileExport, req);
+        File file = new File(filePath);
+        byte[] fileContent = FileUtils.readFileToByteArray(file);
+        String encodedString = Base64.getEncoder().encodeToString(fileContent);
+        String[] fileNameNew = filePath.split("/");
+        ExportModel exportModel = new ExportModel();
+        exportModel.setFileName(fileNameNew[fileNameNew.length - 1]);
+        exportModel.setData(encodedString);
+        resp.setData(exportModel);
+        return Response.ok(resp).build();
     }
 }

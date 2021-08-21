@@ -6,10 +6,11 @@
       v-model:visible="showSlideOut"
       position="right"
       style="width: 1100px"
+      @hide="getData()"
     >
       <DeliveryBillDetails
         :rec="selectedRec"
-        @cancel="showSlideOut = false"
+        @cancel="showSlideOut = false; getData()"
         @changed="getData()"
         :arrWarehouse="arrWarehouse"
         :arrFactory="arrFactory"
@@ -140,6 +141,13 @@
       style="width: 1350px; margin: 20px 0"
     >
       <Button
+        icon="pi pi-download"
+        iconPos="right"
+        label="Báo cáo"
+        @click="exportExcell()"
+        class="p-ml-1 p-button-sm"
+      ></Button>
+      <Button
         icon="pi pi-search"
         iconPos="right"
         label="Tìm kiếm"
@@ -234,7 +242,7 @@ import WarehouseApi from "@/api/material-management/warehouse-api";
 import DeliveryBillDetails from "@/views/material-management/delivery-bill/DeliveryBillDetails.vue";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
-import { debounce } from "@/shared/utils";
+import { debounce, exportFile } from "@/shared/utils";
 import EmployeeApi from "@/api/employee-api";
 
 export default defineComponent({
@@ -398,6 +406,21 @@ export default defineComponent({
       400
     );
 
+    const exportExcell = async () => {
+      await DeliveryBillApi.export(
+        `${searchName.value}`,
+          `${searchCode.value}`,
+          `${searchEmployee.value}`,
+          `${searchWarehouse.value}`,
+          `${searchFormDate.value.toString()}`,
+          `${searchToDate.value.toString()}`,
+          `${searchFactory.value}`
+      ).then((res) => {
+        const data = res.data.data;
+        exportFile(data.data, data.fileName);
+      });
+    };
+
     const onAddClick = async () => {
       const today = new Date().getTime();
       const res = await FactoryApi.getAll();
@@ -510,6 +533,7 @@ export default defineComponent({
       searchToDate,
       searchFactory,
       onSearchKeyup,
+      exportExcell
     };
   },
   components: {

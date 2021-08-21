@@ -51,6 +51,43 @@ export default {
 
     return api.get('/supplies', { params: qsParams });
   },
+  async export(
+    searchCode = "",
+    searchName = "",
+    searchSupplier = "",
+    searchSpecies = "",
+    searchFormPrice = "",
+    searchToPrice = "",
+    searchQuality = "",
+    searchUnit = "",): Promise<AxiosResponse> {
+    const qsParams: Record<string, number | string> = {};
+    if (searchCode) {
+      qsParams.code = searchCode;
+    }
+    if (searchName) {
+      qsParams.name = searchName;
+    }
+    if (searchSupplier) {
+      qsParams.supplierId = searchSupplier;
+    }
+    if (searchSpecies) {
+      qsParams.speciesId = searchSpecies;
+    }
+    if (searchFormPrice) {
+      qsParams.formPrice = searchFormPrice;
+    }
+    if (searchToPrice) {
+      qsParams.toPrice = searchToPrice;
+    }
+    if (searchQuality) {
+      qsParams.qualityId = searchQuality;
+    }
+    if (searchUnit) {
+      qsParams.unit = searchUnit;
+    }
+
+    return api.post('/supplies/export', qsParams);
+  },
 
   async deleteSupplies(suppliesId: string): Promise<AxiosResponse> {
     return api.delete(`/supplies/${suppliesId}`);

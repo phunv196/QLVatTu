@@ -370,7 +370,8 @@ public class Constants {
         //Thu muc xuat bao cao
         String TEMPLATE_FOLDER = "/share/exportTemplate/";
 
-        String TEMPLATE_EXPORT_FOLDER = "web-api/src/main/resources/file/template-export-excel";
+        String TEMPLATE_EXPORT_FOLDER = "web-api/src/main/resources/file/template-export-excel/";
+        String FOLDER_EXPORT = "web-api/src/main/resources/file/folder-export-excel/";
 
         String TEMP = "/share/temp/";
         String FONT_FOLDER = CommonUtils.getConfig("fontFolder");

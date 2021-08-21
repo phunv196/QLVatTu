@@ -2,12 +2,16 @@ package com.app.api.controllers.category;
 
 import com.app.api.BaseController;
 import com.app.dao.base.CommonUtils;
+import com.app.dao.base.converter.DynamicExport;
 import com.app.dao.category.ReceiptDao;
 import com.app.dao.category.ReceiptFlowDao;
 import com.app.model.BaseResponse;
+import com.app.model.ExportModel;
 import com.app.model.category.ReceiptModel;
 import com.app.model.category.ReceiptModel.ReceiptResponse;
+import com.app.model.category.SuppliesModel;
 import com.app.model.user.UserModel;
+import com.app.util.TemplateResouces;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -19,16 +23,19 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.commons.io.FileUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import java.io.File;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static com.app.util.Constants.COMMON.FOLDER_EXPORT;
+import static com.app.util.Constants.COMMON.TEMPLATE_EXPORT_FOLDER;
 
 @Path("receipts")
 @Tag(name = "Receipts")
@@ -278,5 +285,52 @@ public class ReceiptController extends BaseController {
         criteria.setProjection(Projections.rowCount());
         Long rowCount = (Long)criteria.uniqueResult();
         return Response.ok(rowCount > 0).build();
+    }
+
+    @POST
+    @Path("export")
+    @RolesAllowed({"ADMIN"})
+    @Operation(
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response export(
+            ReceiptModel receipt
+    ) throws Exception {
+        ExportModel.ExportResponse resp = new ExportModel.ExportResponse();
+        String fileName = "danh_sach_phieu_nhap.xls";
+        Integer startDataRow = 6;
+        DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_EXPORT_FOLDER + fileName), startDataRow, false);
+        List<ReceiptModel> models = receiptDao.getListExport(receipt.getCode(), receipt.getName(), receipt.getEmployeeId(),
+                receipt.getWarehouseId(), receipt.getFormDate(), receipt.getToDate());
+        int stt = 1;
+        if(models != null && !models.isEmpty()) {
+            for (int i = 0 ; i < models.size() ; i++){
+                ReceiptModel model = models.get(i);
+                int index = 0;
+                dynamicExport.increaseRow();
+                dynamicExport.setEntry(stt++, index++);
+                dynamicExport.setText(model.getCode(), index++);
+                dynamicExport.setText(model.getName(), index++);
+                dynamicExport.setText(CommonUtils.convertDateToString(model.getDateWarehousing()), index++);
+                dynamicExport.setText(model.getFullName(), index++);
+                dynamicExport.setText(model.getWarehouseCode(), index++);
+                dynamicExport.setText(model.getWarehouseName(), index++);
+                dynamicExport.setText(model.getSumMoney() == null ? "" : model.getSumMoney().toString(), index++);
+            }
+        }
+        dynamicExport.setCellFormat(startDataRow, 0, dynamicExport.getLastRow(), 7, DynamicExport.BORDER_FORMAT);
+        // Set ten file xuat ra excel
+        String prefixOutPutFile = new SimpleDateFormat("yyyyMMddHHmmss_").format(new Date()) + "_";
+        String fileExport = FOLDER_EXPORT + prefixOutPutFile +  "danh_sach_phieu_nhap";
+        String filePath = dynamicExport.exportFile(fileExport, req);
+        File file = new File(filePath);
+        byte[] fileContent = FileUtils.readFileToByteArray(file);
+        String encodedString = Base64.getEncoder().encodeToString(fileContent);
+        String[] fileNameNew = filePath.split("/");
+        ExportModel exportModel = new ExportModel();
+        exportModel.setFileName(fileNameNew[fileNameNew.length - 1]);
+        exportModel.setData(encodedString);
+        resp.setData(exportModel);
+        return Response.ok(resp).build();
     }
 }

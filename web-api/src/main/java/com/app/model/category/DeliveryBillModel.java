@@ -25,13 +25,54 @@ public class DeliveryBillModel {
     @Transient
     private String  factoryCode;
     @Transient
+    private String  factoryName;
+    @Transient
     private String  warehouseCode;
+    @Transient
+    private String  warehouseName;
     @Transient
     private Long sumMoney;
     @Transient
     private String fullName;
+    @Transient
+    private String formDate;
+    @Transient
+    private String toDate;
+
     //Getters and Setters
 
+
+    public String getFactoryName() {
+        return factoryName;
+    }
+
+    public void setFactoryName(String factoryName) {
+        this.factoryName = factoryName;
+    }
+
+    public String getWarehouseName() {
+        return warehouseName;
+    }
+
+    public void setWarehouseName(String warehouseName) {
+        this.warehouseName = warehouseName;
+    }
+
+    public String getFormDate() {
+        return formDate;
+    }
+
+    public void setFormDate(String formDate) {
+        this.formDate = formDate;
+    }
+
+    public String getToDate() {
+        return toDate;
+    }
+
+    public void setToDate(String toDate) {
+        this.toDate = toDate;
+    }
 
     public Long getEmployeeId() {
         return employeeId;

@@ -31,8 +31,30 @@ public class SuppliesModel {
     @Transient
     private String supplierName;
 
+    @Transient
+    private Long formPrice;
+
+    @Transient
+    private Long toPrice;
+
     //Getters and Setters
 
+
+    public Long getFormPrice() {
+        return formPrice;
+    }
+
+    public void setFormPrice(Long formPrice) {
+        this.formPrice = formPrice;
+    }
+
+    public Long getToPrice() {
+        return toPrice;
+    }
+
+    public void setToPrice(Long toPrice) {
+        this.toPrice = toPrice;
+    }
 
     public Long getSuppliesId() {
         return suppliesId;

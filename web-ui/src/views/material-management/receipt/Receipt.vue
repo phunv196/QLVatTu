@@ -6,10 +6,11 @@
       v-model:visible="showSlideOut"
       position="right"
       style="width: 1100px"
+      @hide="getData()"
     >
       <ReceiptDetails
         :rec="selectedRec"
-        @cancel="showSlideOut = false"
+        @cancel="showSlideOut = false;"
         @changed="getData()"
         :arrWarehouse="arrWarehouse"
         :isNew="isNewRec"
@@ -23,26 +24,26 @@
           style="padding-top: 7px"
           >Mã phiếu nhập
         </label>
-          <InputText
-            type="text"
-            v-model="searchCode"
-            class="p-inputtext-sm"
-            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
-          />
-        </div>
+        <InputText
+          type="text"
+          v-model="searchCode"
+          class="p-inputtext-sm"
+          style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+        />
+      </div>
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
           >Tên phiếu nhập
         </label>
-          <InputText
-            type="text"
-            v-model="searchName"
-            class="p-inputtext-sm"
-            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
-          />
-        </div>
+        <InputText
+          type="text"
+          v-model="searchName"
+          class="p-inputtext-sm"
+          style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+        />
+      </div>
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
@@ -68,28 +69,28 @@
           style="padding-top: 7px"
           >Ngày lập từ
         </label>
-          <InputText
-            type="date"
-            v-model="searchFormDate"
-            class="p-inputtext-sm"
-            placeholder="dd/mm/yyyy"
-            style="width: 200px; height: 30px"
-          />
-        </div>
+        <InputText
+          type="date"
+          v-model="searchFormDate"
+          class="p-inputtext-sm"
+          placeholder="dd/mm/yyyy"
+          style="width: 200px; height: 30px"
+        />
+      </div>
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
           >Đến ngày
         </label>
-          <InputText
-            type="date"
-            v-model="searchToDate"
-            class="p-inputtext-sm"
-            placeholder="dd/mm/yyyy"
-            style="width: 200px; height: 30px"
-          />
-        </div>
+        <InputText
+          type="date"
+          v-model="searchToDate"
+          class="p-inputtext-sm"
+          placeholder="dd/mm/yyyy"
+          style="width: 200px; height: 30px"
+        />
+      </div>
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
@@ -112,6 +113,13 @@
       class="p-d-flex p-flex-row p-mb-3 p-jc-center"
       style="width: 1350px; margin: 20px 0"
     >
+      <Button
+        icon="pi pi-download"
+        iconPos="right"
+        label="Báo cáo"
+        @click="exportExcell()"
+        class="p-ml-1 p-button-sm"
+      ></Button>
       <Button
         icon="pi pi-search"
         iconPos="right"
@@ -138,11 +146,7 @@
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4"
       style="width: 1350px"
     >
-      <Column
-        field="index"
-        header="STT"
-        headerStyle="width:90px;"
-      ></Column>
+      <Column field="index" header="STT" headerStyle="width:90px;"></Column>
       <Column
         field="code"
         header="Mã phiếu nhập"
@@ -201,7 +205,7 @@ import ReceiptDetails from "@/views/material-management/receipt/ReceiptDetails.v
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import WarehouseApi from "@/api/material-management/warehouse-api";
-import { debounce } from "@/shared/utils";
+import { debounce, exportFile } from "@/shared/utils";
 import EmployeeApi from "@/api/employee-api";
 
 export default defineComponent({
@@ -252,7 +256,7 @@ export default defineComponent({
           searchEmployee,
           searchWarehouse,
           searchFormDate,
-          searchToDate,
+          searchToDate
         );
         let i = 1;
         list.value = resp.data.list.map((v: Record<string, unknown>) => {
@@ -264,14 +268,14 @@ export default defineComponent({
           }).format(dt);
           let index = 1;
           if (page > 1) {
-            index = (10 * (currentPage - 1)) + i++
+            index = 10 * (currentPage - 1) + i++;
           } else {
             index = i++;
           }
           return {
             ...v,
             strDateWarehousing,
-            index
+            index,
           };
         });
         // isLoading.value = false;
@@ -328,12 +332,17 @@ export default defineComponent({
     const onPageChange = (event: Record<string, unknown>) => {
       if (currentPage !== (event.page as number) + 1) {
         currentPage = (event.page as number) + 1;
-        getData(currentPage, pageSize.value, "", `${searchName.value}`,
+        getData(
+          currentPage,
+          pageSize.value,
+          "",
+          `${searchName.value}`,
           `${searchCode.value}`,
           `${searchEmployee.value}`,
           `${searchWarehouse.value}`,
           `${searchFormDate.value.toString()}`,
-          `${searchToDate.value.toString()}`,);
+          `${searchToDate.value.toString()}`
+        );
       }
     };
 
@@ -382,10 +391,24 @@ export default defineComponent({
           `${searchEmployee.value}`,
           `${searchWarehouse.value}`,
           `${searchFormDate.value.toString()}`,
-          `${searchToDate.value.toString()}`,
+          `${searchToDate.value.toString()}`
         ),
       400
     );
+
+    const exportExcell = async () => {
+      await ReceiptApi.export(
+        `${searchName.value}`,
+        `${searchCode.value}`,
+        `${searchEmployee.value}`,
+        `${searchWarehouse.value}`,
+        `${searchFormDate.value.toString()}`,
+        `${searchToDate.value.toString()}`
+      ).then((res) => {
+        const data = res.data.data;
+        exportFile(data.data, data.fileName);
+      });
+    };
 
     onMounted(() => {
       getData(0, pageSize.value);
@@ -436,6 +459,7 @@ export default defineComponent({
       searchFormDate,
       searchToDate,
       onSearchKeyup,
+      exportExcell,
     };
   },
   components: {

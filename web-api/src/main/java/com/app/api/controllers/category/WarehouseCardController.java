@@ -2,13 +2,17 @@ package com.app.api.controllers.category;
 
 import com.app.api.BaseController;
 import com.app.dao.base.CommonUtils;
+import com.app.dao.base.converter.DynamicExport;
 import com.app.dao.category.WarehouseCardDao;
 import com.app.dao.category.WarehouseCardFlowDao;
 import com.app.model.BaseResponse;
+import com.app.model.ExportModel;
 import com.app.model.category.ReceiptModel;
 import com.app.model.category.WarehouseCardModel;
 import com.app.model.category.WarehouseCardModel.WarehouseCardResponse;
+import com.app.model.employee.EmployeeModel;
 import com.app.model.user.UserModel;
+import com.app.util.TemplateResouces;
 import com.app.util.TokenUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,14 +28,22 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.catalina.User;
+import org.apache.commons.io.FileUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import java.io.File;
 import java.math.BigInteger;
 import java.security.Principal;
+import java.text.SimpleDateFormat;
+import java.util.Base64;
+import java.util.Date;
 import java.util.List;
+
+import static com.app.util.Constants.COMMON.FOLDER_EXPORT;
+import static com.app.util.Constants.COMMON.TEMPLATE_EXPORT_FOLDER;
 
 @Path("warehouse_cards")
 @Tag(name = "WarehouseCards")
@@ -240,5 +252,56 @@ public class WarehouseCardController extends BaseController {
         criteria.setProjection(Projections.rowCount());
         Long rowCount = (Long)criteria.uniqueResult();
         return Response.ok(rowCount > 0).build();
+    }
+
+    @POST
+    @Path("export")
+    @RolesAllowed({"ADMIN"})
+    @Operation(
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response export(
+            WarehouseCardModel warehouseCard
+    ) throws Exception {
+        ExportModel.ExportResponse resp = new ExportModel.ExportResponse();
+        String fileName = "danh_sach_the_kho.xls";
+        DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_EXPORT_FOLDER + fileName), 6, false);
+        List<WarehouseCardModel> models = warehouseCardDao.getListExport(warehouseCard.getCode(), warehouseCard.getName(), warehouseCard.getEmployeeId(),
+                warehouseCard.getWarehouseId(), warehouseCard.getSuppliesId(), warehouseCard.getFormDate(), warehouseCard.getToDate());
+        int stt = 1;
+        if(models != null && !models.isEmpty()) {
+            for (int i = 0 ; i < models.size() ; i++){
+                WarehouseCardModel model = models.get(i);
+                int index = 0;
+                dynamicExport.increaseRow();
+                dynamicExport.setEntry(stt++, index++);
+                dynamicExport.setText(model.getCode(), index++);
+                dynamicExport.setText(model.getName(), index++);
+                dynamicExport.setText(model.getFullName(), index++);
+                dynamicExport.setText(CommonUtils.convertDateToString(model.getDateCreated()), index++);
+                dynamicExport.setText(model.getSuppliesCode(), index++);
+                dynamicExport.setText(model.getSuppliesName(), index++);
+                dynamicExport.setText(model.getWarehouseCode(), index++);
+                dynamicExport.setText(model.getWarehouseName(), index++);
+                dynamicExport.setText(model.getCountDeliveryBill() == null ? "" : model.getCountDeliveryBill().toString(), index++);
+                dynamicExport.setText(model.getCountReceipt() == null ? "" : model.getCountReceipt().toString(), index++);
+                dynamicExport.setText(model.getAmountDeliveryBill() == null ? "" : model.getAmountDeliveryBill().toString(), index++);
+                dynamicExport.setText(model.getAmountReceipt() == null ? "" : model.getAmountReceipt().toString(), index++);
+                dynamicExport.setText(model.getAmountInventory() == null ? "" : model.getAmountInventory().toString(), index++);
+            }
+        }
+        // Set ten file xuat ra excel
+        String prefixOutPutFile = new SimpleDateFormat("yyyyMMddHHmmss_").format(new Date()) + "_";
+        String fileExport = FOLDER_EXPORT + prefixOutPutFile +  "danh_sach_the_kho";
+        String filePath = dynamicExport.exportFile(fileExport, req);
+        File file = new File(filePath);
+        byte[] fileContent = FileUtils.readFileToByteArray(file);
+        String encodedString = Base64.getEncoder().encodeToString(fileContent);
+        String[] fileNameNew = filePath.split("/");
+        ExportModel exportModel = new ExportModel();
+        exportModel.setFileName(fileNameNew[fileNameNew.length - 1]);
+        exportModel.setData(encodedString);
+        resp.setData(exportModel);
+        return Response.ok(resp).build();
     }
 }

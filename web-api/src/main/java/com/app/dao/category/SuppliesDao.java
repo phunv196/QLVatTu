@@ -1,7 +1,9 @@
 package com.app.dao.category;
 
 import com.app.dao.base.BaseHibernateDAO;
+import com.app.dao.base.CommonUtils;
 import com.app.model.category.SuppliesModel;
+import com.app.model.employee.EmployeeModel;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -9,6 +11,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SuppliesDao extends BaseHibernateDAO {
@@ -119,5 +122,43 @@ public class SuppliesDao extends BaseHibernateDAO {
         if (searchUnit != null && !searchUnit.isEmpty())   { sqlWhere = sqlWhere + " and LOWER(unit) = :searchUnit "; }
 
         return sqlWhere;
+    }
+
+    public List<SuppliesModel> getListExport(String code, String name, Long supplierId, Long formPrice, Long toPrice, Long qualityId, String unit) {
+        StringBuilder querySelect = new StringBuilder("select s.supplies_id suppliesId," +
+                " s.code code," +
+                " s.name name," +
+                " s.unit unit," +
+                " s.price price," +
+                " s.description description, " +
+                " s.species_id speciesId," +
+                " spec.name speciesName," +
+                " s.supplier_id supplierId," +
+                " sup.name supplierName," +
+                " s.quality_Id qualityId," +
+                " q.name qualityName" +
+                " from supplies s " +
+                " left join species spec on spec.species_id = s.species_id" +
+                " left join supplier sup on sup.supplier_id = s.supplier_id" +
+                " left join quality q on q.quality_id = s.quality_id");
+
+        List<Object> paramList = new ArrayList<>();
+        StringBuilder strCondition = new StringBuilder(" WHERE 1 = 1");
+        CommonUtils.filter(code, strCondition, paramList, "s.code");
+        CommonUtils.filter(name, strCondition, paramList, "s.name");
+        CommonUtils.filter(supplierId, strCondition, paramList, "s.supplier_id");
+        CommonUtils.filterGe(formPrice, strCondition, paramList, "s.price");
+        CommonUtils.filterLe(toPrice, strCondition, paramList, "s.price");
+        CommonUtils.filter(qualityId, strCondition, paramList, "s.quality_id");
+        CommonUtils.filterEqual(unit, strCondition, paramList, "s.unit");
+        querySelect.append(strCondition);
+        querySelect.append(" ORDER BY s.supplies_id ");
+        SQLQuery q = createSQLQuery(querySelect.toString());
+        for (int i = 0; i < paramList.size(); i++) {
+            q.setParameter(i, paramList.get(i));
+        }
+        q.setResultTransformer(Transformers.aliasToBean(SuppliesModel.class));
+        setResultTransformer(q, SuppliesModel.class);
+        return q.list();
     }
 }
