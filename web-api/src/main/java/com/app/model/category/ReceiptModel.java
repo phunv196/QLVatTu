@@ -23,6 +23,7 @@ public class ReceiptModel {
 
     @Transient
     private String warehouseCode;
+	
     @Transient
     private String warehouseName;
 

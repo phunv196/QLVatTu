@@ -113,6 +113,7 @@ export default {
   async resetPasswordUser(userId:number): Promise<AxiosResponse> {
     return api.get(`/users/resetPasswordUser/${userId}`);
   },
+  
   async getById(userId: number): Promise<AxiosResponse> {
     return api.get(`/users/byId/${userId}`);
   },

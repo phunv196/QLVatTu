@@ -235,7 +235,6 @@ public class SuppliesController extends BaseController {
         return Response.ok(rowCount > 0).build();
     }
 
-
     @POST
     @Path("export")
     @RolesAllowed({"ADMIN"})
