@@ -1,4 +1,4 @@
-package com.app.dao;
+﻿package com.app.dao;
 
 import com.app.dao.base.BaseHibernateDAO;
 import com.app.dao.base.CommonUtils;

@@ -103,38 +103,6 @@ export default defineComponent({
       // store.commit('baseUrl', `${window.location.origin}/`);
     });
 
-    const convertBase64ToExcel = () => {
-
-		//window.open ("data:application/vnd.ms-excel;base64," + data);
-    // var contentType = 'application/vnd.ms-excel';
-		// var blob1 = b64toBlob(data, contentType, '');
-		// var blobUrl1 = URL.createObjectURL(blob1);
-		// window.open(blobUrl1);
-		}
-
-	  // const b64toBlob = (b64Data:any, contentType:any , sliceSize:any) => {
-		// contentType = contentType || '';
-	  // var	sliceSize = sliceSize || 512;
-		// var byteCharacters = atob(b64Data);
-		// var byteArrays = [];
-
-		// for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-		// var slice = byteCharacters.slice(offset, offset + sliceSize);
-
-		// var byteNumbers = new Array(slice.length);
-		// for (var i = 0; i < slice.length; i++) {
-		// byteNumbers[i] = slice.charCodeAt(i);
-		// }
-
-		// var byteArray = new Uint8Array(byteNumbers);
-
-		// byteArrays.push(byteArray);
-		// }
-
-		// var blob = new Blob(byteArrays, {type: contentType});
-		// return blob;
-		// }
-
 
     return {
       loginDisabled,
@@ -143,7 +111,6 @@ export default defineComponent({
       onLoginClick,
       onRegisterClick,
       onApiDocsClick,
-      convertBase64ToExcel
     };
   },
   components: {
