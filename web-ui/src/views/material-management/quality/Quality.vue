@@ -69,11 +69,12 @@
       :rows="pageSize"
       :totalRecords="totalRecs"
       :loading="isLoading"
+      stripedRows showGridlines
       @page="onPageChange($event)"
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4"
       style="width: 1000px"
     >
-      <Column field="index" header="STT" headerStyle="width:90px;"></Column>
+      <Column field="index" header="STT" headerStyle="width:90px;" bodyStyle="text-align-last: center;"></Column>
       <Column
         field="code"
         header="Mã chất lượng"
@@ -84,7 +85,7 @@
         header="Tên chất lượng"
         headerStyle="width:160px"
       ></Column>
-      <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px">
+      <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px; text-align: center;">
         <template #body="slotProps">
           <Button
             icon="pi pi-pencil"

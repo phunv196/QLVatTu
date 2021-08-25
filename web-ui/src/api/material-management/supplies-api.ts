@@ -111,4 +111,12 @@ export default {
   async getSuppliesByCode(suppliesObj: Record<string, string | number>): Promise<AxiosResponse> {
     return api.post('/supplies/byCode', suppliesObj);
   },
+
+  async downloadTemplate(): Promise<AxiosResponse> {
+    return api.get('/supplies/downloadTemplate',);
+  },
+
+  async uploadFile(fileImport: any): Promise<AxiosResponse> {
+    return api.post('/supplies/uploadFile', fileImport);
+  },
 };

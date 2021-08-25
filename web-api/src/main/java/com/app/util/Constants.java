@@ -352,16 +352,20 @@ public class Constants {
         public static final String DELETE = "DELETE";
         public static final String PUT = "PUT";
     }
-    public interface CORS_FILTER {
-        public static final String ALLOW_METHODS = "POST, PUT, GET, OPTIONS, DELETE";
-        public static final String ALLOW_HEADERS = "X-CACHEABLE, Authorization, Content-Type, Current-Language, Current-Market, viettel-api-key, sso-two-factor-ticket";
+    public interface Error {
+        String NULL_OR_ENITY = "Trường dữ liệu không được để trống!";
+        String DUOLICATE = "Trường dữ liệu bị trùng!";
+        String DATE = "Trường ngày tháng phải đúng định dạng (dd-mm-yyyy)!";
+        String FOMAT = "Trường dữ liệu phải nhập đúng định dạng!";
     }
+
     /**
      * Cac hang so dung chung.
      */
     public interface COMMON {
         //Dinh dang ngay
         String DATE_FORMAT = "MMM dd yyyy";
+        String DATE_FORMAT_BASIC = "dd-MM-yyyy";
         String SQLDATE_FORMAT = "yyyy-MM-dd";
         String DATE_TIME_FORMAT = "dd/MM/yyyy HH:mm:ss";
         //Thu muc chua file tam de import
@@ -369,9 +373,15 @@ public class Constants {
         String IMPORT_TEMPLATE = "/share/importTemplate/";
         //Thu muc xuat bao cao
         String TEMPLATE_FOLDER = "/share/exportTemplate/";
-
-        String TEMPLATE_EXPORT_FOLDER = "web-api/src/main/resources/file/template-export-excel/";
+        /**
+         * So loi toi da
+         */
+        Integer MAX_ERROR_NUM = 1000;
         String FOLDER_EXPORT = "web-api/src/main/resources/file/folder-export-excel/";
+        String TEMPLATE_EXPORT_FOLDER = "web-api/src/main/resources/file/template-export-excel/";
+        String FOLDER_IMPORT = "web-api/src/main/resources/file/folder-file-import/";
+        String TEMPLATE_IMPORT_EXCELL = "web-api/src/main/resources/file/template-import-excell/";
+        String FOLDER_EXPORT_TEMPLATE = "web-api/src/main/resources/file/folder-export-template/";
 
         String TEMP = "/share/temp/";
         String FONT_FOLDER = CommonUtils.getConfig("fontFolder");

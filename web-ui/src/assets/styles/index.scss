@@ -403,3 +403,20 @@ h1, h2, h3 {
 .p-dialog-mask {
   z-index: 1000000000 !important;
 }
+
+.p-column-header-content {
+  justify-content: center;
+}
+
+.p-fileupload-row div:last-child{
+  width: 50px;
+}
+.p-fileupload-row div:nth-child(1) {
+  display: none;
+}
+.p-fileupload-row div:nth-child(2) {
+  width: 600px;
+}
+.p-fileupload-row div:nth-child(3) {
+  width: 100px;
+}

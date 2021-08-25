@@ -18,9 +18,10 @@
       :rows="pageSize"
       :totalRecords="totalRecs"
       :loading="isLoading"
+      stripedRows showGridlines
       @page="onPageChange($event)"
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4" style="width:1000px">
-      <Column field="receiptFlowId" header="ID" headerStyle="width:50px;"></Column>
+      <Column field="index" header="STT" headerStyle="width:50px;" bodyStyle="text-align-last: center;"></Column>
       <Column field="suppliesCode" header="Mã vật tư" headerStyle="width:80px"></Column>
       <Column field="suppliesName" header="Tên vật tư" headerStyle="width:160px"></Column>
       <Column field="supplierCode" header="Nhà sản xuất" headerStyle="width:160px"></Column>
@@ -29,7 +30,7 @@
       <Column field="suppliesUnit" header="Đơn vị tính" headerStyle="width:90px"></Column>
       <Column field="suppliesPrice" header="Giá" headerStyle="width:90px"></Column>
       <Column field="calculatePrice" header="Thành tiền" headerStyle="width:90px"></Column>
-      <Column header="ACTION" headerStyle="width:95px" bodyStyle="padding:3px">
+      <Column header="ACTION" headerStyle="width:95px" bodyStyle="padding:3px; text-align: center;">
         <template #body="slotProps">
           <Button icon="pi pi-pencil" @click="onEditClick(slotProps.data)"
                   class="p-button-sm p-button-rounded p-button-secondary p-button-text"/>
@@ -75,7 +76,19 @@ export default defineComponent({
       // isLoading.value = true;
       try {
         const resp = await ReceiptFlowApi.getReceiptFlows(page, requestedPageSize, receiptId.value);
-        list.value = resp.data.list;
+        let i = 1;
+        list.value = resp.data.list.map((v: Record<string, unknown>) => {
+          let index = 1;
+          if (page > 1) {
+            index = (10 * (currentPage - 1)) / 2 + i++
+          } else {
+            index = i++;
+          }
+          return {
+            ...v,
+            index,
+          };
+        });
         // isLoading.value = false;
         currentPage = resp.data.currentPage;
         totalPages.value = resp.data.totalPages;

@@ -92,6 +92,7 @@ export default defineComponent({
 
     const onApplyChanges = async () => {
       const rawReceiptFlowObj = JSON.parse(JSON.stringify(recData.value));
+      delete rawReceiptFlowObj.index
       let msg: any[];
       msg = [];
       if (!rawReceiptFlowObj.suppliesId) {
@@ -116,9 +117,9 @@ export default defineComponent({
           toast.add({
             severity: "success",
             summary: rawReceiptFlowObj.receiptFlowId
-              ? "Product Updated"
-              : "Product Added",
-            detail: `${rawReceiptFlowObj.name} (${rawReceiptFlowObj.code})`,
+              ? "Sửa"
+              : "Thêm mới",
+            detail: "Thao tác thành công",
             life: 3000,
           });
           if (!rawReceiptFlowObj.receiptFlowId) {

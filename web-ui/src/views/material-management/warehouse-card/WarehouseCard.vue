@@ -160,11 +160,12 @@
       :rows="pageSize"
       :totalRecords="totalRecs"
       :loading="isLoading"
+      stripedRows showGridlines
       @page="onPageChange($event)"
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4"
       style="width: 1500px"
     >
-      <Column field="index" header="STT" headerStyle="width:70px;"></Column>
+      <Column field="index" header="STT" headerStyle="width:70px;" bodyStyle="text-align-last: center;"></Column>
       <Column
         field="code"
         header="Mã thẻ kho"
@@ -182,7 +183,7 @@
       ></Column>
       <Column
         field="fullName"
-        header="Nhân viên"
+        header="Người tạo thẻ kho"
         headerStyle="width:150px"
       ></Column>
       <Column
@@ -225,7 +226,7 @@
         header="Số lượng tồn"
         headerStyle="width:90px"
       ></Column>
-      <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px">
+      <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px; text-align: center;">
         <template #body="slotProps">
           <Button
             icon="pi pi-pencil"

@@ -31,7 +31,7 @@ export default {
   },
 
   async export(
-  code = '', name = '', email = '', phone = ''): Promise<AxiosResponse> {
+    code = '', name = '', email = '', phone = ''): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
     if (code) {
       qsParams.code = code;
@@ -70,5 +70,13 @@ export default {
 
   async getWarehouseByCode(warehouseObj: Record<string, string | number>): Promise<AxiosResponse> {
     return api.post('/warehouses/byCode', warehouseObj);
+  },
+
+  async downloadTemplate(): Promise<AxiosResponse> {
+    return api.get('/warehouses/downloadTemplate',);
+  },
+
+  async uploadFile(fileImport: any): Promise<AxiosResponse> {
+    return api.post('/warehouses/uploadFile', fileImport);
   },
 };

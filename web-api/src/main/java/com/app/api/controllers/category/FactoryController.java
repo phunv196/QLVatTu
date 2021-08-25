@@ -1,14 +1,20 @@
 package com.app.api.controllers.category;
 
 import com.app.api.BaseController;
+import com.app.dao.EmployeeDao;
 import com.app.dao.base.CommonUtils;
+import com.app.dao.base.ImportFileExcell;
 import com.app.dao.base.converter.DynamicExport;
 import com.app.dao.category.FactoryDao;
 import com.app.model.BaseResponse;
 import com.app.model.ExportModel;
+import com.app.model.category.DepartmentModel;
 import com.app.model.category.FactoryModel;
 import com.app.model.category.FactoryModel.FactoryResponse;
+import com.app.model.category.PositionModel;
 import com.app.model.category.SuppliesModel;
+import com.app.model.employee.EmployeeModel;
+import com.app.util.Constants;
 import com.app.util.TemplateResouces;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,12 +36,10 @@ import org.hibernate.criterion.Restrictions;
 import java.io.File;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
-import static com.app.util.Constants.COMMON.FOLDER_EXPORT;
-import static com.app.util.Constants.COMMON.TEMPLATE_EXPORT_FOLDER;
+import static com.app.util.Constants.COMMON.*;
+import static com.app.util.Constants.COMMON.FOLDER_EXPORT_TEMPLATE;
 
 @Path("factorys")
 @Tag(name = "Factorys")
@@ -44,6 +48,7 @@ import static com.app.util.Constants.COMMON.TEMPLATE_EXPORT_FOLDER;
 public class FactoryController extends BaseController {
 
     FactoryDao factoryDao = new FactoryDao();
+    EmployeeDao employeeDao = new EmployeeDao();
 
     @GET
     @RolesAllowed({"ADMIN"})
@@ -271,6 +276,158 @@ public class FactoryController extends BaseController {
         exportModel.setFileName(fileNameNew[fileNameNew.length - 1]);
         exportModel.setData(encodedString);
         resp.setData(exportModel);
+        return Response.ok(resp).build();
+    }
+
+    @GET
+    @Path("downloadTemplate")
+    @RolesAllowed({"ADMIN", "SUPPORT"})
+    @Operation(
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response dowloadTemplate() throws Exception {
+        ExportModel.ExportResponse resp = new ExportModel.ExportResponse();
+        String fileName = "BM_Nhap_Moi_Phan_Xuong.xls";
+        DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_IMPORT_EXCELL + fileName), 6, false);
+        dynamicExport.setActiveSheet(1);
+        List<EmployeeModel> listEmployeeModel = employeeDao.getAll(EmployeeModel.class, "employeeId");
+        int rows = 2;
+        for (EmployeeModel model : listEmployeeModel) {
+            dynamicExport.setEntry(String.valueOf(rows-1), 0, rows);
+            dynamicExport.setText(model.getCode(), 1, rows);
+            dynamicExport.setText(model.getFullName(), 2, rows);
+            rows++;
+        }
+        dynamicExport.setCellFormat(0, 0, rows-1, 2, DynamicExport.BORDER_FORMAT);
+        String prefixOutPutFile = new SimpleDateFormat("yyyyMMddHHmmss_").format(new Date()) + "_";
+        String fileExport = FOLDER_EXPORT_TEMPLATE + prefixOutPutFile +  "BM_Nhap_Moi_Phan_Xuong";
+        String filePath = dynamicExport.exportFile(fileExport, req);
+        File file = new File(filePath);
+        byte[] fileContent = FileUtils.readFileToByteArray(file);
+        String encodedString = Base64.getEncoder().encodeToString(fileContent);
+        String[] fileNameNew = filePath.split("/");
+        ExportModel exportModel = new ExportModel();
+        exportModel.setFileName(fileNameNew[fileNameNew.length - 1]);
+        exportModel.setData(encodedString);
+        resp.setData(exportModel);
+        return Response.ok(resp).build();
+    }
+
+    @POST
+    @Path("uploadFile")
+    @RolesAllowed({"ADMIN", "SUPPORT"})
+    @Operation(
+            summary = "Add an employee",
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response uploadFile(ExportModel model) throws Exception {
+        ImportFileExcell importFileExcell = new ImportFileExcell();
+        BaseResponse resp = new BaseResponse();
+        List<FactoryModel> factoryModels = new ArrayList<>();
+        List<FactoryModel> factoryModelList = factoryDao.getAll(FactoryModel.class, "factoryId");
+        List<String> factoryCodes = new ArrayList<>();
+        factoryModelList.forEach(element -> {
+            factoryCodes.add(element.getCode());
+        });
+        List<EmployeeModel> listEmployeeModel = employeeDao.getAll(EmployeeModel.class, "employeeId");
+        Map<String, Long> mapEmployee = new HashMap<>();
+        listEmployeeModel.forEach(element -> {
+            if(!CommonUtils.isNullOrEmpty(element.getCode())){
+                mapEmployee.put(element.getCode().toLowerCase(), element.getEmployeeId());
+            }
+        });
+        List<ImportFileExcell.ImportErrorBean> errorList = new ArrayList<>();
+        try {
+            byte[] decodedBytes = Base64.getDecoder().decode(model.getData());
+            FileUtils.writeByteArrayToFile(new File(FOLDER_IMPORT + model.getFileName()), decodedBytes);
+            int startDataRow = 6;
+            int columnConfig = 10;
+            ImportFileExcell.ImportBean importBean = importFileExcell.getListImport(FOLDER_IMPORT + model.getFileName(), startDataRow, columnConfig);
+            for (int row = 0 ; row < importBean.getRows().size(); row++) {
+                Object[] objects = importBean.getDataList().get(row);
+                FactoryModel factoryModel = new FactoryModel();
+                int column = 1;
+                String code = (String) objects[column++];
+                String name = (String) objects[column++];
+                String email = (String) objects[column++];
+                String employeeCode = (String) objects[column++];
+                String address = (String) objects[column++];
+                String dateConstruction = (String) objects[column++];
+                String dateFinish = (String) objects[column++];
+                String description = (String) objects[column++];
+                column = 1;
+                if (CommonUtils.isNullOrEmpty(code)) {
+                    errorList.add(new ImportFileExcell.ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
+                } else {
+                    if (factoryCodes.contains(code.toLowerCase())) {
+                        errorList.add(new ImportFileExcell.ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.DUOLICATE, (String) objects[column]));
+                    } else {
+                        factoryCodes.add(code.toLowerCase());
+                        factoryModel.setCode(code);
+                    }
+                }
+                column++;
+                if (CommonUtils.isNullOrEmpty(name)) {
+                    errorList.add(new ImportFileExcell.ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
+                } else {
+                    factoryModel.setName(name);
+                }
+                column++;
+                if (CommonUtils.isNullOrEmpty(email)) {
+                    errorList.add(new ImportFileExcell.ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
+                } else {
+                    if (CommonUtils.isNullOrEmpty(email)) {
+                        errorList.add(new ImportFileExcell.ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
+                    } else {
+                        factoryModel.setEmail(email);
+                    }
+                }
+                column++;
+                if (CommonUtils.isNullOrEmpty(employeeCode)) {
+                    errorList.add(new ImportFileExcell.ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
+                } else {
+                    if(!mapEmployee.containsKey(employeeCode.toLowerCase())) {
+                        errorList.add(new ImportFileExcell.ImportErrorBean(importBean.getRows().get(row), column, "Mã nhân viên phải nhập theo dữ liệu cho trước!", (String) objects[column]));
+                    } else {
+                        factoryModel.setEmployeeId(mapEmployee.get(employeeCode.toLowerCase()));
+                    }
+                }
+                column++;
+                factoryModel.setAddress(address);
+                column++;
+                if (CommonUtils.isNullOrEmpty(dateConstruction)) {
+                    errorList.add(new ImportFileExcell.ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
+                } else {
+                    if (CommonUtils.convertStringToDateBasic(dateConstruction) == null) {
+                        errorList.add(new ImportFileExcell.ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.DATE, (String) objects[column]));
+                    } else {
+                        factoryModel.setDateConstruction(CommonUtils.convertStringToDateBasic(dateConstruction));
+                    }
+                }
+
+                column++;
+                if (CommonUtils.isNullOrEmpty(dateFinish)) {
+                    errorList.add(new ImportFileExcell.ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
+                } else {
+                    if (CommonUtils.convertStringToDateBasic(dateFinish) == null) {
+                        errorList.add(new ImportFileExcell.ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.DATE, (String) objects[column]));
+                    } else {
+                        factoryModel.setDateFinish(CommonUtils.convertStringToDateBasic(dateFinish));
+                    }
+                }
+                factoryModel.setDescription(description);
+                factoryModels.add(factoryModel);
+            }
+            if (errorList.size() > 0) {
+                return Response.ok(errorList).build();
+            }
+            factoryDao.beginTransaction();
+            factoryDao.saveOrUpdateAll(factoryModels);
+            factoryDao.commitTransaction();
+            resp.setSuccessMessage("Import thành công!");
+        } catch (HibernateException | ConstraintViolationException e) {
+            resp.setErrorMessage("Import thất bại - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+        }
         return Response.ok(resp).build();
     }
 }

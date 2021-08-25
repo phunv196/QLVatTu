@@ -14,6 +14,12 @@
         :isNew="isNewRec"
       ></SupplierDetails>
     </Sidebar>
+    <Dialog v-model:visible="showDialog" style="width: 1000px; height: 650px">
+      <template #header>
+        <h3>Import nhà cung cấp</h3>
+      </template>
+      <Import @cancel="showDialog = false" @changed="getData()"> </Import>
+    </Dialog>
     <h3>Quản lý nhà cung cấp</h3>
     <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1000px">
       <div>
@@ -76,6 +82,13 @@
       style="width: 1000px; margin: 20px 0"
     >
       <Button
+        icon="pi pi-upload"
+        iconPos="right"
+        label="Import"
+        @click="showImport()"
+        class="p-ml-1 p-button-sm"
+      ></Button>
+      <Button
         icon="pi pi-download"
         iconPos="right"
         label="Báo cáo"
@@ -104,11 +117,18 @@
       :rows="pageSize"
       :totalRecords="totalRecs"
       :loading="isLoading"
+      stripedRows
+      showGridlines
       @page="onPageChange($event)"
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4"
       style="width: 1000px"
     >
-      <Column field="index" header="STT" headerStyle="width:90px;"></Column>
+      <Column
+        field="index"
+        header="STT"
+        headerStyle="width:90px;"
+        bodyStyle="text-align-last: center;"
+      ></Column>
       <Column
         field="code"
         header="Mã nhà cung cấp"
@@ -131,7 +151,7 @@
         headerStyle="width:160px"
       ></Column>
       <!--      <Column field="description" header="Ghi chú" headerStyle="width:160px"></Column>-->
-      <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px">
+      <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px; text-align: center;">
         <template #body="slotProps">
           <Button
             icon="pi pi-pencil"
@@ -156,6 +176,7 @@
 import { ref, onMounted, defineComponent } from "vue";
 import SupplierApi from "@/api/material-management/supplier-api"; // eslint-disable-line import/no-cycle
 import SupplierDetails from "@/views/material-management/supplier/SupplierDetails.vue";
+import Import from "@/views/material-management/supplier/Import.vue";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import { debounce, exportFile } from "@/shared/utils";
@@ -168,6 +189,7 @@ export default defineComponent({
     const searchPhone = ref("");
     const isLoading = ref(false);
     const showSlideOut = ref(false);
+    const showDialog = ref(false);
     const pageSize = ref(10);
     const totalPages = ref(0);
     const totalRecs = ref(0);
@@ -314,6 +336,11 @@ export default defineComponent({
         exportFile(data.data, data.fileName);
       });
     };
+
+    const showImport = () => {
+      showDialog.value = true;
+    };
+
     return {
       list,
       isLoading,
@@ -334,11 +361,14 @@ export default defineComponent({
       searchEmail,
       searchPhone,
       onSearchKeyup,
-      exportExcell
+      exportExcell,
+      showImport,
+      showDialog,
     };
   },
   components: {
     SupplierDetails,
+    Import,
   },
 });
 </script>

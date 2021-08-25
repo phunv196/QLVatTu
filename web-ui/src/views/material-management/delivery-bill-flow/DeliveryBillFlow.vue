@@ -18,9 +18,10 @@
       :rows="pageSize"
       :totalRecords="totalRecs"
       :loading="isLoading"
+      stripedRows showGridlines
       @page="onPageChange($event)"
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4" style="width:1000px">
-      <Column field="index" header="STT" headerStyle="width:50px;"></Column>
+      <Column field="index" header="STT" headerStyle="width:50px;" bodyStyle="text-align-last: center;"></Column>
       <Column field="suppliesCode" header="Mã vật tư" headerStyle="width:90px"></Column>
       <Column field="suppliesName" header="Tên vật tư" headerStyle="width:160px"></Column>
       <Column field="speciesName" header="Chủng loại" headerStyle="width:160px"></Column>
@@ -28,7 +29,7 @@
       <Column field="suppliesUnit" header="Đơn vị tính" headerStyle="width:90px"></Column>
       <Column field="suppliesPrice" header="Giá" headerStyle="width:90px"></Column>
       <Column field="calculatePrice" header="Thành tiền" headerStyle="width:90px"></Column>
-      <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px">
+      <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px;text-align: center;">
         <template #body="slotProps">
           <Button icon="pi pi-pencil" @click="onEditClick(slotProps.data)"
                   class="p-button-sm p-button-rounded p-button-secondary p-button-text"/>

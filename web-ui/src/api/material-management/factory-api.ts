@@ -109,4 +109,12 @@ export default {
   async getFactorByCode(factoryObj: Record<string, string | number>): Promise<AxiosResponse> {
     return api.post('/factorys/byCode', factoryObj);
   },
+
+  async downloadTemplate(): Promise<AxiosResponse> {
+    return api.get('/factorys/downloadTemplate',);
+  },
+
+  async uploadFile(fileImport: any): Promise<AxiosResponse> {
+    return api.post('/factorys/uploadFile', fileImport);
+  },
 };

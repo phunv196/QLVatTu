@@ -9,7 +9,6 @@ import com.app.model.BaseResponse;
 import com.app.model.ExportModel;
 import com.app.model.category.ReceiptModel;
 import com.app.model.category.ReceiptModel.ReceiptResponse;
-import com.app.model.category.SuppliesModel;
 import com.app.model.user.UserModel;
 import com.app.util.TemplateResouces;
 import io.swagger.v3.oas.annotations.Operation;
@@ -75,17 +74,9 @@ public class ReceiptController extends BaseController {
                 searchWarehouse = 0l;
             }
             List<ReceiptModel> billModelList = receiptDao.getList(page, pageSize, receiptId,searchCode,
-                    searchName,
-                    searchEmployee,
-                    searchWarehouse,
-                    searchFormDate,
-                    searchToDate);
+                    searchName, searchEmployee, searchWarehouse, searchFormDate, searchToDate);
             BigInteger total = receiptDao.getReceiptCount(receiptId, searchCode,
-                    searchName,
-                    searchEmployee,
-                    searchWarehouse,
-                    searchFormDate,
-                    searchToDate);
+                    searchName, searchEmployee, searchWarehouse, searchFormDate, searchToDate);
             resp.setList(billModelList);
             resp.setTotal(total.intValue());
             resp.setPageStats(total.intValue(),pageSize, page,"");

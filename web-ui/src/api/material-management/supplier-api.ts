@@ -74,4 +74,12 @@ export default {
   async getSupplierByCode(supplierObj: Record<string, string | number>): Promise<AxiosResponse> {
     return api.post('/supplier/byCode', supplierObj);
   },
+
+  async downloadTemplate(): Promise<AxiosResponse> {
+    return api.get('/supplier/downloadTemplate',);
+  },
+
+  async uploadFile(fileImport: any): Promise<AxiosResponse> {
+    return api.post('/supplier/uploadFile', fileImport);
+  },
 };

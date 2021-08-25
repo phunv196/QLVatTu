@@ -14,7 +14,7 @@
     </transition>
     <div>
       <div class="p-mt-3">
-        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
+        <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
           >Mã chất lượng <strong class="p-error">*</strong> </label
         >
         <InputText
@@ -24,13 +24,13 @@
         />
       </div>
       <div class="p-mt-3">
-        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
+        <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
           >Tên chất lượng <strong class="p-error">*</strong>
         </label>
         <InputText type="text" v-model="recData.name" class="p-inputtext-sm p-col-8" />
       </div>
       <div class="p-mt-3 p-d-flex p-ai-center">
-        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1">
+        <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1">
           Ghi chú
         </label>
         <textarea

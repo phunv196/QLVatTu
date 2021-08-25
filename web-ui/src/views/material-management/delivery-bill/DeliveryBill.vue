@@ -169,6 +169,7 @@
       :rows="pageSize"
       :totalRecords="totalRecs"
       :loading="isLoading"
+      stripedRows showGridlines
       @page="onPageChange($event)"
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4"
       style="width: 1350px"
@@ -177,6 +178,7 @@
         field="index"
         header="STT"
         headerStyle="width:90px;"
+        bodyStyle="text-align-last: center;"
       ></Column>
       <Column
         field="code"
@@ -192,10 +194,11 @@
         field="strDateDeliveryBill"
         header="Ngày lập phiếu"
         headerStyle="width:160px"
+        bodyStyle="text-align-last: center;"
       ></Column>
       <Column
         field="fullName"
-        header="Nhân viên"
+        header="Người tạo phiếu"
         headerStyle="width:160px"
       ></Column>
       <Column
@@ -213,7 +216,7 @@
         header="Tổng giao dịch"
         headerStyle="width:160px"
       ></Column>
-      <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px">
+      <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px; text-align: center;">
         <template #body="slotProps">
           <Button
             icon="pi pi-pencil"

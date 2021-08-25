@@ -117,4 +117,12 @@ export default {
   async getById(userId: number): Promise<AxiosResponse> {
     return api.get(`/users/byId/${userId}`);
   },
+
+  async downloadTemplate(): Promise<AxiosResponse> {
+    return api.get('/users/downloadTemplate',);
+  },
+
+  async uploadFile(fileImport: any): Promise<AxiosResponse> {
+    return api.post('/users/uploadFile', fileImport);
+  },
 };

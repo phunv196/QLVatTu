@@ -15,7 +15,13 @@
       >
       </EmployeeDetails>
     </Sidebar>
-    <h3>Manage Employees</h3>
+    <Dialog v-model:visible="showDialog" style="width: 1000px; height: 650px">
+      <template #header>
+        <h3>Import nhân viên</h3>
+      </template>
+      <Import @cancel="showDialog = false" @changed="getData()"> </Import>
+    </Dialog>
+    <h3>Quản lý nhân viên</h3>
     <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1150px">
       <div>
         <label
@@ -104,21 +110,19 @@
           optionLabel="name"
           optionValue="positionId"
         />
-        <input type="file" ref="file" @change="selectFile" />
       </div>
     </div>
     <div
       class="p-d-flex p-flex-row p-mb-3 p-jc-center"
       style="width: 1150px; margin: 20px 0"
     >
-      <FileUpload
-        name="demo[]"
-        url="./upload"
-        :maxFileSize="1000000"
-        :fileLimit="3"
-        @select="test($event)"
-        @uploader="myUploader"
-      />
+      <Button
+        icon="pi pi-upload"
+        iconPos="right"
+        label="Import"
+        @click="showImport()"
+        class="p-ml-1 p-button-sm"
+      ></Button>
       <Button
         icon="pi pi-download"
         iconPos="right"
@@ -148,6 +152,8 @@
       :rows="pageSize"
       :totalRecords="totalRecs"
       :loading="isLoading"
+      stripedRows
+      showGridlines
       @page="onPageChange($event)"
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4"
       style="width: 1250px"
@@ -155,15 +161,21 @@
       <Column
         field="index"
         header="STT"
-        headerStyle="width:50px; text-align: center"
+        headerStyle="width:50px;"
+        bodyStyle="text-align-last: center;"
       ></Column>
       <Column
         field="code"
         header="Mã nhân viên"
         headerStyle="width:120px;"
+        bodyStyle="text-align-last: center;"
       ></Column>
       <Column field="fullName" header="Họ và tên"></Column>
-      <Column field="strBitrh" header="Ngày sinh"></Column>
+      <Column
+        field="strBitrh"
+        header="Ngày sinh"
+        bodyStyle="text-align-last: center;"
+      ></Column>
       <Column field="sexString" header="Giới tính"></Column>
       <Column field="phone" header="Điện thoại"></Column>
       <Column field="email" header="EMAIL" headerStyle="width:210px"></Column>
@@ -177,7 +189,11 @@
         header="Chức vụ"
         headerStyle="width:160px"
       ></Column>
-      <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px">
+      <Column
+        header="ACTION"
+        headerStyle="width:100px"
+        bodyStyle="padding:3px; text-align: center;"
+      >
         <template #body="slotProps">
           <Button
             icon="pi pi-pencil"
@@ -200,6 +216,7 @@
 <script lang='ts'>
 import { ref, onMounted, defineComponent } from "vue";
 import EmployeeDetails from "@/views/material-management/employee/EmployeeDetails.vue";
+import Import from "@/views/material-management/employee/Import.vue";
 import EmployeeApi from "@/api/employee-api"; // eslint-disable-line import/no-cycle
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
@@ -212,6 +229,7 @@ export default defineComponent({
   setup(): unknown {
     const isLoading = ref(false);
     const showSlideOut = ref(false);
+    const showDialog = ref(false);
     const pageSize = ref(10);
     const totalPages = ref(0);
     const totalRecs = ref(0);
@@ -404,97 +422,30 @@ export default defineComponent({
     };
 
     const exportExcell = async () => {
-      await employeeApi.export(
-        `${searchCode.value}`,
-        `${searchName.value}`,
-        `${searchEmail.value}`,
-        `${searchPhone.value}`,
-        `${searchDepartment.value}`,
-        `${searchPosition.value}`
-      ).then((res) => {
-        const data = res.data.data;
-        exportFile(data.data, data.fileName);
-      });
+      await employeeApi
+        .export(
+          `${searchCode.value}`,
+          `${searchName.value}`,
+          `${searchEmail.value}`,
+          `${searchPhone.value}`,
+          `${searchDepartment.value}`,
+          `${searchPosition.value}`
+        )
+        .then((res) => {
+          const data = res.data.data;
+          exportFile(data.data, data.fileName);
+        });
     };
 
-    const dowloadTemplate = async () => {
-      await employeeApi.dowloadTemplate().then((res) => {
-        //window.open ("data:application/vnd.ms-excel;base64," + res.data);
-        var contentType = "application/vnd.ms-excel";
-        const a = document.createElement("a");
-        var blob1 = b64toBlob(res.data, contentType, "");
-        var url = URL.createObjectURL(blob1);
-        a.href = url;
-        a.download = "phunv.xls";
-        a.click();
-        setTimeout(() => {
-          window.URL.revokeObjectURL(url);
-          document.body.removeChild(a);
-        }, 0);
-        //window.open(blobUrl1);
-      });
-    };
-
-    const b64toBlob = (b64Data: any, contentType: any, sliceSize: any) => {
-      contentType = contentType || "";
-      var sliceSize = sliceSize || 512;
-      var byteCharacters = atob(b64Data);
-      var byteArrays = [];
-
-      for (
-        var offset = 0;
-        offset < byteCharacters.length;
-        offset += sliceSize
-      ) {
-        var slice = byteCharacters.slice(offset, offset + sliceSize);
-
-        var byteNumbers = new Array(slice.length);
-        for (var i = 0; i < slice.length; i++) {
-          byteNumbers[i] = slice.charCodeAt(i);
-        }
-
-        var byteArray = new Uint8Array(byteNumbers);
-
-        byteArrays.push(byteArray);
-      }
-      var blob = new Blob(byteArrays, { type: contentType });
-      return blob;
-    };
-
-    const test = (event: any) => {
-      console.log(event.files);
-      let formData = new FormData();
-      formData.append("file", event.files[0]);
-      getBase64(event.files[0]).then((res) => {
-        let data:any = res;
-        let da = data.slice(37, data.length)
-        var contentType = "application/vnd.ms-excel";
-        const a = document.createElement("a");
-        var blob1 = b64toBlob(da, contentType, "");
-        var url = URL.createObjectURL(blob1);
-        a.href = url;
-        a.download = "phunv.xls";
-        a.click();
-        setTimeout(() => {
-          window.URL.revokeObjectURL(url);
-          document.body.removeChild(a);
-        }, 0);
-      });
-    };
-
-    const getBase64 = (file: any) => {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = (error) => reject(error);
-      });
+    const showImport = () => {
+      showDialog.value = true;
     };
 
     return {
       list,
       isLoading,
       showSlideOut,
+      showDialog,
       pageSize,
       totalPages,
       totalRecs,
@@ -516,11 +467,12 @@ export default defineComponent({
       searchDepartment,
       searchPosition,
       exportExcell,
-      test,
+      showImport,
     };
   },
   components: {
     EmployeeDetails,
+    Import,
   },
 });
 </script>

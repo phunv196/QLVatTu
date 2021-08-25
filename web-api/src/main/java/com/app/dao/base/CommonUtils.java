@@ -227,6 +227,22 @@ public class CommonUtils {
         }
     }
 
+    public static Date convertStringToDateBasic(String date) throws Exception {
+        if (date == null || date.trim().isEmpty()) {
+            return null;
+        } else {
+            String pattern = Constants.COMMON.DATE_FORMAT_BASIC;
+            SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
+            dateFormat.setLenient(false);
+            try {
+                return dateFormat.parse(date);
+            } catch (Exception ex) {
+                LOGGER.debug(ex.toString());
+                return null;
+            }
+        }
+    }
+
     /**
      * Chuyen doi tuong String thanh doi tuong Date.
      *
@@ -2240,5 +2256,12 @@ public class CommonUtils {
         str = str.replace("  ", " ");
         str = "%" + str.trim().toLowerCase().replace("/", "//").replace("_", "/_").replace("%", "/%") + "%";
         return str;
+    }
+
+    public static boolean isValidEmailAddress(String email) {
+        String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
+        java.util.regex.Matcher m = p.matcher(email);
+        return m.matches();
     }
 }

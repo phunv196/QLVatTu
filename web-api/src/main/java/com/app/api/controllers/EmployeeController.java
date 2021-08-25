@@ -3,15 +3,20 @@ package com.app.api.controllers;
 import com.app.api.BaseController;
 import com.app.dao.EmployeeDao;
 import com.app.dao.base.CommonUtils;
+import com.app.dao.base.ImportFileExcell;
+import com.app.dao.base.ImportFileExcell.ImportBean;
+import com.app.dao.base.ImportFileExcell.ImportErrorBean;
 import com.app.dao.base.converter.DynamicExport;
+import com.app.dao.category.DepartmentDao;
+import com.app.dao.category.PositionDao;
 import com.app.model.BaseResponse;
 import com.app.model.ExportModel;
 import com.app.model.ExportModel.ExportResponse;
+import com.app.model.category.DepartmentModel;
+import com.app.model.category.PositionModel;
 import com.app.model.employee.EmployeeModel;
 import com.app.model.employee.EmployeeModel.EmployeeResponse;
-import com.app.model.user.UserModel;
-import com.app.model.user.UserOutputModel;
-import com.app.service.EmployeeService;
+import com.app.util.Constants;
 import com.app.util.TemplateResouces;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,12 +39,9 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import java.io.File;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
-import static com.app.util.Constants.COMMON.FOLDER_EXPORT;
-import static com.app.util.Constants.COMMON.TEMPLATE_EXPORT_FOLDER;
+import static com.app.util.Constants.COMMON.*;
 
 @Path("employees")
 @Tag(name = "Employees")
@@ -48,7 +50,8 @@ import static com.app.util.Constants.COMMON.TEMPLATE_EXPORT_FOLDER;
 @CrossOrigin
 public class EmployeeController extends BaseController {
     EmployeeDao employeeDao = new EmployeeDao();
-    EmployeeService service = new EmployeeService();
+    DepartmentDao departmentDao = new DepartmentDao();
+    PositionDao positionDao = new PositionDao();
 
     @GET
     @RolesAllowed({"ADMIN", "SUPPORT"})
@@ -153,10 +156,10 @@ public class EmployeeController extends BaseController {
     )
     public Response deleteEmployee(@Parameter(description="Employee Id", example="1") @PathParam("employeeId") Long employeeId) {
         BaseResponse resp = new BaseResponse();
-        if (employeeId == 201 || employeeId == 205){
-            resp.setErrorMessage("Employee 201 and 205 are special, they cannot be deleted");
-            return Response.ok(resp).build();
-        }
+//        if (employeeId == 201 || employeeId == 205){
+//            resp.setErrorMessage("Employee 201 and 205 are special, they cannot be deleted");
+//            return Response.ok(resp).build();
+//        }
         try {
             if (employeeId == null) {
                 employeeId = 0l;
@@ -205,22 +208,47 @@ public class EmployeeController extends BaseController {
     }
 
     @GET
-    @Path("dowloadTemplate")
+    @Path("downloadTemplate")
     @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
     public Response dowloadTemplate() throws Exception {
-        String path = "C:/Users/Admin/Downloads/31072021_brief_list.xls";
-        String path1 = "C:/Users/Admin/Downloads/phunv.xls";
-        File file = new File(path);
+        ExportResponse resp = new ExportResponse();
+        String fileName = "BM_Nhap_Moi_Nhan_Vien.xls";
+        DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_IMPORT_EXCELL + fileName), 6, false);
+        dynamicExport.setActiveSheet(1);
+        List<DepartmentModel> departmentList = departmentDao.getAll(DepartmentModel.class, "departmentId");
+        int rows = 2;
+        for (DepartmentModel model : departmentList) {
+            dynamicExport.setEntry(String.valueOf(rows-1), 0, rows);
+            dynamicExport.setText(model.getCode(), 1, rows);
+            dynamicExport.setText(model.getName(), 2, rows);
+            rows++;
+        }
+        dynamicExport.setCellFormat(0, 0, rows-1, 2, DynamicExport.BORDER_FORMAT);
+        rows = 2;
+        List<PositionModel> positionList = positionDao.getAll(PositionModel.class, "positionId");
+        for (PositionModel model : positionList) {
+            dynamicExport.setEntry(String.valueOf(rows-1), 4, rows);
+            dynamicExport.setText(model.getCode(), 5, rows);
+            dynamicExport.setText(model.getName(), 6, rows);
+            rows++;
+        }
+        dynamicExport.setCellFormat(0, 4, rows-1, 6, DynamicExport.BORDER_FORMAT);
+        
+        String prefixOutPutFile = new SimpleDateFormat("yyyyMMddHHmmss_").format(new Date()) + "_";
+        String fileExport = FOLDER_EXPORT_TEMPLATE + prefixOutPutFile +  "BM_Nhap_Moi_Nhan_Vien";
+        String filePath = dynamicExport.exportFile(fileExport, req);
+        File file = new File(filePath);
         byte[] fileContent = FileUtils.readFileToByteArray(file);
         String encodedString = Base64.getEncoder().encodeToString(fileContent);
-
-
-        byte[] decodedBytes = Base64.getDecoder().decode(encodedString);
-        FileUtils.writeByteArrayToFile(new File(path1), decodedBytes);
-        return Response.ok(encodedString).build();
+        String[] fileNameNew = filePath.split("/");
+        ExportModel exportModel = new ExportModel();
+        exportModel.setFileName(fileNameNew[fileNameNew.length - 1]);
+        exportModel.setData(encodedString);
+        resp.setData(exportModel);
+        return Response.ok(resp).build();
     }
 
     @POST
@@ -317,15 +345,142 @@ public class EmployeeController extends BaseController {
             summary = "Add an employee",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
-    public Response uploadFile(EmployeeModel emp) {
+    public Response uploadFile(ExportModel model) throws Exception {
+        ImportFileExcell importFileExcell = new ImportFileExcell();
         BaseResponse resp = new BaseResponse();
+        List<DepartmentModel> departmentList = departmentDao.getAll(DepartmentModel.class, "departmentId");
+        Map<String, Long> department = new HashMap<>();
+        departmentList.forEach(element ->{
+            department.put(element.getCode().toLowerCase(), element.getDepartmentId());
+        });
+        List<PositionModel> positionList = positionDao.getAll(PositionModel.class, "positionId");
+        Map<String, Long> position = new HashMap<>();
+        positionList.forEach(element ->{
+            position.put(element.getCode().toLowerCase(), element.getPositionId());
+        });
+        List<EmployeeModel> listEmployeeModel = employeeDao.getAll(EmployeeModel.class, "employeeId");
+        List<EmployeeModel> employeeModels = new ArrayList<>();
+        List<ImportErrorBean> errorList = new ArrayList<>();
+        List<String> employeeCode = new ArrayList<>();
+        listEmployeeModel.forEach(element -> {
+            if(!CommonUtils.isNullOrEmpty(element.getCode())){
+                employeeCode.add(element.getCode().toLowerCase());
+            }
+        });
         try {
+            byte[] decodedBytes = Base64.getDecoder().decode(model.getData());
+            FileUtils.writeByteArrayToFile(new File(FOLDER_IMPORT + model.getFileName()), decodedBytes);
+            int startDataRow = 6;
+            int columnConfig = 10;
+            ImportBean importBean = importFileExcell.getListImport(FOLDER_IMPORT + model.getFileName(), startDataRow, columnConfig);
+            for (int row = 0 ; row < importBean.getRows().size(); row++) {
+                Object[] objects = importBean.getDataList().get(row);
+                EmployeeModel employeeModel = new EmployeeModel();
+                int column = 1;
+                String code = (String) objects[column++];
+                String firstName = (String) objects[column++];
+                String lastName = (String) objects[column++];
+                String birth = (String) objects[column++];
+                String sex = (String) objects[column++];
+                String email = (String) objects[column++];
+                String phone = (String) objects[column++];
+                String departmentCode = (String) objects[column++];
+                String positionCode = (String) objects[column++];
+                String address = (String) objects[column++];
+                column = 1;
+                if (CommonUtils.isNullOrEmpty(code)) {
+                    errorList.add(new ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
+                } else {
+                    if (employeeCode.contains(code.toLowerCase())) {
+                        errorList.add(new ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.DUOLICATE, (String) objects[column]));
+                    } else {
+                        employeeCode.add(code.toLowerCase());
+                        employeeModel.setCode(code);
+                    }
+                }
+                column++;
+                if (CommonUtils.isNullOrEmpty(firstName)) {
+                    errorList.add(new ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
+                } else {
+                    employeeModel.setFirstName(firstName);
+                }
+                column++;
+                if (CommonUtils.isNullOrEmpty(lastName)) {
+                    errorList.add(new ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
+                } else {
+                    employeeModel.setLastName(lastName);
+                }
+                column++;
+                if (CommonUtils.isNullOrEmpty(birth)) {
+                    errorList.add(new ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
+                } else {
+                    if (CommonUtils.convertStringToDateBasic(birth) == null) {
+                        errorList.add(new ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.DATE, (String) objects[column]));
+                    } else {
+                        employeeModel.setBirth(CommonUtils.convertStringToDateBasic(birth));
+                    }
+                }
+
+                column++;
+                if (CommonUtils.isNullOrEmpty(sex)) {
+                    errorList.add(new ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
+                } else {
+                    if (!sex.toLowerCase().equals("nam") && !sex.toLowerCase().equals("nu")) {
+                        errorList.add(new ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.FOMAT, (String) objects[column]));
+                    } else {
+                        employeeModel.setSex(sex.toLowerCase().equals("nam") ? 1L : 2L);
+                    }
+                }
+                column++;
+                if (CommonUtils.isNullOrEmpty(email)) {
+                    errorList.add(new ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
+                } else {
+                    if (CommonUtils.isValidEmailAddress(email)) {
+                        employeeModel.setEmail(email);
+                    } else {
+                        errorList.add(new ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.FOMAT, (String) objects[column]));
+                    }
+                }
+                column++;
+                if (!CommonUtils.containPhoneNumber(phone) && !CommonUtils.isNullOrEmpty(phone)) {
+                    errorList.add(new ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.FOMAT, (String) objects[column]));
+                } else {
+                    employeeModel.setPhone(phone);
+                }
+
+                column++;
+                if (CommonUtils.isNullOrEmpty(departmentCode)) {
+                    errorList.add(new ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
+                } else {
+                    if(!department.containsKey(departmentCode.toLowerCase())) {
+                        errorList.add(new ImportErrorBean(importBean.getRows().get(row), column, "Mã phòng ban phải nhập theo dữ liệu cho trước!", (String) objects[column]));
+                    } else {
+                        employeeModel.setDepartmentId(department.get(departmentCode.toLowerCase()));
+                    }
+                }
+                column++;
+                if (CommonUtils.isNullOrEmpty(positionCode)) {
+                    errorList.add(new ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
+                } else {
+                    if(!position.containsKey(positionCode.toLowerCase())) {
+                        errorList.add(new ImportErrorBean(importBean.getRows().get(row), column, "Mã chức vụ phải nhập theo dữ liệu cho trước!", (String) objects[column]));
+                    } else {
+                        employeeModel.setPositionId(position.get(positionCode.toLowerCase()));
+                    }
+                }
+                employeeModel.setFullName(firstName + " " + lastName);
+                employeeModel.setAddress(address);
+                employeeModels.add(employeeModel);
+            }
+            if (errorList.size() > 0) {
+                return Response.ok(errorList).build();
+            }
             employeeDao.beginTransaction();
-            employeeDao.save(emp);
+            employeeDao.saveOrUpdateAll(employeeModels);
             employeeDao.commitTransaction();
-            resp.setSuccessMessage("Employee Added");
+            resp.setSuccessMessage("Import thành công!");
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot add employee - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Import thất bại - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
         }
         return Response.ok(resp).build();
     }
