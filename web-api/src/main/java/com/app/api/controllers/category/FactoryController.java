@@ -299,8 +299,7 @@ public class FactoryController extends BaseController {
             rows++;
         }
         dynamicExport.setCellFormat(0, 0, rows-1, 2, DynamicExport.BORDER_FORMAT);
-        String prefixOutPutFile = new SimpleDateFormat("yyyyMMddHHmmss_").format(new Date()) + "_";
-        String fileExport = FOLDER_EXPORT_TEMPLATE + prefixOutPutFile +  "BM_Nhap_Moi_Phan_Xuong";
+        String fileExport = FOLDER_EXPORT_TEMPLATE + "BM_Nhap_Moi_Phan_Xuong";
         String filePath = dynamicExport.exportFile(fileExport, req);
         File file = new File(filePath);
         byte[] fileContent = FileUtils.readFileToByteArray(file);
@@ -376,10 +375,10 @@ public class FactoryController extends BaseController {
                 if (CommonUtils.isNullOrEmpty(email)) {
                     errorList.add(new ImportFileExcell.ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
                 } else {
-                    if (CommonUtils.isNullOrEmpty(email)) {
-                        errorList.add(new ImportFileExcell.ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
-                    } else {
+                    if (CommonUtils.isValidEmailAddress(email)) {
                         factoryModel.setEmail(email);
+                    } else {
+                        errorList.add(new ImportFileExcell.ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.FOMAT, (String) objects[column]));
                     }
                 }
                 column++;

@@ -51,6 +51,7 @@ export default {
 
     return api.get('/supplies', { params: qsParams });
   },
+  
   async export(
     searchCode = "",
     searchName = "",

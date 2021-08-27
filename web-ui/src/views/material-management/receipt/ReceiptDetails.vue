@@ -60,6 +60,7 @@
           :showClear="true"
           optionLabel="name"
           optionValue="warehouseId"
+          placeholder="--Hãy chọn--"
         />
       </div>
       <div class="p-mt-3 p-d-flex p-ai-center">

@@ -13,19 +13,17 @@
       >
     </transition>
     <div>
-      <div class="p-mt-3">
+      <div class="p-mt-12">
         <label class="p-d-inline-block m-label-size-2 p-text-left p-mr-1"
           >Mã vật tư <strong class="p-error">*</strong>
         </label>
         <InputText
           type="text"
           v-model="recData.code"
-          class="p-inputtext-sm p-mr-1"
+          class="p-inputtext-sm p-mr-5 "
           style="width: 30%"
         />
-      </div>
-      <div class="p-mt-3">
-        <label class="p-d-inline-block m-label-size-2 p-text-left p-mr-1"
+        <label class="p-d-inline-block m-label-size-2 p-text-left p-mr-1 p-ml-5"
           >Tên vvật tư <strong class="p-error">*</strong>
         </label>
         <InputText
@@ -41,17 +39,16 @@
         </label>
         <Dropdown
           style="width: 30%"
-          class="p-inputtext-sm"
+          class="p-inputtext-sm p-mr-5"
           v-model="recData.speciesId"
           :options="arrSpecies"
           :filter="true"
           :showClear="true"
           optionLabel="name"
           optionValue="speciesId"
+          placeholder="--Hãy chọn--"
         />
-      </div>
-      <div class="p-mt-3">
-        <label class="p-d-inline-block m-label-size-2 p-text-left p-mr-1"
+        <label class="p-d-inline-block m-label-size-2 p-text-left p-mr-1 p-ml-5"
           >Chất lượng</label
         >
         <Dropdown
@@ -63,6 +60,7 @@
           :showClear="true"
           optionLabel="name"
           optionValue="qualityId"
+          placeholder="--Hãy chọn--"
         />
       </div>
       <div class="p-mt-3">
@@ -71,26 +69,28 @@
         </label>
         <Dropdown
           style="width: 30%"
-          class="p-inputtext-sm"
+          class="p-inputtext-sm p-mr-5"
           v-model="recData.supplierId"
           :options="arrSupplier"
           :filter="true"
           :showClear="true"
           optionLabel="name"
           optionValue="supplierId"
+          placeholder="--Hãy chọn--"
         />
-      </div>
-      <div class="p-mt-3">
-        <label class="p-d-inline-block m-label-size-2 p-text-left p-mr-1"
+        <label class="p-d-inline-block m-label-size-2 p-text-left p-mr-1 p-ml-5"
           >Đơn vị tính <strong class="p-error">*</strong>
         </label>
         <Dropdown
           class="p-inputtext-sm"
-          style="width: 200px"
-          v-model="recData.unit"
-          :options="['Cái', 'Kg', 'Cân', 'Lít', 'Mét', 'Dm', 'Cm']"
+          style="width: 30%"
+          v-model="recData.unitId"
+          :options="arrUnit"
           :filter="true"
           :showClear="true"
+          optionLabel="name"
+          optionValue="unitId"
+          placeholder="--Hãy chọn--"
         />
       </div>
       <div class="p-mt-3">
@@ -104,12 +104,19 @@
           style="width: 30%"
         />
       </div>
-      <!--      <div class="p-mt-3 p-d-flex p-ai-center">-->
-      <!--        <label class="p-d-inline-block m-label-size-2 p-text-left p-mr-1"> Ghi chú </label>-->
-      <!--        <textarea rows="3" v-model="recData.description" class="p-inputtext-sm" maxlength="500" style="width: 300px"/>-->
-      <!--      </div>-->
+      <div class="p-mt-3 p-d-flex p-ai-center">
+        <label class="p-d-inline-block m-label-size-2 p-text-left p-mr-1">
+          Ghi chú
+        </label>
+        <textarea
+          rows="3"
+          v-model="recData.description"
+          class="p-inputtext-sm"
+          maxlength="500"
+          style="width: 77.5%"
+        />
+      </div>
     </div>
-    <!--button-->
     <div class="p-mt-2 p-d-flex p-flex-row p-jc-end" style="width: 100%">
       <template v-if="changesApplied">
         <Button
@@ -143,6 +150,7 @@ import { useToast } from "primevue/usetoast";
 import SupplierApi from "@/api/material-management/supplier-api";
 import QualityApi from "@/api/material-management/quality-api";
 import SpeciesApi from "@/api/material-management/species-api";
+import unitApi from "@/api/material-management/unit-api";
 
 export default defineComponent({
   props: {
@@ -155,6 +163,7 @@ export default defineComponent({
   setup(props, { emit }): unknown {
     const userMessage = ref("");
     const arrQuality = ref([]);
+    const arrUnit = ref([]);
     const arrSpecies = ref([]);
     const arrSupplier = ref([]);
     const toast = useToast();
@@ -174,7 +183,7 @@ export default defineComponent({
       if (!rawSuppliesObj.supplierId) {
         msg.push("nhà cung cấp");
       }
-      if (!rawSuppliesObj.unit) {
+      if (!rawSuppliesObj.unitId) {
         msg.push("đơn vị tính");
       }
       if (!rawSuppliesObj.price) {
@@ -232,6 +241,7 @@ export default defineComponent({
       await lstSupplier();
       await lstQuality();
       await lstSpecies();
+      await lstUnit();
     });
 
     const lstSupplier = async () => {
@@ -250,6 +260,14 @@ export default defineComponent({
         lstQualitys = resp.data.list;
       }
       arrQuality.value = lstQualitys;
+    };
+    const lstUnit = async () => {
+      const resp = await unitApi.getAll();
+      let lstUnits = [];
+      if (resp.data) {
+        lstUnits = resp.data.list;
+      }
+      arrUnit.value = lstUnits;
     };
 
     const lstSpecies = async () => {
@@ -271,6 +289,7 @@ export default defineComponent({
       onApplyChanges,
       onCancel,
       userMessage,
+      arrUnit
     };
   },
 });

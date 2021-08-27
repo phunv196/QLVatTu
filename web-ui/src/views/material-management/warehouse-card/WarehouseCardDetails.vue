@@ -63,6 +63,7 @@
           optionLabel="name"
           @change="change()"
           optionValue="suppliesId"
+          placeholder="--Hãy chọn--"
         />
         <label
           class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
@@ -79,6 +80,7 @@
           :showClear="true"
           optionLabel="name"
           optionValue="warehouseId"
+          placeholder="--Hãy chọn--"
         />
       </div>
       <div class="p-mt-3 p-d-flex p-ai-center">

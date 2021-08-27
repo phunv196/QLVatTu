@@ -18,7 +18,7 @@ import Factory from '@/views/material-management/factory/Factory.vue';
 import Position from '@/views/material-management/position/Position.vue';
 import Quality from '@/views/material-management/quality/Quality.vue';
 import Receipt from '@/views/material-management/receipt/Receipt.vue';
-import Role from '@/views/material-management/role/Role.vue';
+import Unit from '@/views/material-management/unit/Unit.vue';
 import Species from '@/views/material-management/species/Species.vue';
 import Supplier from '@/views/material-management/supplier/Supplier.vue';
 import Supplies from '@/views/material-management/supplies/Supplies.vue';
@@ -59,7 +59,7 @@ const routes: Array<RouteRecordRaw> = [
           { path: 'position', component: Position },
           { path: 'quality', component: Quality },
           { path: 'receipt', component: Receipt },
-          { path: 'role', component: Role },
+          { path: 'unit', component: Unit },
           { path: 'species', component: Species },
           { path: 'supplier', component: Supplier },
           { path: 'supplies', component: Supplies },

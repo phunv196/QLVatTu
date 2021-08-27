@@ -26,6 +26,7 @@
           :showClear="true"
           optionLabel="name"
           optionValue="suppliesId"
+          placeholder="--Hãy chọn--"
         />
       </div>
 

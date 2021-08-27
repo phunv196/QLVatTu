@@ -5,7 +5,7 @@
     <Sidebar
       v-model:visible="showSlideOut"
       position="right"
-      style="width: 700px"
+      style="width: 1000px"
     >
       <SuppliesDetails
         :rec="selectedRec"
@@ -67,6 +67,7 @@
           :showClear="true"
           optionLabel="name"
           optionValue="supplierId"
+          placeholder="--Hãy chọn--"
         />
       </div>
       <div>
@@ -84,6 +85,7 @@
           :showClear="true"
           optionLabel="name"
           optionValue="speciesId"
+          placeholder="--Hãy chọn--"
         />
       </div>
     </div>
@@ -133,6 +135,7 @@
           :showClear="true"
           optionLabel="name"
           optionValue="qualityId"
+          placeholder="--Hãy chọn--"
         />
       </div>
       <div>
@@ -145,9 +148,12 @@
           class="p-inputtext-sm"
           style="width: 200px"
           v-model="searchUnit"
-          :options="['Cái', 'Kg', 'Cân', 'Lít', 'Mét', 'Dm', 'Cm']"
+          :options="unit"
           :filter="true"
           :showClear="true"
+          optionLabel="name"
+          optionValue="unitId"
+          placeholder="--Hãy chọn--"
         />
       </div>
     </div>
@@ -225,7 +231,7 @@
         headerStyle="width:160px"
       ></Column>
       <Column
-        field="unit"
+        field="unitName"
         header="Đơn vị tính"
         headerStyle="width:160px"
       ></Column>
@@ -266,6 +272,7 @@ import SupplierApi from "@/api/material-management/supplier-api";
 import QualityApi from "@/api/material-management/quality-api";
 import SpeciesApi from "@/api/material-management/species-api";
 import { debounce, exportFile } from "@/shared/utils";
+import unitApi from "@/api/material-management/unit-api";
 
 export default defineComponent({
   setup(): unknown {
@@ -283,6 +290,7 @@ export default defineComponent({
     const toast = useToast();
     let currentPage = 1;
     let quality = ref([]);
+    let unit = ref([]);
     let species = ref([]);
     let supplier = ref([]);
     let searchName = ref("");
@@ -441,6 +449,7 @@ export default defineComponent({
       lstSupplier();
       lstQuality();
       lstSpecies();
+      lstUnit();
     });
 
     const lstSupplier = async () => {
@@ -450,6 +459,15 @@ export default defineComponent({
         lstSuppliers = resp.data.list;
       }
       supplier.value = lstSuppliers;
+    };
+
+    const lstUnit = async () => {
+      const resp = await unitApi.getAll();
+      let lstUnits = [];
+      if (resp.data) {
+        lstUnits = resp.data.list;
+      }
+      unit.value = lstUnits;
     };
 
     const lstQuality = async () => {
@@ -533,6 +551,7 @@ export default defineComponent({
       exportExcell,
       showImport,
       showDialog,
+      unit
     };
   },
   components: {

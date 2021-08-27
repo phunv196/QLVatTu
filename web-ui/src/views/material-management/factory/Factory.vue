@@ -78,6 +78,7 @@
           :showClear="true"
           optionLabel="fullName"
           optionValue="employeeId"
+          placeholder="--Hãy chọn--"
         />
       </div>
     </div>

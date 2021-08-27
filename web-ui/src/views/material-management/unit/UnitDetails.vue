@@ -2,9 +2,9 @@
   <div class="m-font-regular">
     <Toast />
     <h4>
-      Role #
+      Unit #
       <span style="color: var(--primary-color)">
-        {{ recData.roleId ? recData.roleId : "NEW" }}
+        {{ recData.UnitId ? recData.UnitId : "NEW" }}
       </span>
     </h4>
     <transition name="p-message">
@@ -16,7 +16,7 @@
     <div>
       <div class="p-mt-1">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Mã quyền <strong class="p-error">*</strong> </label
+          >Mã đơn vị tính <strong class="p-error">*</strong> </label
         >
         <InputText
           type="text"
@@ -26,7 +26,7 @@
       </div>
       <div class="p-mt-1">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Tên quyền <strong class="p-error">*</strong>
+          >Tên đơn vị tính <strong class="p-error">*</strong>
         </label>
         <InputText type="text" v-model="recData.name" class="p-inputtext-sm p-col-8" />
       </div>
@@ -71,7 +71,7 @@
 
 <script lang='ts'>
 import { defineComponent, ref } from "vue";
-import RoleApi from "@/api/material-management/role-api";
+import UnitApi from "@/api/material-management/unit-api";
 import { useToast } from "primevue/usetoast";
 
 export default defineComponent({
@@ -90,40 +90,40 @@ export default defineComponent({
     const recData = ref(JSON.parse(JSON.stringify(props.rec))); // do not create direct refs to props to avoid making changes to props, instead use a cloned value of prop
 
     const onApplyChanges = async () => {
-      const rawRoleObj = JSON.parse(JSON.stringify(recData.value));
+      const rawUnitObj = JSON.parse(JSON.stringify(recData.value));
       let msg: any[];
       msg = [];
-      if (!rawRoleObj.code) {
-        msg.push("mã quyền");
+      if (!rawUnitObj.code) {
+        msg.push("mã đơn vị tính");
       }
-      if (!rawRoleObj.name) {
-        msg.push("tên quyền");
+      if (!rawUnitObj.name) {
+        msg.push("tên đơn vị tính");
       }
       if (msg.length > 0) {
         userMessage.value =
           "Trường " + msg.join(", ") + " không được để trống!";
         showMessage.value = true;
       } else {
-        delete rawRoleObj.index;
-        const check = await RoleApi.getRoleByCode(rawRoleObj);
+        delete rawUnitObj.index;
+        const check = await UnitApi.getUnitByCode(rawUnitObj);
         if (check.data) {
-          userMessage.value = "Mã quyền bị trùng. Vui lòng nhập lại!";
+          userMessage.value = "Mã đơn vị tính bị trùng. Vui lòng nhập lại!";
           showMessage.value = true;
         } else {
           let resp;
-          if (rawRoleObj.roleId) {
-            resp = await RoleApi.updateRole(rawRoleObj);
+          if (rawUnitObj.UnitId) {
+            resp = await UnitApi.updateUnit(rawUnitObj);
           } else {
-            resp = await RoleApi.addRole(rawRoleObj);
+            resp = await UnitApi.addUnit(rawUnitObj);
           }
           if (resp.data.msgType === "SUCCESS") {
             toast.add({
               severity: "success",
-              summary: rawRoleObj.roleId ? "Product Updated" : "Product Added",
-              detail: `${rawRoleObj.name} (${rawRoleObj.code})`,
+              summary: rawUnitObj.UnitId ? "Product Updated" : "Product Added",
+              detail: `${rawUnitObj.name} (${rawUnitObj.code})`,
               life: 3000,
             });
-            if (!rawRoleObj.roleId) {
+            if (!rawUnitObj.UnitId) {
               recData.value.id = "CREATED";
             }
             changesApplied.value = true;

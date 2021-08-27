@@ -51,6 +51,7 @@
           :showClear="true"
           optionLabel="fullName"
           optionValue="employeeId"
+          placeholder="--Hãy chọn--"
           @change="getEmployeeById(recData.employeeId)"
         />
       </div>

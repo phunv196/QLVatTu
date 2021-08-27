@@ -86,6 +86,7 @@
           :showClear="true"
           optionLabel="name"
           optionValue="departmentId"
+          placeholder="--Hãy chọn--"
         />
       </div>
       <div>
@@ -103,6 +104,7 @@
           :showClear="true"
           optionLabel="name"
           optionValue="positionId"
+          placeholder="--Hãy chọn--"
         />
       </div>
     </div>

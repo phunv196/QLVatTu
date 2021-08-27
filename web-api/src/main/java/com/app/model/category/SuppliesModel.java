@@ -20,7 +20,7 @@ public class SuppliesModel {
     @Column(name = "species_id")      private Long  speciesId;
     @Column(name = "quality_id")      private Long  qualityId;
     @Column(name = "supplier_id")      private Long  supplierId;
-    @Column(name = "unit")      private String  unit;
+    @Column(name = "unit_id")      private Long  unitId;
 
     @Transient
     private String speciesName;
@@ -30,6 +30,9 @@ public class SuppliesModel {
 
     @Transient
     private String supplierName;
+
+    @Transient
+    private String unitName;
 
     @Transient
     private Long formPrice;
@@ -96,12 +99,20 @@ public class SuppliesModel {
         this.supplierId = supplierId;
     }
 
-    public String getUnit() {
-        return unit;
+    public Long getUnitId() {
+        return unitId;
     }
 
-    public void setUnit(String unit) {
-        this.unit = unit;
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
     }
 
     public String getCode() {

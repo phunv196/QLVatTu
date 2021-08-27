@@ -48,6 +48,7 @@
           @change="getAmountDelivery()"
           optionLabel="code"
           optionValue="deliveryBillId"
+          placeholder="--Hãy chọn--"
         />
       </div>
       <div
@@ -72,6 +73,7 @@
           @change="getAmountReceipt()"
           optionLabel="code"
           optionValue="receiptId"
+          placeholder="--Hãy chọn--"
         />
       </div>
       <div class="p-mt-3">

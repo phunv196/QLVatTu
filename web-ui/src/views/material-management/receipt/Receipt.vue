@@ -59,6 +59,7 @@
           :showClear="true"
           optionLabel="fullName"
           optionValue="employeeId"
+          placeholder="--Hãy chọn--"
         />
       </div>
     </div>
@@ -106,6 +107,7 @@
           :showClear="true"
           optionLabel="name"
           optionValue="warehouseId"
+          placeholder="--Hãy chọn--"
         />
       </div>
     </div>

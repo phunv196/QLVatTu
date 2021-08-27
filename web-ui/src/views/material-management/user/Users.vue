@@ -92,6 +92,7 @@
           :showClear="true"
           optionLabel="name"
           optionValue="code"
+          placeholder="--Hãy chọn--"
         />
       </div>
       <div>
@@ -109,6 +110,7 @@
           :showClear="true"
           optionLabel="fullName"
           optionValue="employeeId"
+          placeholder="--Hãy chọn--"
         />
       </div>
     </div>

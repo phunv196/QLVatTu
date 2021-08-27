@@ -2,12 +2,15 @@ package com.app.api.controllers.category;
 
 import com.app.api.BaseController;
 import com.app.dao.base.CommonUtils;
+import com.app.dao.base.ImportFileExcell;
 import com.app.dao.base.converter.DynamicExport;
 import com.app.dao.category.SupplierDao;
 import com.app.model.BaseResponse;
 import com.app.model.ExportModel;
 import com.app.model.category.*;
 import com.app.model.category.SupplierModel.SupplierResponse;
+import com.app.model.employee.EmployeeModel;
+import com.app.util.Constants;
 import com.app.util.TemplateResouces;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,12 +32,10 @@ import org.hibernate.criterion.Restrictions;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
-import static com.app.util.Constants.COMMON.FOLDER_EXPORT;
-import static com.app.util.Constants.COMMON.TEMPLATE_EXPORT_FOLDER;
+import static com.app.util.Constants.COMMON.*;
+import static com.app.util.Constants.COMMON.FOLDER_IMPORT;
 
 @Path("supplier")
 @Tag(name = "Supplier")
@@ -258,6 +259,112 @@ public class SupplierController extends BaseController {
         exportModel.setFileName(fileNameNew[fileNameNew.length - 1]);
         exportModel.setData(encodedString);
         resp.setData(exportModel);
+        return Response.ok(resp).build();
+    }
+
+    @GET
+    @Path("downloadTemplate")
+    @RolesAllowed({"ADMIN", "SUPPORT"})
+    @Operation(
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response dowloadTemplate() throws Exception {
+        ExportModel.ExportResponse resp = new ExportModel.ExportResponse();
+        String fileName = "BM_Nhap_Moi_Nha_Cung_Cap.xls";
+        File file = new File(TEMPLATE_IMPORT_EXCELL + fileName);
+        byte[] fileContent = FileUtils.readFileToByteArray(file);
+        String encodedString = Base64.getEncoder().encodeToString(fileContent);
+        ExportModel exportModel = new ExportModel();
+        exportModel.setFileName(fileName);
+        exportModel.setData(encodedString);
+        resp.setData(exportModel);
+        return Response.ok(resp).build();
+    }
+
+    @POST
+    @Path("uploadFile")
+    @RolesAllowed({"ADMIN", "SUPPORT"})
+    @Operation(
+            summary = "Add an employee",
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response uploadFile(ExportModel model) throws Exception {
+        ImportFileExcell importFileExcell = new ImportFileExcell();
+        BaseResponse resp = new BaseResponse();
+        List<SupplierModel> supplierModels = new ArrayList<>();
+        List<SupplierModel> supplierModelList = supplierDao.getAll(SupplierModel.class, "supplierId");
+        List<String> supplierCodes = new ArrayList<>();
+        supplierModelList.forEach(element -> {
+            supplierCodes.add(element.getCode());
+        });
+        List<ImportFileExcell.ImportErrorBean> errorList = new ArrayList<>();
+        try {
+            byte[] decodedBytes = Base64.getDecoder().decode(model.getData());
+            FileUtils.writeByteArrayToFile(new File(FOLDER_IMPORT + model.getFileName()), decodedBytes);
+            int startDataRow = 6;
+            int columnConfig = 10;
+            ImportFileExcell.ImportBean importBean = importFileExcell.getListImport(FOLDER_IMPORT + model.getFileName(), startDataRow, columnConfig);
+            for (int row = 0 ; row < importBean.getRows().size(); row++) {
+                Object[] objects = importBean.getDataList().get(row);
+                SupplierModel supplierModel = new SupplierModel();
+                int column = 1;
+                String code = (String) objects[column++];
+                String name = (String) objects[column++];
+                String email = (String) objects[column++];
+                String phone = (String) objects[column++];
+                String address = (String) objects[column++];
+                String description = (String) objects[column++];
+                column = 1;
+                if (CommonUtils.isNullOrEmpty(code)) {
+                    errorList.add(new ImportFileExcell.ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
+                } else {
+                    if (supplierCodes.contains(code.toLowerCase())) {
+                        errorList.add(new ImportFileExcell.ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.DUOLICATE, (String) objects[column]));
+                    } else {
+                        supplierCodes.add(code.toLowerCase());
+                        supplierModel.setCode(code);
+                    }
+                }
+                column++;
+                if (CommonUtils.isNullOrEmpty(name)) {
+                    errorList.add(new ImportFileExcell.ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
+                } else {
+                    supplierModel.setName(name);
+                }
+                column++;
+                if (CommonUtils.isNullOrEmpty(email)) {
+                    errorList.add(new ImportFileExcell.ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
+                } else {
+                    if (CommonUtils.isValidEmailAddress(email)) {
+                        supplierModel.setEmail(email);
+                    } else {
+                        errorList.add(new ImportFileExcell.ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.FOMAT, (String) objects[column]));
+                    }
+                }
+                column++;
+                if (CommonUtils.isNullOrEmpty(phone)) {
+                    errorList.add(new ImportFileExcell.ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
+                } else {
+                    if (!CommonUtils.containPhoneNumber(phone)) {
+                        errorList.add(new ImportFileExcell.ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.FOMAT, (String) objects[column]));
+                    } else {
+                        supplierModel.setPhone(phone);
+                    }
+                }
+                supplierModel.setAddress(address);
+                supplierModel.setDescription(description);
+                supplierModels.add(supplierModel);
+            }
+            if (errorList.size() > 0) {
+                return Response.ok(errorList).build();
+            }
+            supplierDao.beginTransaction();
+            supplierDao.saveOrUpdateAll(supplierModels);
+            supplierDao.commitTransaction();
+            resp.setSuccessMessage("Import thành công!");
+        } catch (HibernateException | ConstraintViolationException e) {
+            resp.setErrorMessage("Import thất bại - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+        }
         return Response.ok(resp).build();
     }
 }

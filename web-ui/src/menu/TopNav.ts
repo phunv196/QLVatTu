@@ -25,25 +25,15 @@ export default {
           to: '/home/manage/quality',
         },
         {
-          label:'Chức vụ',
-          icon:'pi pi-fw pi-filter',
-          to: '/home/manage/position'
-        },
-        // {
-        //   label:'Quyền',
-        //   icon:'pi pi-fw pi-filter',
-        //   to: '/home/manage/role'
-        // },
-        {
           label:'Chủng loại',
           icon:'pi pi-fw pi-filter',
           to: '/home/manage/species'
-        }
-        ,{
-          label:'Phòng ban',
+        },
+        {
+          label:'Đơn vị tính',
           icon:'pi pi-fw pi-filter',
-          to: '/home/manage/department'
-        }
+          to: '/home/manage/unit'
+        },
       ]
     },
     {
@@ -61,6 +51,16 @@ export default {
           icon:'pi pi-fw pi-users',
           to: '/home/manage/employees'
         },
+        {
+          label:'Chức vụ',
+          icon:'pi pi-fw pi-filter',
+          to: '/home/manage/position'
+        },
+        {
+          label:'Phòng ban',
+          icon:'pi pi-fw pi-filter',
+          to: '/home/manage/department'
+        }
       ]
     },
     {

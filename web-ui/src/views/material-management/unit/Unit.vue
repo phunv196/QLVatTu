@@ -3,16 +3,16 @@
     <ConfirmDialog position="top"></ConfirmDialog>
     <Toast/>
     <Sidebar v-model:visible="showSlideOut" position="right" style="width:700px">
-      <RoleDetails :rec="selectedRec" @cancel="showSlideOut = false" @changed="getData()"
-                   :isNew="isNewRec"></RoleDetails>
+      <UnitDetails :rec="selectedRec" @cancel="showSlideOut = false" @changed="getData()"
+                   :isNew="isNewRec"></UnitDetails>
     </Sidebar>
-    <h3> Quản lý quyền user </h3>
+    <h3> Quản lý đơn vị tính </h3>
         <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1000px">
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
-          >Mã quyền user
+          >Mã đơn vị tính
         </label>
         <InputText
           type="text"
@@ -25,7 +25,7 @@
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
-          >Tên quyền user
+          >Tên đơn vị tính
         </label>
         <InputText
           type="text"
@@ -47,7 +47,7 @@
         class="p-ml-1 p-button-sm"
       ></Button>
       <Button
-        icon="pi pi-user"
+        icon="pi pi"
         iconPos="right"
         label="ADD"
         @click="onAddClick()"
@@ -64,9 +64,9 @@
       stripedRows showGridlines
       @page="onPageChange($event)"
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4" style="width:1000px">
-      <Column field="index" :sortable="true" header="STT" headerStyle="width:90px;" bodyStyle="text-align-last: center;"></Column>
-      <Column field="code" header="Mã quyền" headerStyle="width:90px"></Column>
-      <Column field="name" header="Tên quyền" headerStyle="width:160px"></Column>
+      <Column field="index" header="STT" headerStyle="width:90px;" bodyStyle="text-align-last: center;"></Column>
+      <Column field="code" header="Mã đơn vị tính" headerStyle="width:90px"></Column>
+      <Column field="name" header="Tên đơn vị tính" headerStyle="width:160px"></Column>
       <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px; text-align: center;">
         <template #body="slotProps">
           <Button icon="pi pi-pencil" @click="onEditClick(slotProps.data)"
@@ -82,8 +82,8 @@
 
 <script lang='ts'>
 import { ref, onMounted, defineComponent } from 'vue';
-import RoleApi from '@/api/material-management/role-api'; // eslint-disable-line import/no-cycle
-import RoleDetails from '@/views/material-management/role/RoleDetails.vue';
+import UnitApi from '@/api/material-management/unit-api'; // eslint-disable-line import/no-cycle
+import UnitDetails from '@/views/material-management/unit/UnitDetails.vue';
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
 import { debounce } from '@/shared/utils';
@@ -105,10 +105,10 @@ export default defineComponent({
     const toast = useToast();
     let currentPage = 1;
 
-    const getData = async (page: number, requestedPageSize: number, roleId = '',code='', name='') => {
+    const getData = async (page: number, requestedPageSize: number, unitId = '',code='', name='') => {
       // isLoading.value = true;
       try {
-        const resp = await RoleApi.getRoles(page, requestedPageSize, roleId, code, name);
+        const resp = await UnitApi.getUnits(page, requestedPageSize, unitId, code, name);
         let i = 1;
         list.value = resp.data.list.map((v: Record<string, unknown>) => {
           let index = 1;
@@ -140,7 +140,7 @@ export default defineComponent({
         acceptIcon: 'pi pi-check',
         accept: async () => {
           try {
-            const resp = await RoleApi.deleteRole(rec.roleId as string);
+            const resp = await UnitApi.deleteUnit(rec.unitId as string);
             if (resp.data.msgType === 'SUCCESS') {
               getData(currentPage, pageSize.value);
               toast.add({
@@ -180,7 +180,7 @@ export default defineComponent({
 
     const onAddClick = () => {
       isNewRec.value = true;
-      selectedRec.value = { roleId: '' };
+      selectedRec.value = { unitId: '' };
       showSlideOut.value = true;
     };
 
@@ -221,7 +221,7 @@ export default defineComponent({
     };
   },
   components: {
-    RoleDetails,
+    UnitDetails,
   },
 });
 </script>

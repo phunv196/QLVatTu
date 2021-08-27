@@ -127,16 +127,25 @@ export default defineComponent({
             emit("change");
             emit("cancel");
           } else {
-            showError.value = true;
-            let i = 1;
-            list.value = res.data.map((v: Record<string, unknown>) => {
-              let index = 1;
-              index = i++;
-              return {
-                ...v,
-                index,
-              };
+            if(res.data.msgType === "ERROR") {
+              toast.add({
+              severity: "error",
+              summary: "ERROR",
+              detail: res.data.msg,
+              life: 3000,
             });
+            } else {
+              showError.value = true;
+              let i = 1;
+              list.value = res.data.map((v: Record<string, unknown>) => {
+                let index = 1;
+                index = i++;
+                return {
+                  ...v,
+                  index,
+                };
+              });
+            }
           }
         });
       } else {

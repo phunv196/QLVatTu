@@ -236,9 +236,8 @@ public class EmployeeController extends BaseController {
             rows++;
         }
         dynamicExport.setCellFormat(0, 4, rows-1, 6, DynamicExport.BORDER_FORMAT);
-        
-        String prefixOutPutFile = new SimpleDateFormat("yyyyMMddHHmmss_").format(new Date()) + "_";
-        String fileExport = FOLDER_EXPORT_TEMPLATE + prefixOutPutFile +  "BM_Nhap_Moi_Nhan_Vien";
+
+        String fileExport = FOLDER_EXPORT_TEMPLATE + "BM_Nhap_Moi_Nhan_Vien";
         String filePath = dynamicExport.exportFile(fileExport, req);
         File file = new File(filePath);
         byte[] fileContent = FileUtils.readFileToByteArray(file);

@@ -52,6 +52,7 @@
           :showClear="true"
           optionLabel="fullName"
           optionValue="employeeId"
+          placeholder="--Hãy chọn--"
         />
       </div>
       <div class="p-mt-3">

@@ -63,6 +63,7 @@
           :showClear="true"
           optionLabel="name"
           optionValue="factoryId"
+          placeholder="--Hãy chọn--"
         />
 
         <label class="p-d-inline-block m-label-size-4 p-text-right p-mr-1"
@@ -77,6 +78,7 @@
           :showClear="true"
           optionLabel="name"
           optionValue="warehouseId"
+          placeholder="--Hãy chọn--"
         />
       </div>
       <div class="p-mt-3 p-d-flex p-ai-center">

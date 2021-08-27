@@ -97,6 +97,7 @@
           :showClear="true"
           optionLabel="name"
           optionValue="positionId"
+          placeholder="--Hãy chọn--"
         />
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
           >Phòng ban <strong class="p-error">*</strong>
@@ -110,6 +111,7 @@
           :showClear="true"
           optionLabel="name"
           optionValue="departmentId"
+          placeholder="--Hãy chọn--"
         />
       </div>
       <div class="p-mt-3">
