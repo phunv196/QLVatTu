@@ -62,7 +62,6 @@ public class ReceiptController extends BaseController {
             @Parameter(description="Items in each page", example="20") @DefaultValue("20") @QueryParam("page-size") int pageSize
     ) {
         ReceiptResponse resp = new ReceiptResponse();;
-        try {
             if (receiptId == null) {
                 receiptId = 0l;
             }
@@ -82,10 +81,6 @@ public class ReceiptController extends BaseController {
             resp.setPageStats(total.intValue(),pageSize, page,"");
             resp.setSuccessMessage("List of receipt and nested details " + (receiptId >0 ? "- Customer:" + receiptId:""));
             return Response.ok(resp).build();
-        } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Order - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
-            return Response.ok(resp).build();
-        }
     }
 
     @GET
@@ -121,10 +116,10 @@ public class ReceiptController extends BaseController {
             receiptDao.beginTransaction();
             receiptDao.save(receipt);
             receiptDao.commitTransaction();
-            resp.setSuccessMessage(String.format("Receipt Added - New Receipt ID : %s ", receipt.getReceiptId()));
+            resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công code: %s ", receipt.getCode()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot add Receipt - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể thêm mới bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -145,14 +140,14 @@ public class ReceiptController extends BaseController {
                 receiptDao.beginTransaction();
                 receiptDao.update(receipt);
                 receiptDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Receipt Updated (getReceiptId:%s)", receipt.getReceiptId()));
+                resp.setSuccessMessage(String.format("Sửa bản ghi thành công (code:%s)", receipt.getCode()));
                 return Response.ok(resp).build();
             } else {
-                resp.setErrorMessage(String.format("Cannot Update - Receipt not found (getReceiptId:%s)", receipt.getReceiptId()));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (code:%s)", receipt.getCode()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot update Receipt - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể sửa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -169,18 +164,17 @@ public class ReceiptController extends BaseController {
         try {
             ReceiptModel foundProd  = receiptDao.getById(receiptId);
             if (foundProd==null) {
-                resp.setErrorMessage(String.format("Cannot delete Receipt - Customer do not exist (id:%s)", receiptId));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (id:%s)", receiptId));
                 return Response.ok(resp).build();
             } else {
                 receiptDao.beginTransaction();
                 receiptDao.delete(receiptId);
                 receiptDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Receipt deleted (receiptId:%s)", receiptId));
+                resp.setSuccessMessage(String.format("Xóa bản ghi thành công (code:%s)", foundProd.getCode()));
                 return Response.ok(resp).build();
             }
-//            }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Receipt - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể xóa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -240,19 +234,14 @@ public class ReceiptController extends BaseController {
             @Parameter(description="DeliveryBill Id", example="601") @PathParam("suppliesId") Integer suppliesId
     ) {
         ReceiptResponse resp = new ReceiptResponse();
-        try {
-            suppliesId = suppliesId == null ? 0 : suppliesId;
-            List<Integer> arrReceiptId = new ArrayList<>();
-            arrReceiptId = receiptDao.getListBySuppliersId(suppliesId);
-            Set<Integer> set = new HashSet<>(arrReceiptId);
-            List<Integer> arrReceipt = new ArrayList<Integer>(set);
-            List<ReceiptModel> modelList = receiptDao.getListBySupplies(arrReceipt);
-            resp.setList(modelList);
-            return Response.ok(resp).build();
-        } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Order - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
-            return Response.ok(resp).build();
-        }
+        suppliesId = suppliesId == null ? 0 : suppliesId;
+        List<Integer> arrReceiptId = new ArrayList<>();
+        arrReceiptId = receiptDao.getListBySuppliersId(suppliesId);
+        Set<Integer> set = new HashSet<>(arrReceiptId);
+        List<Integer> arrReceipt = new ArrayList<Integer>(set);
+        List<ReceiptModel> modelList = receiptDao.getListBySupplies(arrReceipt);
+        resp.setList(modelList);
+        return Response.ok(resp).build();
     }
 
     @POST

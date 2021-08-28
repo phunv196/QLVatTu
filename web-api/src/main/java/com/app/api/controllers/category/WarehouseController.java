@@ -84,16 +84,13 @@ public class WarehouseController extends BaseController {
         if (pageSize <= 0 || pageSize > 1000){ pageSize = 20; }
         recordFrom = (page-1) * pageSize;
 
-        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
         criteria.setProjection(Projections.rowCount());
         Long rowCount = (Long)criteria.uniqueResult();
 
-        // Execute the Main Query
         criteria.setProjection(null);
         criteria.setFirstResult( (int) (long)recordFrom);
         criteria.setMaxResults(  (int) (long)pageSize);
         List<WarehouseModel> warehouseList = criteria.list();
-
         WarehouseResponse resp = new WarehouseResponse();
         resp.setList(warehouseList);
         resp.setPageStats(rowCount.intValue(), pageSize, page,"");
@@ -111,7 +108,6 @@ public class WarehouseController extends BaseController {
     public Response getWarehouseList(
     ) {
         Criteria criteria = warehouseDao.createCriteria(WarehouseModel.class);
-        // Execute the Main Query
         criteria.setProjection(null);
         List<WarehouseModel> warehouseList = criteria.list();
         WarehouseResponse resp = new WarehouseResponse();
@@ -132,10 +128,10 @@ public class WarehouseController extends BaseController {
             warehouseDao.beginTransaction();
             warehouseDao.save(warehouse);
             warehouseDao.commitTransaction();
-            resp.setSuccessMessage(String.format("Warehouse Added - New Warehouse ID : %s ", warehouse.getWarehouseId()));
+            resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công code: %s ", warehouse.getCode()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot add Warehouse - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể thêm mới bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -154,14 +150,14 @@ public class WarehouseController extends BaseController {
                 warehouseDao.beginTransaction();
                 warehouseDao.update(warehouse);
                 warehouseDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Warehouse Updated (getWarehouseId:%s)", warehouse.getWarehouseId()));
+                resp.setSuccessMessage(String.format("Sửa bản ghi thành công (code:%s)", warehouse.getCode()));
                 return Response.ok(resp).build();
             } else {
-                resp.setErrorMessage(String.format("Cannot Update - Warehouse not found (getWarehouseId:%s)", warehouse.getWarehouseId()));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (code:%s)", warehouse.getCode()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot update Warehouse - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể sửa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -178,17 +174,17 @@ public class WarehouseController extends BaseController {
         try {
             WarehouseModel foundProd  = warehouseDao.getById(warehouseId);
             if (foundProd==null) {
-                resp.setErrorMessage(String.format("Cannot delete Warehouse - Customer do not exist (id:%s)", warehouseId));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (id:%s)", warehouseId));
                 return Response.ok(resp).build();
             } else {
                 warehouseDao.beginTransaction();
                 warehouseDao.delete(warehouseId);
                 warehouseDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Warehouse deleted (warehouseId:%s)", warehouseId));
+                resp.setSuccessMessage(String.format("Xóa bản ghi thành công (code:%s)", foundProd.getCode()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Warehouse - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể xóa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -202,7 +198,6 @@ public class WarehouseController extends BaseController {
     public Response getByCode(
             WarehouseModel warehouseModel
     ) {
-        int recordFrom = 0;
         Criteria criteria = warehouseDao.createCriteria(WarehouseModel.class);
         if (warehouseModel.getWarehouseId() != null){
             criteria.add(Restrictions.ne("warehouseId", warehouseModel.getWarehouseId()));
@@ -210,7 +205,6 @@ public class WarehouseController extends BaseController {
         if (!CommonUtils.isNullOrEmpty(warehouseModel.getCode())){
             criteria.add(Restrictions.eq("code", warehouseModel.getCode()).ignoreCase());
         }
-        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
         criteria.setProjection(Projections.rowCount());
         Long rowCount = (Long)criteria.uniqueResult();
         return Response.ok(rowCount > 0).build();

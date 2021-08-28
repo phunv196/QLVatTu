@@ -58,7 +58,7 @@ public class DeliveryBillFlowController extends BaseController {
             resp.setSuccessMessage("List of DeliveryBillFlowModel and nested details " + (deliveryBillId>0 ? "- Customer:"+deliveryBillId:""));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Order - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Lỗi xảy ra - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -78,7 +78,7 @@ public class DeliveryBillFlowController extends BaseController {
             resp.setSuccessMessage(String.format("DeliveryBillFlow Added - New DeliveryBillFlow ID : %s ", deliveryBillFlow.getDeliveryBillFlowId()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot add DeliveryBillFlow - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể thêm mới bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -100,11 +100,11 @@ public class DeliveryBillFlowController extends BaseController {
                 resp.setSuccessMessage(String.format("DeliveryBillFlow Updated (getDeliveryBillFlowId:%s)", deliveryBillFlow.getDeliveryBillFlowId()));
                 return Response.ok(resp).build();
             } else {
-                resp.setErrorMessage(String.format("Cannot Update - DeliveryBillFlow not found (getDeliveryBillFlowId:%s)", deliveryBillFlow.getDeliveryBillFlowId()));
+                resp.setErrorMessage(String.format("Sửa bản ghi thất bại (id:%s)", deliveryBillFlow.getDeliveryBillFlowId()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot update DeliveryBillFlow - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể sửa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -121,17 +121,17 @@ public class DeliveryBillFlowController extends BaseController {
         try {
             DeliveryBillFlowModel foundProd  = deliveryBillFlowDao.getById(deliveryBillFlowId);
             if (foundProd==null) {
-                resp.setErrorMessage(String.format("Cannot delete DeliveryBillFlow - Customer do not exist (id:%s)", deliveryBillFlowId));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (id:%s)", deliveryBillFlowId));
                 return Response.ok(resp).build();
             } else {
                 deliveryBillFlowDao.beginTransaction();
                 deliveryBillFlowDao.delete(deliveryBillFlowId);
                 deliveryBillFlowDao.commitTransaction();
-                resp.setSuccessMessage(String.format("DeliveryBillFlow deleted (deliveryBillFlowId:%s)", deliveryBillFlowId));
+                resp.setSuccessMessage(String.format("Xóa bản ghi thành công (id:%s)", deliveryBillFlowId));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete DeliveryBillFlow - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể xóa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }

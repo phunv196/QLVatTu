@@ -114,10 +114,10 @@ public class QualityController extends BaseController {
             qualityDao.beginTransaction();
             qualityDao.save(qual);
             qualityDao.commitTransaction();
-            resp.setSuccessMessage(String.format("Quality Added - New Quality ID : %s ", qual.getQualityId()));
+            resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công code: %s ", qual.getCode()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot add Quality - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể thêm mới bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -136,14 +136,14 @@ public class QualityController extends BaseController {
                 qualityDao.beginTransaction();
                 qualityDao.update(qual);
                 qualityDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Quality Updated (getQualityId:%s)", qual.getQualityId()));
+                resp.setSuccessMessage(String.format("Sửa bản ghi thành công (code:%s)", qual.getCode()));
                 return Response.ok(resp).build();
             } else {
-                resp.setErrorMessage(String.format("Cannot Update - Quality not found (getQualityId:%s)", qual.getQualityId()));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (code:%s)", qual.getCode()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot update Quality - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể sửa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -160,18 +160,18 @@ public class QualityController extends BaseController {
         try {
             QualityModel foundProd  = qualityDao.getById(qualityId);
             if (foundProd==null) {
-                resp.setErrorMessage(String.format("Cannot delete Quality - Customer do not exist (id:%s)", qualityId));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (id:%s)", qualityId));
                 return Response.ok(resp).build();
             } else {
                 qualityDao.beginTransaction();
                 qualityDao.delete(qualityId);
                 qualityDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Quality deleted (id:%s)", qualityId));
+                resp.setSuccessMessage(String.format("Xóa bản ghi thành công (code:%s)", foundProd.getCode()));
                 return Response.ok(resp).build();
             }
 //            }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Quality - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể xóa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }

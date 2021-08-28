@@ -82,7 +82,7 @@ export default defineComponent({
       } else {
         toast.add({
               severity: "error",
-              summary: "Error",
+              summary: "Lỗi xảy ra!",
               detail: "Tài khoản hoặc mật khẩu không đúng. Vui lòng nhập lại!",
               life: 3000,
             });

@@ -68,7 +68,7 @@ public class OrderController extends BaseController {
             resp.setSuccessMessage("List of Orders and nested details " + (customerId>0 ? "- Customer:"+customerId:""));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Order - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Lỗi xảy ra - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }

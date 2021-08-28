@@ -42,21 +42,16 @@ public class WarehouseCardFlowController extends BaseController {
             @Parameter(description="Items in each page", example="5") @DefaultValue("5") @QueryParam("page-size") int pageSize
     ) {
         WarehouseCardFlowResponse resp = new WarehouseCardFlowResponse();
-        try {
-            if (warehouseCardId == null) {
-                warehouseCardId = 0l;
-            }
-            List<WarehouseCardFlowModel> cardFlowModels = warehouseCardFlowDao.getList(page, pageSize, warehouseCardId);
-            BigInteger total = warehouseCardFlowDao.getWarehouseCardFlowCount(warehouseCardId);
-            resp.setList(cardFlowModels);
-            resp.setTotal(total.intValue());
-            resp.setPageStats(total.intValue(),pageSize, page,"");
-            resp.setSuccessMessage("List of receipt and nested details " + (warehouseCardId >0 ? "- Customer:" + warehouseCardId:""));
-            return Response.ok(resp).build();
-        } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Order - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
-            return Response.ok(resp).build();
+        if (warehouseCardId == null) {
+            warehouseCardId = 0l;
         }
+        List<WarehouseCardFlowModel> cardFlowModels = warehouseCardFlowDao.getList(page, pageSize, warehouseCardId);
+        BigInteger total = warehouseCardFlowDao.getWarehouseCardFlowCount(warehouseCardId);
+        resp.setList(cardFlowModels);
+        resp.setTotal(total.intValue());
+        resp.setPageStats(total.intValue(),pageSize, page,"");
+        resp.setSuccessMessage("List of receipt and nested details " + (warehouseCardId >0 ? "- Customer:" + warehouseCardId:""));
+        return Response.ok(resp).build();
     }
 
     @POST
@@ -71,10 +66,10 @@ public class WarehouseCardFlowController extends BaseController {
             warehouseCardFlowDao.beginTransaction();
             warehouseCardFlowDao.save(warehouseCardFlow);
             warehouseCardFlowDao.commitTransaction();
-            resp.setSuccessMessage(String.format("WarehouseCardFlow Added - New WarehouseCardFlow ID : %s ", warehouseCardFlow.getWarehouseCardFlowId()));
+            resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công id: %s ", warehouseCardFlow.getWarehouseCardFlowId()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot add WarehouseCardFlow - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể thêm mới bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -93,14 +88,14 @@ public class WarehouseCardFlowController extends BaseController {
                 warehouseCardFlowDao.beginTransaction();
                 warehouseCardFlowDao.update(warehouseCardFlow);
                 warehouseCardFlowDao.commitTransaction();
-                resp.setSuccessMessage(String.format("WarehouseCardFlow Updated (getWarehouseCardFlowId:%s)", warehouseCardFlow.getWarehouseCardFlowId()));
+                resp.setSuccessMessage(String.format("Sửa bản ghi thành công (id:%s)", warehouseCardFlow.getWarehouseCardFlowId()));
                 return Response.ok(resp).build();
             } else {
-                resp.setErrorMessage(String.format("Cannot Update - WarehouseCardFlow not found (getWarehouseCardFlowId:%s)", warehouseCardFlow.getWarehouseCardFlowId()));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (id:%s)", warehouseCardFlow.getWarehouseCardFlowId()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot update WarehouseCardFlow - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể sửa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -118,18 +113,17 @@ public class WarehouseCardFlowController extends BaseController {
 
             WarehouseCardFlowModel foundProd  = warehouseCardFlowDao.getById(warehouseCardFlowId);
             if (foundProd==null) {
-                resp.setErrorMessage(String.format("Cannot delete WarehouseCardFlow - Customer do not exist (id:%s)", warehouseCardFlowId));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (id:%s)", warehouseCardFlowId));
                 return Response.ok(resp).build();
             } else {
                 warehouseCardFlowDao.beginTransaction();
                 warehouseCardFlowDao.delete(warehouseCardFlowId);
                 warehouseCardFlowDao.commitTransaction();
-                resp.setSuccessMessage(String.format("WarehouseCardFlow deleted (warehouseCardFlowId:%s)", warehouseCardFlowId));
+                resp.setSuccessMessage(String.format("Xóa bản ghi thành công (id:%s)", warehouseCardFlowId));
                 return Response.ok(resp).build();
             }
-//            }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete WarehouseCardFlow - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể xóa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }

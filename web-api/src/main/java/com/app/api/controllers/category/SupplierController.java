@@ -132,10 +132,10 @@ public class SupplierController extends BaseController {
             supplierDao.beginTransaction();
             supplierDao.save(supplier);
             supplierDao.commitTransaction();
-            resp.setSuccessMessage(String.format("Supplier Added - New Supplier ID : %s ", supplier.getSupplierId()));
+            resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công code: %s ", supplier.getCode()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot add Supplier - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể thêm mới bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -154,14 +154,14 @@ public class SupplierController extends BaseController {
                 supplierDao.beginTransaction();
                 supplierDao.update(supplier);
                 supplierDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Supplier Updated (getSupplierId:%s)", supplier.getSupplierId()));
+                resp.setSuccessMessage(String.format("Sửa bản ghi thành công (code:%s)", supplier.getCode()));
                 return Response.ok(resp).build();
             } else {
-                resp.setErrorMessage(String.format("Cannot Update - Supplier not found (getSupplierId:%s)", supplier.getSupplierId()));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (code:%s)", supplier.getCode()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot update Supplier - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể sửa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -178,18 +178,18 @@ public class SupplierController extends BaseController {
         try {
             SupplierModel foundProd  = supplierDao.getById(supplierId);
             if (foundProd==null) {
-                resp.setErrorMessage(String.format("Cannot delete Supplier - Customer do not exist (id:%s)", supplierId));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (id:%s)", supplierId));
                 return Response.ok(resp).build();
             } else {
                 supplierDao.beginTransaction();
                 supplierDao.delete(supplierId);
                 supplierDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Supplier deleted (supplierId:%s)", supplierId));
+                resp.setSuccessMessage(String.format("Xóa bản ghi thành công (code:%s)", foundProd.getCode()));
                 return Response.ok(resp).build();
             }
 //            }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Supplier - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể xóa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -211,7 +211,6 @@ public class SupplierController extends BaseController {
         if (!CommonUtils.isNullOrEmpty(supplier.getCode())){
             criteria.add(Restrictions.eq("code", supplier.getCode()).ignoreCase());
         }
-        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
         criteria.setProjection(Projections.rowCount());
         Long rowCount = (Long)criteria.uniqueResult();
         return Response.ok(rowCount > 0).build();

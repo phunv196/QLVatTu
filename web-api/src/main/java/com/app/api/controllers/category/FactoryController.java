@@ -89,10 +89,10 @@ public class FactoryController extends BaseController {
             resp.setList(modelList);
             resp.setTotal(total.intValue());
             resp.setPageStats(total.intValue(),pageSize, page,"");
-            resp.setSuccessMessage("List of factory and nested details " + (factoryId>0 ? "- factory:"+factoryId:""));
+            resp.setSuccessMessage("Danh sách phân xưởng " + (factoryId>0 ? "- factory:"+factoryId:""));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Order - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Lỗi sảy ra - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -130,7 +130,7 @@ public class FactoryController extends BaseController {
             FactoryModel foundProd  = factoryDao.getById(factoryId);
             return Response.ok(foundProd).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Factory - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Lỗi xảy ra - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -147,10 +147,10 @@ public class FactoryController extends BaseController {
             factoryDao.beginTransaction();
             factoryDao.save(factory);
             factoryDao.commitTransaction();
-            resp.setSuccessMessage(String.format("Factory Added - New Factory ID : %s ", factory.getFactoryId()));
+            resp.setSuccessMessage(String.format("Thê mới bản ghi thành công code: %s ", factory.getCode()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot add Factory - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể thêm mới bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -169,14 +169,14 @@ public class FactoryController extends BaseController {
                 factoryDao.beginTransaction();
                 factoryDao.update(factory);
                 factoryDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Factory Updated (getFactoryId:%s)", factory.getFactoryId()));
+                resp.setSuccessMessage(String.format("Sửa bản ghi thành công (code:%s)", factory.getCode()));
                 return Response.ok(resp).build();
             } else {
-                resp.setErrorMessage(String.format("Cannot Update - Factory not found (getFactoryId:%s)", factory.getFactoryId()));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (code:%s)", factory.getCode()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot update Factory - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Sửa bản ghi thất bại - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -193,18 +193,18 @@ public class FactoryController extends BaseController {
         try {
             FactoryModel foundProd  = factoryDao.getById(factoryId);
             if (foundProd==null) {
-                resp.setErrorMessage(String.format("Cannot delete Factory - Customer do not exist (id:%s)", factoryId));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (id:%s)", factoryId));
                 return Response.ok(resp).build();
             } else {
                 factoryDao.beginTransaction();
                 factoryDao.delete(factoryId);
                 factoryDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Factory deleted (factoryId:%s)", factoryId));
+                resp.setSuccessMessage(String.format("Xóa bản ghi thành công (code:%s)", foundProd.getCode()));
                 return Response.ok(resp).build();
             }
 //            }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Factory - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể xóa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }

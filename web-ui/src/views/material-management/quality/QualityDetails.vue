@@ -119,7 +119,7 @@ export default defineComponent({
           if (resp.data.msgType === "SUCCESS") {
             toast.add({
               severity: "success",
-              summary: rawQualityObj.id ? "Product Updated" : "Product Added",
+              summary: rawQualityObj.id ? "Sửa thành công!" : "Thêm mới thành công!",
               detail: `${rawQualityObj.name} (${rawQualityObj.code})`,
               life: 3000,
             });
@@ -134,7 +134,7 @@ export default defineComponent({
           } else {
             toast.add({
               severity: "error",
-              summary: "Error",
+              summary: "Lỗi xảy ra!",
               detail: resp.data.msg,
             });
           }

@@ -70,35 +70,29 @@ public class EmployeeController extends BaseController {
         @Parameter(description="Search by name or email - Use % for wildcard like '%ra%'", example="%ra%") @QueryParam("search") String search,
         @Parameter(description="Page No, Starts from 1 ", example="1") @DefaultValue("1")  @QueryParam("page")  int page,
         @Parameter(description="Items in each page", example="20") @DefaultValue("20") @QueryParam("page-size") int pageSize
-    ) throws Exception {
-//        service.processExport(req);
+    ) {
         EmployeeResponse resp = new EmployeeResponse();
-        try {
-            if (employeeId == null) {
-                employeeId = 0l;
-            }
-
-            if (searchDepartment == null) {
-                searchDepartment = 0l;
-            }
-
-            if (searchPosition == null) {
-                searchPosition = 0l;
-            }
-
-            List<EmployeeModel> employeeList = employeeDao.getList(page, pageSize, employeeId, searchCode,
-                    searchName, searchEmail, searchPhone, searchDepartment, searchPosition);
-            BigInteger total = employeeDao.getEmployeeCount(employeeId, searchCode,
-                    searchName, searchEmail, searchPhone, searchDepartment, searchPosition);
-            resp.setList(employeeList);
-            resp.setTotal(total.intValue());
-            resp.setPageStats(total.intValue(), pageSize, page, "");
-            resp.setSuccessMessage("List of Orders and nested details " + (employeeId > 0 ? "- Customer:" + employeeId : ""));
-            return Response.ok(resp).build();
-        } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Order - " + e.getMessage() + ", " + (e.getCause() != null ? e.getCause().getMessage() : ""));
-            return Response.ok(resp).build();
+        if (employeeId == null) {
+            employeeId = 0l;
         }
+
+        if (searchDepartment == null) {
+            searchDepartment = 0l;
+        }
+
+        if (searchPosition == null) {
+            searchPosition = 0l;
+        }
+
+        List<EmployeeModel> employeeList = employeeDao.getList(page, pageSize, employeeId, searchCode,
+                searchName, searchEmail, searchPhone, searchDepartment, searchPosition);
+        BigInteger total = employeeDao.getEmployeeCount(employeeId, searchCode,
+                searchName, searchEmail, searchPhone, searchDepartment, searchPosition);
+        resp.setList(employeeList);
+        resp.setTotal(total.intValue());
+        resp.setPageStats(total.intValue(), pageSize, page, "");
+        resp.setSuccessMessage("List of Orders and nested details " + (employeeId > 0 ? "- Customer:" + employeeId : ""));
+        return Response.ok(resp).build();
     }
 
     @POST
@@ -113,9 +107,9 @@ public class EmployeeController extends BaseController {
             employeeDao.beginTransaction();
             employeeDao.save(emp);
             employeeDao.commitTransaction();
-            resp.setSuccessMessage("Employee Added");
+            resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công code: %s ", emp.getCode()));
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot add employee - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể thêm mới bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
         }
         return Response.ok(resp).build();
     }
@@ -135,14 +129,14 @@ public class EmployeeController extends BaseController {
                 employeeDao.beginTransaction();
                 employeeDao.update(emp);
                 employeeDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Employee Updated (id:%s)", emp.getEmployeeId()));
+                resp.setSuccessMessage(String.format("Sửa bản ghi thành công (code:%s)", emp.getCode()));
                 return Response.ok(resp).build();
             } else {
-                resp.setErrorMessage(String.format("Cannot Update - Employee not found (id:%s)", emp.getEmployeeId()));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (code:%s)", emp.getCode()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot update Employee - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể sửa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -156,27 +150,23 @@ public class EmployeeController extends BaseController {
     )
     public Response deleteEmployee(@Parameter(description="Employee Id", example="1") @PathParam("employeeId") Long employeeId) {
         BaseResponse resp = new BaseResponse();
-//        if (employeeId == 201 || employeeId == 205){
-//            resp.setErrorMessage("Employee 201 and 205 are special, they cannot be deleted");
-//            return Response.ok(resp).build();
-//        }
         try {
             if (employeeId == null) {
                 employeeId = 0l;
             }
             EmployeeModel foundEmp  = employeeDao.getById(employeeId);
             if (foundEmp==null) {
-                resp.setErrorMessage(String.format("Cannot delete - Employee do not exist (id:%s)", employeeId));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (id:%s)", employeeId));
                 return Response.ok(resp).build();
             } else {
                 employeeDao.beginTransaction();
                 employeeDao.delete(employeeId);
                 employeeDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Employee deleted (id:%s)", employeeId));
+                resp.setSuccessMessage(String.format("Xóa bản ghi thành công (id:%s)", employeeId));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Customer - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể xóa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -191,18 +181,11 @@ public class EmployeeController extends BaseController {
     )
     public Response getAll(
     ) {
-        int recordFrom=0;
         Criteria criteria = employeeDao.createCriteria(EmployeeModel.class);
-        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
-        criteria.setProjection(Projections.rowCount());
-        Long rowCount = (Long)criteria.uniqueResult();
-        // Execute the Main Query
         criteria.setProjection(null);
-        criteria.setFirstResult(recordFrom);
         List<EmployeeModel> empUserList = criteria.list();
         EmployeeResponse resp = new EmployeeResponse();
         resp.setList(empUserList);
-
         resp.setSuccessMessage("List of employees");
         return Response.ok(resp).build();
     }

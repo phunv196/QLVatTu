@@ -192,13 +192,13 @@ export default defineComponent({
             toast.add({
               severity: "success",
               summary: rawDeliveryBillObj.deliveryBillId
-                ? "Product Updated"
-                : "Product Added",
+                ? "Sửa thành công!"
+                : "Xóa thành công!",
               detail: `${rawDeliveryBillObj.name} (${rawDeliveryBillObj.code})`,
               life: 3000,
             });
             if (!rawDeliveryBillObj.deliveryBillId) {
-              recData.value.id = "CREATED";
+              recData.value.id = "Thên mới";
             }
             changesApplied.value = true;
             emit("changed");
@@ -208,7 +208,7 @@ export default defineComponent({
           } else {
             toast.add({
               severity: "error",
-              summary: "Error",
+              summary: "Lỗi xảy ra!",
               detail: resp.data.msg,
             });
           }

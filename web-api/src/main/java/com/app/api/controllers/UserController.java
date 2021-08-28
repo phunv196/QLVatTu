@@ -122,11 +122,8 @@ public class UserController extends BaseController {
         UserResponse resp = new UserResponse();
         if (userView!=null) {
             if (userFromToken.getRole().equalsIgnoreCase("ADMIN") || userFromToken.getLoginName().equals(loginName)) {
-                //For Admins and Own-Id - Just remove the password
                 userView.setPassword("");
             } else {
-                // If not a ADMIN or not his own id then strip all the data and just send the id
-                // others should be able to find out if the loginName exist or not
                 userView.setEmployeeId(0);
                 userView.setPassword("");
                 userView.setRole("");
@@ -153,8 +150,9 @@ public class UserController extends BaseController {
         @Parameter(description="User ID", example="mdaniel") @PathParam("loginName") String loginName
     ) {
         BaseResponse resp = new BaseResponse();
-        if (loginName.equals("admin") || loginName.equals("support") || loginName.equals("customer")){
-            resp.setErrorMessage("Cannot delete reserved User IDs - (admin, support or customer)");
+        UserModel userFromToken = (UserModel)securityContext.getUserPrincipal();
+        if (loginName.equals("admin")){
+            resp.setErrorMessage("Bạn không thể xóa user: admin");
             return Response.ok(resp).build();
         }
         if (StringUtils.isBlank(loginName)){
@@ -164,14 +162,14 @@ public class UserController extends BaseController {
         try {
             UserModel userInfo = userDao.getById(loginName);
             if (userInfo==null){
-                resp.setErrorMessage("User not found");
+                resp.setErrorMessage("Bản khi không tồn tại!");
                 return Response.ok(resp).build();
             }
             userDao.beginTransaction();
             userDao.delete(userInfo);
             userDao.commitTransaction();
         } catch (ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete User - Database constraints are violated");
+            resp.setErrorMessage("Xóa bản ghi không thành công!");
             return Response.ok(resp).build();
         }
         resp.setSuccessMessage("Deleted");
@@ -186,11 +184,10 @@ public class UserController extends BaseController {
     )
     public Response addUser(UserOutputModel addUser) throws Exception {
         BaseResponse resp = new BaseResponse();
-        UserModel userFromToken = (UserModel)securityContext.getUserPrincipal();  // securityContext is defined in BaseController
-        //Customers can query their own cart only
+        UserModel userFromToken = (UserModel)securityContext.getUserPrincipal();
         if (userFromToken==null || !userFromToken.getRole().equalsIgnoreCase(Constants.UserRoleConstants.ROLE_ADMIN)){
             if (addUser.getRole().equalsIgnoreCase(Constants.UserRoleConstants.ROLE_ADMIN)) {
-                resp.setErrorMessage("Role cannot be ADMIN ");
+                resp.setErrorMessage("Bạn không có quyền thêm mới user quyền ADMIN ");
                 return Response.ok(resp).build();
             }
         }
@@ -208,9 +205,9 @@ public class UserController extends BaseController {
             userDao.beginTransaction();
             userDao.save(model);
             userDao.commitTransaction();
-            resp.setSuccessMessage("User Registered Successfully");
+            resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công loginName: %s ", model.getLoginName()));
         } catch (HibernateException | ConstraintViolationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            resp.setErrorMessage("Cannot add User - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể thêm mới bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
         }
         return Response.ok(resp).build();
     }
@@ -231,14 +228,14 @@ public class UserController extends BaseController {
                 userDao.beginTransaction();
                 userDao.update(foundProd);
                 userDao.commitTransaction();
-                resp.setSuccessMessage(String.format("User Updated (getUserId:%s)", user.getUserId()));
+                resp.setSuccessMessage(String.format("Sửa bản ghi thành công (loginName:%s)", user.getLoginName()));
                 return Response.ok(resp).build();
             } else {
-                resp.setErrorMessage(String.format("Cannot Update - User not found (getUserId:%s)", user.getUserId()));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (loginName:%s)", user.getLoginName()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            resp.setErrorMessage("Cannot update User - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể sửa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -259,7 +256,6 @@ public class UserController extends BaseController {
         if (!CommonUtils.isNullOrEmpty(model.getLoginName())){
             criteria.add(Restrictions.eq("loginName", model.getLoginName()).ignoreCase());
         }
-        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
         criteria.setProjection(Projections.rowCount());
         Long rowCount = (Long)criteria.uniqueResult();
         return Response.ok(rowCount > 0).build();
@@ -294,9 +290,7 @@ public class UserController extends BaseController {
             userDao.update(userModel);
             userDao.commitTransaction();
         }
-        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
         criteria.setProjection(Projections.rowCount());
-
         return Response.ok(true).build();
     }
 
@@ -325,7 +319,7 @@ public class UserController extends BaseController {
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot update User - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Reset password thất bại - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -389,7 +383,7 @@ public class UserController extends BaseController {
             CommonUtils.copyProperties(model, foundProd);
             return Response.ok(model).build();
         } catch (HibernateException | ConstraintViolationException | NullPointerException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            resp.setErrorMessage("Cannot update User - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Lỗi xảy ra - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }

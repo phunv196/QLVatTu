@@ -155,8 +155,8 @@ export default defineComponent({
             toast.add({
               severity: "success",
               summary: rawSupplierObj.supplierId
-                ? "Product Updated"
-                : "Product Added",
+                ? "Sửa thành công!"
+                : "Thêm mới thành công!",
               detail: `${rawSupplierObj.name} (${rawSupplierObj.code})`,
               life: 3000,
             });
@@ -171,7 +171,7 @@ export default defineComponent({
           } else {
             toast.add({
               severity: "error",
-              summary: "Error",
+              summary: "Lỗi xảy ra!",
               detail: resp.data.msg,
             });
           }

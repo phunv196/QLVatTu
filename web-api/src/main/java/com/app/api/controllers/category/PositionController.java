@@ -113,10 +113,10 @@ public class PositionController extends BaseController {
             positionDao.beginTransaction();
             positionDao.save(position);
             positionDao.commitTransaction();
-            resp.setSuccessMessage(String.format("Position Added - New Position ID : %s ", position.getPositionId()));
+            resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công code:%s ", position.getCode()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot add Position - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể thêm mới bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -135,15 +135,15 @@ public class PositionController extends BaseController {
                 positionDao.beginTransaction();
                 positionDao.update(position);
                 positionDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Position Updated (getPositionId:%s)", position.getPositionId()));
+                resp.setSuccessMessage(String.format("Sửa bản ghi thành công (code:%s)", position.getCode()));
                 return Response.ok(resp).build();
             } else {
-                resp.setErrorMessage(String.format("Cannot Update - Position not found (getPositionId:%s)", position.getPositionId()));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (code:%s)", position.getCode()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
             e.printStackTrace();
-            resp.setErrorMessage("Cannot update Position - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể sửa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -161,17 +161,17 @@ public class PositionController extends BaseController {
 
             PositionModel foundProd  = positionDao.getById(positionId);
             if (foundProd==null) {
-                resp.setErrorMessage(String.format("Cannot delete Position - Customer do not exist (id:%s)", positionId));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (id:%s)", positionId));
                 return Response.ok(resp).build();
             } else {
                 positionDao.beginTransaction();
                 positionDao.delete(positionId);
                 positionDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Position deleted (positionId:%s)", positionId));
+                resp.setSuccessMessage(String.format("Bản ghi thành công (code:%s)", foundProd.getCode()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Position - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể xóa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }

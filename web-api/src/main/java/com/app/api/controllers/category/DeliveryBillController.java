@@ -9,7 +9,6 @@ import com.app.model.BaseResponse;
 import com.app.model.ExportModel;
 import com.app.model.category.DeliveryBillModel;
 import com.app.model.category.DeliveryBillModel.DeliveryBillResponse;
-import com.app.model.category.ReceiptModel;
 import com.app.model.user.UserModel;
 import com.app.util.TemplateResouces;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,7 +59,7 @@ public class DeliveryBillController extends BaseController {
                             @Parameter(description = "Order Id") @QueryParam("searchToDate") String searchToDate,
                             @Parameter(description = "Order Id") @QueryParam("searchFactory") Long searchFactory,
                             @Parameter(description = "Page No, Starts from 1 ", example = "1") @DefaultValue("1") @QueryParam("page") int page,
-                            @Parameter(description = "Items in each page", example = "20") @DefaultValue("20") @QueryParam("page-size") int pageSize
+                            @Parameter(description = "Items in each page", example = "20") @DefaultValue("10") @QueryParam("page-size") int pageSize
     ) throws Exception {
         DeliveryBillResponse resp = new DeliveryBillResponse();
         try {
@@ -96,10 +95,10 @@ public class DeliveryBillController extends BaseController {
             resp.setList(billModelList);
             resp.setTotal(total.intValue());
             resp.setPageStats(total.intValue(), pageSize, page, "");
-            resp.setSuccessMessage("List of Orders and nested details " + (deliveryBillId > 0 ? "- Customer:" + deliveryBillId : ""));
+            resp.setSuccessMessage("  " + (deliveryBillId > 0 ? "- Customer:" + deliveryBillId : ""));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Order - " + e.getMessage() + ", " + (e.getCause() != null ? e.getCause().getMessage() : ""));
+            resp.setErrorMessage("Lỗi xảy ra - " + e.getMessage() + ", " + (e.getCause() != null ? e.getCause().getMessage() : ""));
             return Response.ok(resp).build();
         }
     }
@@ -126,7 +125,7 @@ public class DeliveryBillController extends BaseController {
             resp.setList(billModelList);
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Order - " + e.getMessage() + ", " + (e.getCause() != null ? e.getCause().getMessage() : ""));
+            resp.setErrorMessage("Lỗi xảy ra - " + e.getMessage() + ", " + (e.getCause() != null ? e.getCause().getMessage() : ""));
             return Response.ok(resp).build();
         }
     }
@@ -148,7 +147,7 @@ public class DeliveryBillController extends BaseController {
             resp.setSuccessMessage(String.format("DeliveryBill Added - New DeliveryBill ID : %s ", deliveryBill.getDeliveryBillId()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot add DeliveryBill - " + e.getMessage() + ", " + (e.getCause() != null ? e.getCause().getMessage() : ""));
+            resp.setErrorMessage("Lỗi xảy ra - " + e.getMessage() + ", " + (e.getCause() != null ? e.getCause().getMessage() : ""));
             return Response.ok(resp).build();
         }
     }
@@ -169,14 +168,14 @@ public class DeliveryBillController extends BaseController {
                 deliveryBillDao.beginTransaction();
                 deliveryBillDao.update(deliveryBill);
                 deliveryBillDao.commitTransaction();
-                resp.setSuccessMessage(String.format("DeliveryBill Updated (getDeliveryBillId:%s)", deliveryBill.getDeliveryBillId()));
+                resp.setSuccessMessage(String.format("Sửa bản ghi thành công (code:%s)", deliveryBill.getCode()));
                 return Response.ok(resp).build();
             } else {
-                resp.setErrorMessage(String.format("Cannot Update - DeliveryBill not found (getDeliveryBillId:%s)", deliveryBill.getDeliveryBillId()));
+                resp.setErrorMessage(String.format("Không thể sửa bản ghi (code:%s)", deliveryBill.getCode()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot update DeliveryBill - " + e.getMessage() + ", " + (e.getCause() != null ? e.getCause().getMessage() : ""));
+            resp.setErrorMessage("Lỗi xảy ra - " + e.getMessage() + ", " + (e.getCause() != null ? e.getCause().getMessage() : ""));
             return Response.ok(resp).build();
         }
     }
@@ -193,17 +192,17 @@ public class DeliveryBillController extends BaseController {
         try {
             DeliveryBillModel foundProd = deliveryBillDao.getById(deliveryBillId);
             if (foundProd == null) {
-                resp.setErrorMessage(String.format("Cannot delete DeliveryBill - Customer do not exist (id:%s)", deliveryBillId));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại: (id:%s)", deliveryBillId));
                 return Response.ok(resp).build();
             } else {
                 deliveryBillDao.beginTransaction();
                 deliveryBillDao.delete(deliveryBillId);
                 deliveryBillDao.commitTransaction();
-                resp.setSuccessMessage(String.format("DeliveryBill deleted (deliveryBillId:%s)", deliveryBillId));
+                resp.setSuccessMessage(String.format("Xóa bản ghi thành công (code:%s)", foundProd.getCode()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete DeliveryBill - " + e.getMessage() + ", " + (e.getCause() != null ? e.getCause().getMessage() : ""));
+            resp.setErrorMessage("Không thể xóa bản ghi - " + e.getMessage() + ", " + (e.getCause() != null ? e.getCause().getMessage() : ""));
             return Response.ok(resp).build();
         }
     }
@@ -270,7 +269,6 @@ public class DeliveryBillController extends BaseController {
         if (!CommonUtils.isNullOrEmpty(model.getCode())){
             criteria.add(Restrictions.eq("code", model.getCode()).ignoreCase());
         }
-        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
         criteria.setProjection(Projections.rowCount());
         Long rowCount = (Long)criteria.uniqueResult();
         return Response.ok(rowCount > 0).build();

@@ -134,7 +134,7 @@ export default defineComponent({
         } else {
           toast.add({
             severity: "error",
-            summary: "Error",
+            summary: "Lỗi xảy ra!",
             detail: resp.data.msg,
           });
         }

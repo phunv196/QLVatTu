@@ -102,12 +102,12 @@ export default defineComponent({
             const resp = await OrderApi.deleteOrder(rec.id as string);
             if (resp.data.msgType === 'SUCCESS') {
               getData(currentPage, pageSize.value);
-              toast.add({ severity: 'success', summary: 'Successfully Deleted', life: 3000 });
+              toast.add({ severity: 'success', summary: 'Xóa bản ghi thành công!', life: 3000 });
             } else {
-              toast.add({ severity: 'error', summary: 'Error', detail: resp.data.msg, life: 3000 });
+              toast.add({ severity: 'error', summary: 'Lỗi xảy ra!', detail: resp.data.msg, life: 3000 });
             }
           } catch (e) {
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to connect to server', life: 3000 });
+            toast.add({ severity: 'error', summary: 'Lỗi xảy ra!', detail: 'Vui lòng liên hệ quản trị viên!', life: 3000 });
           }
         },
         reject: () => {

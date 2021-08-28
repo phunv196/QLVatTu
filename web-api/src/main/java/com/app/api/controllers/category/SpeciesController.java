@@ -113,10 +113,10 @@ public class SpeciesController extends BaseController {
             speciesDao.beginTransaction();
             speciesDao.save(species);
             speciesDao.commitTransaction();
-            resp.setSuccessMessage(String.format("Species Added - New Species ID : %s ", species.getSpeciesId()));
+            resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công code: %s ", species.getCode()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot add Species - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể thêm mới bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -135,14 +135,14 @@ public class SpeciesController extends BaseController {
                 speciesDao.beginTransaction();
                 speciesDao.update(species);
                 speciesDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Species Updated (getSpeciesId:%s)", species.getSpeciesId()));
+                resp.setSuccessMessage(String.format("Sửa bản ghi thành công (code:%s)", species.getCode()));
                 return Response.ok(resp).build();
             } else {
-                resp.setErrorMessage(String.format("Cannot Update - Species not found (getSpeciesId:%s)", species.getSpeciesId()));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (code:%s)", species.getCode()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot update Species - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể sửa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -159,18 +159,17 @@ public class SpeciesController extends BaseController {
         try {
             SpeciesModel foundProd  = speciesDao.getById(speciesId);
             if (foundProd==null) {
-                resp.setErrorMessage(String.format("Cannot delete Species - Customer do not exist (id:%s)", speciesId));
+                resp.setErrorMessage(String.format("Không thể xóa bản ghi (id:%s)", speciesId));
                 return Response.ok(resp).build();
             } else {
                 speciesDao.beginTransaction();
                 speciesDao.delete(speciesId);
                 speciesDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Species deleted (speciesId:%s)", speciesId));
+                resp.setSuccessMessage(String.format("Xóa bản ghi thành công (code:%s)", foundProd.getCode()));
                 return Response.ok(resp).build();
             }
-//            }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Species - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể xóa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -192,7 +191,6 @@ public class SpeciesController extends BaseController {
         if (!CommonUtils.isNullOrEmpty(model.getCode())){
             criteria.add(Restrictions.eq("code", model.getCode()).ignoreCase());
         }
-        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
         criteria.setProjection(Projections.rowCount());
         Long rowCount = (Long)criteria.uniqueResult();
         return Response.ok(rowCount > 0).build();

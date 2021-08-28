@@ -128,7 +128,7 @@ export default defineComponent({
             showSlideOut.value = false;
             toast.add({
               severity: "success",
-              summary: "Success",
+              summary: "Thành công!",
               detail: "Đổi mật khẩu thành công!",
               life: 3000,
             });

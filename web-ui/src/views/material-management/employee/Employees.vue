@@ -313,8 +313,8 @@ export default defineComponent({
 
     const confirmDialog = (rec: Record<string, unknown>) => {
       confirm.require({
-        message: `Do you want to delete: ${rec.employeeId} ?`,
-        header: "Delete Confirmation",
+        message: `Bạn có muốn xóa bản ghi ${rec.code} không ?`,
+        header: "Xác nhận!",
         icon: "pi pi-question-circle",
         acceptIcon: "pi pi-check",
         accept: async () => {
@@ -326,13 +326,13 @@ export default defineComponent({
               getData(currentPage, pageSize.value);
               toast.add({
                 severity: "success",
-                summary: "Successfully Deleted",
+                summary: "Xóa bản ghi thành công!",
                 life: 3000,
               });
             } else {
               toast.add({
                 severity: "error",
-                summary: "Access Denied",
+                summary: "Quyền truy cập bị từ chối!",
                 detail: resp.data.msg,
                 life: 3000,
               });
@@ -340,8 +340,8 @@ export default defineComponent({
           } catch (e) {
             toast.add({
               severity: "error",
-              summary: "Error",
-              detail: "Unable to connect to server",
+              summary: "Lỗi xảy ra!",
+              detail: "Vui lòng liên hệ với quản trị viên!",
               life: 3000,
             });
           }

@@ -72,7 +72,7 @@
           field="content"
           header="Giá trị"
           headerStyle="max-width:200px; justify-content: center;"
-           bodyStyle="max-width:200px;"
+          bodyStyle="max-width:200px;"
         ></Column>
       </DataTable>
     </div>
@@ -120,21 +120,28 @@ export default defineComponent({
           if (res.data.msgType === "SUCCESS") {
             toast.add({
               severity: "success",
-              summary: "SUCCESS",
+              summary: "Thành công!",
               detail: res.data.msg,
               life: 3000,
             });
             emit("change");
             emit("cancel");
           } else {
-            if(res.data.msgType === "ERROR") {
+            if (res.data.msgType === "ERROR") {
               toast.add({
-              severity: "error",
-              summary: "ERROR",
-              detail: res.data.msg,
-              life: 3000,
-            });
+                severity: "error",
+                summary: "Lỗi xảy ra!",
+                detail: res.data.msg,
+                life: 3000,
+              });
             } else {
+              toast.add({
+                severity: "error",
+                summary: "Import thất bại",
+                detail:
+                  "Dữ liệu import bị lỗi. Vui lòng sửa file và import lại!",
+                life: 3000,
+              });
               showError.value = true;
               let i = 1;
               list.value = res.data.map((v: Record<string, unknown>) => {
@@ -151,7 +158,7 @@ export default defineComponent({
       } else {
         toast.add({
           severity: "error",
-          summary: "ERROR",
+          summary: "Lỗi xảy ra!",
           detail: "Vui lòng chọn file!",
           life: 3000,
         });
@@ -160,9 +167,9 @@ export default defineComponent({
 
     const downloadTemplate = () => {
       usersApi.downloadTemplate().then((res) => {
-          const data = res.data.data;
-          exportFile(data.data, data.fileName);
-        });
+        const data = res.data.data;
+        exportFile(data.data, data.fileName);
+      });
     };
 
     return {

@@ -61,7 +61,6 @@ public class SuppliesController extends BaseController {
             @Parameter(description="Supplies Id", example="601") @PathParam("suppliesId") Long suppliesId
     ) {
         SuppliesModel model = suppliesDao.getById(suppliesId);
-        //model.setSuccessMessage("List of species");
         return Response.ok(model).build();
     }
 
@@ -86,41 +85,36 @@ public class SuppliesController extends BaseController {
     ) {
 
         SuppliesModel.SuppliesResponse resp = new SuppliesModel.SuppliesResponse();
-        try {
-            if (suppliesId == null) {
-                suppliesId = 0l;
-            }
-            if (searchSupplier == null) {
-                searchSupplier = 0l;
-            }
-            if (searchSpecies == null) {
-                searchSpecies = 0l;
-            }
-            if (searchQuality == null) {
-                searchQuality = 0l;
-            }
-            if (searchFormPrice == null) {
-                searchFormPrice = 0l;
-            }
-            if (searchToPrice == null) {
-                searchToPrice = 0l;
-            }
-            if (searchUnit == null) {
-                searchUnit = 0l;
-            }
-            List<SuppliesModel> modelList = suppliesDao.getList(page, pageSize, suppliesId, searchCode, searchName,
-                    searchSupplier, searchSpecies, searchFormPrice, searchToPrice, searchQuality, searchUnit);
-            BigInteger total = suppliesDao.getSuppliesCount(suppliesId, searchCode, searchName, searchSupplier, searchSpecies,
-                    searchFormPrice, searchToPrice, searchQuality, searchUnit);
-            resp.setList(modelList);
-            resp.setTotal(total.intValue());
-            resp.setPageStats(total.intValue(),pageSize, page,"");
-            resp.setSuccessMessage("List of Supplies and nested details " + (suppliesId>0 ? "- Customer:"+suppliesId:""));
-            return Response.ok(resp).build();
-        } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Supplies - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
-            return Response.ok(resp).build();
+        if (suppliesId == null) {
+            suppliesId = 0l;
         }
+        if (searchSupplier == null) {
+            searchSupplier = 0l;
+        }
+        if (searchSpecies == null) {
+            searchSpecies = 0l;
+        }
+        if (searchQuality == null) {
+            searchQuality = 0l;
+        }
+        if (searchFormPrice == null) {
+            searchFormPrice = 0l;
+        }
+        if (searchToPrice == null) {
+            searchToPrice = 0l;
+        }
+        if (searchUnit == null) {
+            searchUnit = 0l;
+        }
+        List<SuppliesModel> modelList = suppliesDao.getList(page, pageSize, suppliesId, searchCode, searchName,
+                searchSupplier, searchSpecies, searchFormPrice, searchToPrice, searchQuality, searchUnit);
+        BigInteger total = suppliesDao.getSuppliesCount(suppliesId, searchCode, searchName, searchSupplier, searchSpecies,
+                searchFormPrice, searchToPrice, searchQuality, searchUnit);
+        resp.setList(modelList);
+        resp.setTotal(total.intValue());
+        resp.setPageStats(total.intValue(),pageSize, page,"");
+        resp.setSuccessMessage("List of Supplies and nested details " + (suppliesId>0 ? "- Customer:"+suppliesId:""));
+        return Response.ok(resp).build();
     }
 
     @GET
@@ -133,10 +127,7 @@ public class SuppliesController extends BaseController {
     public Response getAll(
 
     ) {
-        int recordFrom = 0;
         Criteria criteria = suppliesDao.createCriteria(SuppliesModel.class);
-
-        // Execute the Main Query
         criteria.setProjection(null);
         List<SuppliesModel> suppliesList = criteria.list();
         SuppliesResponse resp = new SuppliesResponse();
@@ -157,10 +148,10 @@ public class SuppliesController extends BaseController {
             suppliesDao.beginTransaction();
             suppliesDao.save(supplies);
             suppliesDao.commitTransaction();
-            resp.setSuccessMessage(String.format("Supplies Added - New Supplies ID : %s ", supplies.getSuppliesId()));
+            resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công code: %s ", supplies.getCode()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot add Supplies - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể thêm mới bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -179,14 +170,14 @@ public class SuppliesController extends BaseController {
                 suppliesDao.beginTransaction();
                 suppliesDao.update(supplies);
                 suppliesDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Supplies Updated (getSuppliesId:%s)", supplies.getSuppliesId()));
+                resp.setSuccessMessage(String.format("Sửa bản ghi thành công (code:%s)", supplies.getCode()));
                 return Response.ok(resp).build();
             } else {
-                resp.setErrorMessage(String.format("Cannot Update - Supplies not found (getSuppliesId:%s)", supplies.getSuppliesId()));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (code:%s)", supplies.getCode()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot update Supplies - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể sửa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -203,17 +194,17 @@ public class SuppliesController extends BaseController {
         try {
             SuppliesModel foundProd  = suppliesDao.getById(suppliesId);
             if (foundProd==null) {
-                resp.setErrorMessage(String.format("Cannot delete Supplies - Customer do not exist (id:%s)", suppliesId));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (id:%s)", suppliesId));
                 return Response.ok(resp).build();
             } else {
                 suppliesDao.beginTransaction();
                 suppliesDao.delete(suppliesId);
                 suppliesDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Supplies deleted (suppliesId:%s)", suppliesId));
+                resp.setSuccessMessage(String.format("Xóa bản ghi thành công (code:%s)", foundProd.getCode()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Supplies - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể xóa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -227,7 +218,6 @@ public class SuppliesController extends BaseController {
     public Response getByCode(
             SuppliesModel supplies
     ) {
-        int recordFrom = 0;
         Criteria criteria = suppliesDao.createCriteria(SuppliesModel.class);
         if (supplies.getSuppliesId() != null){
             criteria.add(Restrictions.ne("suppliesId", supplies.getSuppliesId()));
@@ -235,7 +225,6 @@ public class SuppliesController extends BaseController {
         if (!CommonUtils.isNullOrEmpty(supplies.getCode())){
             criteria.add(Restrictions.eq("code", supplies.getCode()).ignoreCase());
         }
-        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
         criteria.setProjection(Projections.rowCount());
         Long rowCount = (Long)criteria.uniqueResult();
         return Response.ok(rowCount > 0).build();

@@ -131,10 +131,10 @@ public class DepartmentController extends BaseController {
             departmentDao.beginTransaction();
             departmentDao.save(dep);
             departmentDao.commitTransaction();
-            resp.setSuccessMessage(String.format("Department Added - New Department ID : %s ", dep.getDepartmentId()));
+            resp.setSuccessMessage(String.format("Thêm mới bản chi thành công code: %s ", dep.getCode()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot add Department - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể thêm mới bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -153,14 +153,14 @@ public class DepartmentController extends BaseController {
                 departmentDao.beginTransaction();
                 departmentDao.update(dep);
                 departmentDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Department Updated (getDepartmentId:%s)", dep.getDepartmentId()));
+                resp.setSuccessMessage(String.format("Sửa bản ghi thành công (code:%s)", dep.getCode()));
                 return Response.ok(resp).build();
             } else {
-                resp.setErrorMessage(String.format("Cannot Update - Department not found (getDepartmentId:%s)", dep.getDepartmentId()));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (coe:%s)", dep.getCode()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot update Department - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể sửa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -177,18 +177,18 @@ public class DepartmentController extends BaseController {
         try {
             DepartmentModel foundProd  = departmentDao.getById(departmentId);
             if (foundProd==null) {
-                resp.setErrorMessage(String.format("Cannot delete Department - Customer do not exist (id:%s)", departmentId));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (id:%s)", departmentId));
                 return Response.ok(resp).build();
             } else {
                 departmentDao.beginTransaction();
                 departmentDao.delete(departmentId);
                 departmentDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Department deleted (id:%s)", departmentId));
+                resp.setSuccessMessage(String.format("xóa bản ghi thành công (code:%s)", foundProd.getCode()));
                 return Response.ok(resp).build();
             }
 //            }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Department - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể xóa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -210,7 +210,6 @@ public class DepartmentController extends BaseController {
         if (!CommonUtils.isNullOrEmpty(model.getCode())){
             criteria.add(Restrictions.eq("code", model.getCode()).ignoreCase());
         }
-        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
         criteria.setProjection(Projections.rowCount());
         Long rowCount = (Long)criteria.uniqueResult();
         return Response.ok(rowCount > 0).build();

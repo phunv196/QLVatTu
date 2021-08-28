@@ -322,8 +322,8 @@ export default defineComponent({
 
     const confirmDialog = (rec: Record<string, unknown>) => {
       confirm.require({
-        message: `Do you want to delete: ${rec.loginName} ?`,
-        header: "Delete Confirmation",
+        message: `Bạn có chắc muốn xóa user: ${rec.loginName} ?`,
+        header: "Xác nhận!",
         icon: "pi pi-question-circle",
         acceptIcon: "pi pi-check",
         accept: async () => {
@@ -347,8 +347,8 @@ export default defineComponent({
           } catch (e) {
             toast.add({
               severity: "error",
-              summary: "Error",
-              detail: "Lỗi xảy ra vui lòng liên hệ với quản trị viên!!",
+              summary: "Lỗi xảy ra!",
+              detail: "Vui lòng liên hệ với quản trị viên!",
               life: 3000,
             });
           }
@@ -395,8 +395,8 @@ export default defineComponent({
           } catch (e) {
             toast.add({
               severity: "error",
-              summary: "Error",
-              detail: "Lỗi xảy ra vui lòng liên hệ với quản trị viên!!",
+              summary: "Lỗi xảy ra!",
+              detail: "Vui lòng liên hệ với quản trị viên!",
               life: 3000,
             });
           }

@@ -43,21 +43,16 @@ public class ReceiptFlowController extends BaseController {
             @Parameter(description="Items in each page", example="5") @DefaultValue("5") @QueryParam("page-size") int pageSize
     ) {
         ReceiptFlowResponse resp = new ReceiptFlowResponse();
-        try {
-            if (receiptId == null) {
-                receiptId = 0l;
-            }
-            List<ReceiptFlowModel> modelList = receiptFlowDao.getList(page, pageSize, receiptId);
-            BigInteger total = receiptFlowDao.getReceiptFlowCount(receiptId);
-            resp.setList(modelList);
-            resp.setTotal(total.intValue());
-            resp.setPageStats(total.intValue(),pageSize, page,"");
-            resp.setSuccessMessage("List of DeliveryBillFlowModel and nested details " + (receiptId>0 ? "- Customer:"+receiptId:""));
-            return Response.ok(resp).build();
-        } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Order - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
-            return Response.ok(resp).build();
+        if (receiptId == null) {
+            receiptId = 0l;
         }
+        List<ReceiptFlowModel> modelList = receiptFlowDao.getList(page, pageSize, receiptId);
+        BigInteger total = receiptFlowDao.getReceiptFlowCount(receiptId);
+        resp.setList(modelList);
+        resp.setTotal(total.intValue());
+        resp.setPageStats(total.intValue(),pageSize, page,"");
+        resp.setSuccessMessage("List of DeliveryBillFlowModel and nested details " + (receiptId>0 ? "- Customer:"+receiptId:""));
+        return Response.ok(resp).build();
     }
 
     @POST
@@ -72,10 +67,10 @@ public class ReceiptFlowController extends BaseController {
             receiptFlowDao.beginTransaction();
             receiptFlowDao.save(receiptFlow);
             receiptFlowDao.commitTransaction();
-            resp.setSuccessMessage(String.format("ReceiptFlow Added - New ReceiptFlow ID : %s ", receiptFlow.getReceiptFlowId()));
+            resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công id: %s ", receiptFlow.getReceiptFlowId()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot add ReceiptFlow - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể thêm mới bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -94,14 +89,14 @@ public class ReceiptFlowController extends BaseController {
                 receiptFlowDao.beginTransaction();
                 receiptFlowDao.update(receiptFlow);
                 receiptFlowDao.commitTransaction();
-                resp.setSuccessMessage(String.format("ReceiptFlow Updated (getReceiptFlowId:%s)", receiptFlow.getReceiptFlowId()));
+                resp.setSuccessMessage(String.format("Sửa bản ghi thành công (id:%s)", receiptFlow.getReceiptFlowId()));
                 return Response.ok(resp).build();
             } else {
-                resp.setErrorMessage(String.format("Cannot Update - ReceiptFlow not found (getReceiptFlowId:%s)", receiptFlow.getReceiptFlowId()));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (id:%s)", receiptFlow.getReceiptFlowId()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot update ReceiptFlow - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể sửa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -118,18 +113,18 @@ public class ReceiptFlowController extends BaseController {
         try {
             ReceiptFlowModel foundProd  = receiptFlowDao.getById(receiptFlowId);
             if (foundProd==null) {
-                resp.setErrorMessage(String.format("Cannot delete ReceiptFlow - Customer do not exist (id:%s)", receiptFlowId));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (id:%s)", receiptFlowId));
                 return Response.ok(resp).build();
             } else {
                 receiptFlowDao.beginTransaction();
                 receiptFlowDao.delete(receiptFlowId);
                 receiptFlowDao.commitTransaction();
-                resp.setSuccessMessage(String.format("ReceiptFlow deleted (receiptFlowId:%s)", receiptFlowId));
+                resp.setSuccessMessage(String.format("Xóa bản ghi thành công (id:%s)", receiptFlowId));
                 return Response.ok(resp).build();
             }
 //            }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete ReceiptFlow - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể xóa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }

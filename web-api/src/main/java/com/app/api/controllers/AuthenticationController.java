@@ -51,8 +51,6 @@ public class AuthenticationController extends BaseController {
             resp.setTypeAndMessage(BaseResponse.MessageTypeEnum.AUTH_FAILED, "Missing Username or Password");
             return Response.status(Response.Status.UNAUTHORIZED).entity(resp).build();
         }
-
-
         String hql = "FROM UserModel u WHERE u.loginName = :uid";
         Query q = dao.createQuery(hql);
         q.setParameter("uid", uid);

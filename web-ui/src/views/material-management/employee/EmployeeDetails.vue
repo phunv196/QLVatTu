@@ -178,12 +178,6 @@ export default defineComponent({
       const rawEmpObj = JSON.parse(JSON.stringify(recData.value));
       delete rawEmpObj.index;
       delete rawEmpObj.strBitrh;
-      // rawEmpObj.id = rawEmpObj.employeeId || "";
-      // delete rawEmpObj.employeeId;
-      // delete rawEmpObj.loginName;
-      // delete rawEmpObj.password;
-      // delete rawEmpObj.role;
-      // delete rawEmpObj.fullName;
       let msg: any[];
       msg = [];
       if (!rawEmpObj.code) {
@@ -230,12 +224,12 @@ export default defineComponent({
           if (resp.data.msgType === "SUCCESS") {
             toast.add({
               severity: "success",
-              summary: rawEmpObj.employeeId ? "Employee Updated" : "Employee Added",
+              summary: rawEmpObj.employeeId ? "Sửa thành công!" : "Thêm mới thành công",
               detail: `${rawEmpObj.firstName} ${rawEmpObj.lastName}`,
               life: 3000,
             });
             if (!rawEmpObj.employeeId) {
-              recData.value.employeeemployeeId = "CREATED";
+              recData.value.employeeId = "Tạo mới";
             }
             changesApplied.value = true;
             emit("changed");
@@ -245,7 +239,7 @@ export default defineComponent({
           } else {
             toast.add({
               severity: "error",
-              summary: "Error updating Employee",
+              summary: "Lỗi xảy ra!",
               detail: resp.data.msg,
             });
           }

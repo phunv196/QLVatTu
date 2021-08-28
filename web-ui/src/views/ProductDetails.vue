@@ -90,14 +90,14 @@ export default defineComponent({
         resp = await ProductApi.addProduct(rawProductObj);
       }
       if (resp.data.msgType === 'SUCCESS') {
-        toast.add({ severity: 'success', summary: rawProductObj.id ? 'Product Updated' : 'Product Added', detail: `${rawProductObj.productName} (${rawProductObj.productCode})`, life: 3000 });
+        toast.add({ severity: 'success', summary: rawProductObj.id ? 'Thêm mới thành công!' : 'Thêm mới thành công!', detail: `${rawProductObj.productName} (${rawProductObj.productCode})`, life: 3000 });
         if (!rawProductObj.id) {
           recData.value.id = 'CREATED';
         }
         changesApplied.value = true;
         emit('changed');
       } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: resp.data.msg });
+        toast.add({ severity: 'error', summary: 'Lỗi xảy ra!', detail: resp.data.msg });
       }
     };
 

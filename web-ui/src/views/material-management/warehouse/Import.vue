@@ -80,7 +80,7 @@
 </template>
 
 <script lang='ts'>
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, ref } from "vue";
 import { useToast } from "primevue/usetoast";
 import { exportFile } from "@/shared/utils";
 import warehouseApi from "@/api/material-management/warehouse-api";
@@ -120,13 +120,19 @@ export default defineComponent({
           if (res.data.msgType === "SUCCESS") {
             toast.add({
               severity: "success",
-              summary: "SUCCESS",
+              summary: "Thành công!",
               detail: res.data.msg,
               life: 3000,
             });
             emit("change");
             emit("cancel");
           } else {
+            toast.add({
+              severity: "error",
+              summary: 'Import thất bại',
+              detail: 'Dữ liệu import bị lỗi. Vui lòng sửa file và import lại!',
+              life: 3000,
+            });
             showError.value = true;
             let i = 1;
             list.value = res.data.map((v: Record<string, unknown>) => {
@@ -142,7 +148,7 @@ export default defineComponent({
       } else {
         toast.add({
           severity: "error",
-          summary: "ERROR",
+          summary: "Lỗi xảy ra!",
           detail: "Vui lòng chọn file!",
           life: 3000,
         });

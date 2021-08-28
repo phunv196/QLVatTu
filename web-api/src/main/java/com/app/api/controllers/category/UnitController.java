@@ -61,17 +61,12 @@ public class UnitController extends BaseController {
         if (page<=0){ page = 1; }
         if (pageSize <= 0 || pageSize > 1000){ pageSize = 20; }
         recordFrom = (page-1) * pageSize;
-
-        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
         criteria.setProjection(Projections.rowCount());
         Long rowCount = (Long)criteria.uniqueResult();
-
-        // Execute the Main Query
         criteria.setProjection(null);
         criteria.setFirstResult( (int) (long)recordFrom);
         criteria.setMaxResults(  (int) (long)pageSize);
         List<UnitModel> unitList = criteria.list();
-
         UnitResponse resp = new UnitResponse();
         resp.setList(unitList);
         resp.setPageStats(rowCount.intValue(), pageSize, page,"");
@@ -110,10 +105,10 @@ public class UnitController extends BaseController {
             unitDao.beginTransaction();
             unitDao.save(unit);
             unitDao.commitTransaction();
-            resp.setSuccessMessage(String.format("Unit Added - New Unit ID : %s ", unit.getUnitId()));
+            resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công code: %s ", unit.getCode()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot add Unit - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể thêm mới bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -132,14 +127,14 @@ public class UnitController extends BaseController {
                 unitDao.beginTransaction();
                 unitDao.update(unit);
                 unitDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Unit Updated (getUnitId:%s)", unit.getUnitId()));
+                resp.setSuccessMessage(String.format("Sửa bả ghi thành công (code:%s)", unit.getCode()));
                 return Response.ok(resp).build();
             } else {
-                resp.setErrorMessage(String.format("Cannot Update - Unit not found (getUnitId:%s)", unit.getUnitId()));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (code:%s)", unit.getCode()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot update Unit - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể sửa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -156,17 +151,17 @@ public class UnitController extends BaseController {
         try {
             UnitModel foundProd  = unitDao.getById(unitId);
             if (foundProd==null) {
-                resp.setErrorMessage(String.format("Cannot delete Unit - Customer do not exist (id:%s)", unitId));
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (id:%s)", unitId));
                 return Response.ok(resp).build();
             } else {
                 unitDao.beginTransaction();
                 unitDao.delete(unitId);
                 unitDao.commitTransaction();
-                resp.setSuccessMessage(String.format("Unit deleted (id:%s)", unitId));
+                resp.setSuccessMessage(String.format("Xóa bản ghi thành công (code:%s)", foundProd.getCode()));
                 return Response.ok(resp).build();
             }
         } catch (HibernateException | ConstraintViolationException e) {
-            resp.setErrorMessage("Cannot delete Unit - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
+            resp.setErrorMessage("Không thể xóa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
@@ -180,7 +175,6 @@ public class UnitController extends BaseController {
     public Response getByCode(
             UnitModel model
     ) {
-        int recordFrom = 0;
         Criteria criteria = unitDao.createCriteria(UnitModel.class);
         if (model.getUnitId() != null){
             criteria.add(Restrictions.ne("unitId", model.getUnitId()));
@@ -188,7 +182,6 @@ public class UnitController extends BaseController {
         if (!CommonUtils.isNullOrEmpty(model.getCode())){
             criteria.add(Restrictions.eq("code", model.getCode()).ignoreCase());
         }
-        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
         criteria.setProjection(Projections.rowCount());
         Long rowCount = (Long)criteria.uniqueResult();
         return Response.ok(rowCount > 0).build();
