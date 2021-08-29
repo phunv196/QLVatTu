@@ -1,19 +1,17 @@
 package com.app.api.controllers.category;
 
 import com.app.api.BaseController;
+import com.app.dao.EmployeeDao;
 import com.app.dao.base.CommonUtils;
 import com.app.dao.base.converter.DynamicExport;
-import com.app.dao.category.WarehouseCardDao;
-import com.app.dao.category.WarehouseCardFlowDao;
+import com.app.dao.category.*;
 import com.app.model.BaseResponse;
 import com.app.model.ExportModel;
-import com.app.model.category.ReceiptModel;
-import com.app.model.category.WarehouseCardModel;
+import com.app.model.category.*;
 import com.app.model.category.WarehouseCardModel.WarehouseCardResponse;
 import com.app.model.employee.EmployeeModel;
 import com.app.model.user.UserModel;
 import com.app.util.TemplateResouces;
-import com.app.util.TokenUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -21,29 +19,26 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.apache.catalina.User;
 import org.apache.commons.io.FileUtils;
+import org.apache.poi.sl.usermodel.VerticalAlignment;
+import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
+import org.apache.poi.xwpf.usermodel.*;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
-import java.io.File;
+import java.io.*;
 import java.math.BigInteger;
-import java.security.Principal;
 import java.text.SimpleDateFormat;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
-import static com.app.util.Constants.COMMON.FOLDER_EXPORT;
-import static com.app.util.Constants.COMMON.TEMPLATE_EXPORT_EXCELL;
+import static com.app.util.Constants.COMMON.*;
+import static com.app.util.Constants.COMMON.FOLDER_EXPORT_DOCX;
 
 @Path("warehouse_cards")
 @Tag(name = "WarehouseCards")
@@ -52,6 +47,10 @@ import static com.app.util.Constants.COMMON.TEMPLATE_EXPORT_EXCELL;
 public class WarehouseCardController extends BaseController {
     WarehouseCardDao warehouseCardDao = new WarehouseCardDao();
     WarehouseCardFlowDao warehouseCardFlowDao = new WarehouseCardFlowDao();
+    SuppliesDao suppliesDao = new SuppliesDao();
+    DepartmentDao departmentDao = new DepartmentDao();
+    EmployeeDao employeeDao = new EmployeeDao();
+    UnitDao unitDao = new UnitDao();
 
     @GET
     @RolesAllowed({"ADMIN", "SUPPORT"})
@@ -293,6 +292,107 @@ public class WarehouseCardController extends BaseController {
         String[] fileNameNew = filePath.split("/");
         ExportModel exportModel = new ExportModel();
         exportModel.setFileName(fileNameNew[fileNameNew.length - 1]);
+        exportModel.setData(encodedString);
+        resp.setData(exportModel);
+        return Response.ok(resp).build();
+    }
+
+    @GET
+    @Path("downloadFileDocx/{warehouseCardId}")
+    @RolesAllowed({"ADMIN", "SUPPORT"})
+    @Operation(
+            summary = "Delete a deliveryBill",
+            responses = {@ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response downloadFileDocx(@Parameter(description = "DeliveryBill Id", example = "601") @PathParam("warehouseCardId") Long warehouseCardId) throws IOException {
+        ExportModel.ExportResponse resp = new ExportModel.ExportResponse();
+        //lay ra user dang dang nhap -> employeeId -> department
+        UserModel userFromToken = (UserModel)securityContext.getUserPrincipal();
+        EmployeeModel employeeModel = employeeDao.getById(Long.valueOf(userFromToken.getEmployeeId()));
+        DepartmentModel departmentModel = departmentDao.getById(employeeModel.getDepartmentId());
+
+        WarehouseCardModel warehouseCardModel = warehouseCardDao.getById(warehouseCardId);
+        SuppliesModel suppliesModel = suppliesDao.getById(warehouseCardModel.getSuppliesId());
+        UnitModel unitModel = unitDao.getById(suppliesModel.getUnitId());
+        List<WarehouseCardFlowModel> models = warehouseCardFlowDao.getByWarehouseCardId(warehouseCardId);
+        Date date = new Date();
+        String strDate = CommonUtils.convertDateToString(date);
+        String[] arrDate = strDate.split("/");
+        File fileDocx = new File(TEMPLATE_EXPORT_DOCX + "BM_The_Kho.docx");
+        String prefixOutPutFile = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "_";
+
+        Map<String, String> map = new HashMap<>();
+        map.put("departmentName", departmentModel == null ? " " : departmentModel.getName());
+        map.put("departmentAddress", departmentModel == null ? " " : departmentModel.getAddress());
+        map.put("day", arrDate[0]);
+        map.put("month", arrDate[1]);
+        map.put("year", arrDate[2]);
+        map.put("strDate", CommonUtils.convertDateToString(warehouseCardModel.getDateCreated()));
+        map.put("supplies", suppliesModel.getCode() + " - " + suppliesModel.getName());
+        map.put("unitName", unitModel == null ? " " : unitModel.getName());
+        map.put("warehouseCardCode", warehouseCardModel.getCode());
+
+        try (InputStream is = new FileInputStream(fileDocx);
+             XWPFDocument doc = new XWPFDocument(is)) {
+            Iterator<IBodyElement> docElementsIterator = doc.getBodyElementsIterator();
+            List<XWPFParagraph> xwpfParagraphList = doc.getParagraphs();
+            for (XWPFParagraph xwpfParagraph : xwpfParagraphList) {
+                CommonUtils.replaceParagraph(xwpfParagraph, map);
+                IBodyElement docElement = docElementsIterator.next();
+                if ("TABLE".equalsIgnoreCase(docElement.getElementType().name())) {
+                    //Get List of table and iterate it
+                    List<XWPFTable> xwpfTableList = docElement.getBody().getTables();
+                    for (XWPFTable xwpfTable : xwpfTableList) {
+                        int index = 1;
+                        int row = 2;
+                        Long sumReceipt = 0L;
+                        Long sumDeliveryBill = 0L;
+                        Long inventory = 0L;
+                        for (int i = 0; i < models.size(); i++) {
+                            WarehouseCardFlowModel model = models.get(i);
+                            int col = 0;
+                            xwpfTable.createRow();
+                            xwpfTable.getRow(row).getCell(col++).setText(String.valueOf(index++));
+                            xwpfTable.getRow(row).getCell(col++).setText(CommonUtils.convertDateToString(model.getCreateAt()));
+                            xwpfTable.getRow(row).getCell(col++).setText(model.getReceiptCode());
+                            xwpfTable.getRow(row).addNewTableCell();
+                            xwpfTable.getRow(row).getCell(col++).setText(model.getDeliveryBillCode());
+                            xwpfTable.getRow(row).getCell(col++).setText(model.getDescription());
+                            xwpfTable.getRow(row).getCell(col++).setText(CommonUtils.convertDateToString(model.getDate()));
+                            xwpfTable.getRow(row).getCell(col++).setText( model.getReceiptId() != null ? String.valueOf(model.getAmount()) : "");
+                            xwpfTable.getRow(row).addNewTableCell();
+                            xwpfTable.getRow(row).getCell(col++).setText( model.getDeliveryBillId() != null ? String.valueOf(model.getAmount()) : "");
+                            xwpfTable.getRow(row).addNewTableCell();
+                            if (model.getReceiptId() != null) {
+                                inventory += model.getAmount();
+                                sumReceipt += model.getAmount();
+                            } else {
+                                inventory -= model.getAmount();
+                                sumDeliveryBill += model.getAmount();
+                            }
+                            xwpfTable.getRow(row).getCell(col++).setText(String.valueOf(inventory));
+                            row++;
+                        }
+                        xwpfTable.createRow();
+                        xwpfTable.getRow(row).getCell(1).setText("Tổng cộng:");
+                        xwpfTable.getRow(row).addNewTableCell();
+                        xwpfTable.getRow(row).addNewTableCell();
+                        xwpfTable.getRow(row).addNewTableCell();
+                        xwpfTable.getRow(row).getCell(6).setText(String.valueOf(sumReceipt));
+                        xwpfTable.getRow(row).getCell(7).setText(String.valueOf(sumDeliveryBill));
+                        xwpfTable.getRow(row).getCell(8).setText(String.valueOf(sumReceipt - sumDeliveryBill));
+                    }
+                }
+            }
+            try (FileOutputStream out = new FileOutputStream(FOLDER_EXPORT_DOCX + prefixOutPutFile + "The_Kho.docx")) {
+                doc.write(out);
+            }
+        }
+        File file = new File(FOLDER_EXPORT_DOCX + prefixOutPutFile + "The_Kho.docx");
+        byte[] fileContent = FileUtils.readFileToByteArray(file);
+        String encodedString = Base64.getEncoder().encodeToString(fileContent);
+        ExportModel exportModel = new ExportModel();
+        exportModel.setFileName(prefixOutPutFile + "The_Kho.docx");
         exportModel.setData(encodedString);
         resp.setData(exportModel);
         return Response.ok(resp).build();

@@ -6,7 +6,7 @@ export default {
     { id: '2', label: 'My Cart', icon: 'shopping-cart', to: '/home/my-cart' },
   ],
   SUPPORT: [
-    { id: '0', label: 'Dashboard', icon: 'bar-chart', to: '/home/manage/dashboard' },
+    { label: 'Trang chủ', icon:'pi pi-fw pi-home', to: '/home/manage/dashboard' },
     {
       id: '2',
       label:'Quản lý danh mục',
@@ -103,7 +103,7 @@ export default {
     },
   ],
   ADMIN: [
-    { id: '0', label: 'Dashboard', icon: 'bar-chart', to: '/home/manage/dashboard' },
+    { label: 'Trang chủ', icon:'pi pi-fw pi-home', to: '/home/manage/dashboard' },
     {
       id: '2',
       label:'Quản lý danh mục',

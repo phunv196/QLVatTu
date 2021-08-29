@@ -205,23 +205,23 @@
         headerStyle="width:100px"
       ></Column>
       <Column
-        field="countDeliveryBill"
-        header="Số phiếu xuất"
-        headerStyle="width:90px"
-      ></Column>
-      <Column
         field="countReceipt"
         header="Số phiếu nhập"
         headerStyle="width:90px"
       ></Column>
       <Column
-        field="amountDeliveryBill"
-        header="Số lượng xuất"
+        field="countDeliveryBill"
+        header="Số phiếu xuất"
         headerStyle="width:90px"
       ></Column>
       <Column
         field="amountReceipt"
         header="Số lượng nhập"
+        headerStyle="width:90px"
+      ></Column>
+      <Column
+        field="amountDeliveryBill"
+        header="Số lượng xuất"
         headerStyle="width:90px"
       ></Column>
       <Column
@@ -234,14 +234,17 @@
           <Button
             icon="pi pi-pencil"
             @click="onEditClick(slotProps.data)"
-            class="
-              p-button-sm p-button-rounded p-button-secondary p-button-text
-            "
+            class="p-button-sm p-button-rounded p-button-secondary p-button-text"
           />
           <Button
             icon="pi pi-trash"
             @click="onDeleteClick(slotProps.data)"
             class="p-button-sm p-button-rounded p-button-danger p-button-text"
+          />
+          <Button
+            icon="pi pi-book"
+            @click="onDownloadFileDocx(slotProps.data)"
+            class="p-button-sm p-button-rounded p-button-info p-button-text"
           />
         </template>
       </Column>
@@ -259,7 +262,7 @@ import { useToast } from "primevue/usetoast";
 import SuppliesApi from "@/api/material-management/supplies-api";
 import WarehouseApi from "@/api/material-management/warehouse-api";
 import EmployeeApi from "@/api/employee-api";
-import { debounce, exportFile } from "@/shared/utils";
+import { debounce, exportFile, exportFileDocx } from "@/shared/utils";
 export default defineComponent({
   setup(): unknown {
     const isLoading = ref(false);
@@ -517,6 +520,13 @@ export default defineComponent({
       supplies.value = lstSuppliess;
     };
 
+    const onDownloadFileDocx = async (rec: Record<string, unknown>) => {
+      WarehouseCardApi.downloadFileDocx(rec.warehouseCardId).then((res) => {
+        const data = res.data.data;
+        exportFileDocx(data.data, data.fileName);
+      });
+    };
+
     return {
       list,
       arrWarehouse,
@@ -545,7 +555,8 @@ export default defineComponent({
       searchToDate,
       searchSupplies,
       onSearchKeyup,
-      exportExcell
+      exportExcell,
+      onDownloadFileDocx
     };
   },
   components: {

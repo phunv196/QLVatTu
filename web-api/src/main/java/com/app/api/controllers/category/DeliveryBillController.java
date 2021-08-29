@@ -327,7 +327,7 @@ public class DeliveryBillController extends BaseController {
         return Response.ok(resp).build();
     }
 
-    @DELETE
+    @GET
     @Path("downloadFileDocx/{deliveryBillId}")
     @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
@@ -365,7 +365,6 @@ public class DeliveryBillController extends BaseController {
                     //Get List of table and iterate it
                     List<XWPFTable> xwpfTableList = docElement.getBody().getTables();
                     for (XWPFTable xwpfTable : xwpfTableList) {
-                        System.out.println("Total Rows : " + xwpfTable.getNumberOfRows());
                         int index = 1;
                         int row = 1;
                         Long sum = 0L;
@@ -396,7 +395,7 @@ public class DeliveryBillController extends BaseController {
         byte[] fileContent = FileUtils.readFileToByteArray(file);
         String encodedString = Base64.getEncoder().encodeToString(fileContent);
         ExportModel exportModel = new ExportModel();
-        exportModel.setFileName(prefixOutPutFile + "test2.docx");
+        exportModel.setFileName(prefixOutPutFile + "Phieu_Xuat_Kho.docx");
         exportModel.setData(encodedString);
         resp.setData(exportModel);
         return Response.ok(resp).build();

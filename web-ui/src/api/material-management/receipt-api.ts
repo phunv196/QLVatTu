@@ -104,4 +104,8 @@ export default {
   async getReceiptByCode(receiptObj: Record<string, string | number>): Promise<AxiosResponse> {
     return api.post('/receipts/byCode', receiptObj);
   },
+
+  async downloadFileDocx(deliveryBillId: any): Promise<AxiosResponse> {
+    return api.get(`/receipts/downloadFileDocx/${deliveryBillId}`);
+  },
 };

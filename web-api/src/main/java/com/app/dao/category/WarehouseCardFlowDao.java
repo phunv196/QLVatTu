@@ -87,4 +87,35 @@ public class WarehouseCardFlowDao extends BaseHibernateDAO {
         setResultTransformer(q, WarehouseCardFlowModel.class);
         return q.list();
     }
+
+    public List<WarehouseCardFlowModel> getByWarehouseCardId(Long warehouseCardId) {
+        String finalSql = "select" +
+                " wcf.warehouse_card_flow_id warehouseCardFlowId," +
+                " wcf.type type," +
+                " wcf.amount amount," +
+                " wcf.warehouse_card_id warehouseCardId," +
+                " wcf.description description," +
+                " db.delivery_bill_id deliveryBillId," +
+                " db.code deliveryBillCode," +
+                " r.receipt_id receiptId," +
+                " r.code receiptCode," +
+                " (IF( ISNULL(db.delivery_bill_id ) , " +
+                " (concat(emp.first_name, ' ' , emp.last_name))," +
+                " (concat(e.first_name, ' ' , e.last_name)) )) employeeName, " +
+                " (IF( ISNULL(db.delivery_bill_id ) , " +
+                " (r.date_warehousing)," +
+                " (db.date_delivery_bill) )) date" +
+                " from warehouse_card_flow wcf " +
+                " left join delivery_bill db on db.delivery_bill_id = wcf.delivery_bill_id" +
+                " left join receipt r on r.receipt_id = wcf.receipt_id" +
+                " left join employees e on e.employee_id = db.employee_id" +
+                " left join employees emp on emp.employee_id = r.employee_id" +
+                " where wcf.warehouse_card_id = :warehouseCardId";
+        finalSql = finalSql + " order by wcf.warehouse_card_flow_id ";
+        SQLQuery q = createSQLQuery(finalSql);
+        q.setParameter("warehouseCardId", warehouseCardId);
+        q.setResultTransformer(Transformers.aliasToBean(WarehouseCardFlowModel.class));
+        setResultTransformer(q, WarehouseCardFlowModel.class);
+        return q.list();
+    }
 }

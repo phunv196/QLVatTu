@@ -18,6 +18,7 @@ public class TokenUtil {
     private static Logger log = LoggerFactory.getLogger(TokenUtil.class);
 
     private static final long VALIDITY_TIME_MS =  2 * 60 * 60 * 1000; // 2 hours  validity
+//    private static final long VALIDITY_TIME_MS =  1000; // 2 hours  validity
     private static String secret="phunv";
 
     public static String createTokenForUser(UserModel user)  {

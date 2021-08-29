@@ -261,6 +261,7 @@ export default defineComponent({
       }
       arrQuality.value = lstQualitys;
     };
+
     const lstUnit = async () => {
       const resp = await unitApi.getAll();
       let lstUnits = [];

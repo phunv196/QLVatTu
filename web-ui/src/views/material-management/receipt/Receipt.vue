@@ -194,6 +194,11 @@
             @click="onDeleteClick(slotProps.data)"
             class="p-button-sm p-button-rounded p-button-danger p-button-text"
           />
+          <Button
+            icon="pi pi-book"
+            @click="onDownloadFileDocx(slotProps.data)"
+            class="p-button-sm p-button-rounded p-button-info p-button-text"
+          />
         </template>
       </Column>
     </DataTable>
@@ -208,7 +213,7 @@ import ReceiptDetails from "@/views/material-management/receipt/ReceiptDetails.v
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import WarehouseApi from "@/api/material-management/warehouse-api";
-import { debounce, exportFile } from "@/shared/utils";
+import { debounce, exportFile, exportFileDocx } from "@/shared/utils";
 import EmployeeApi from "@/api/employee-api";
 
 export default defineComponent({
@@ -437,6 +442,14 @@ export default defineComponent({
       warehouse.value = lstWarehouses;
     };
 
+    const onDownloadFileDocx = async (rec: Record<string, unknown>) => {
+      ReceiptApi.downloadFileDocx(rec.receiptId).then((res) => {
+        debugger
+        const data = res.data.data;
+        exportFileDocx(data.data, data.fileName);
+      });
+    };
+
     return {
       list,
       arrWarehouse,
@@ -463,6 +476,7 @@ export default defineComponent({
       searchToDate,
       onSearchKeyup,
       exportExcell,
+      onDownloadFileDocx
     };
   },
   components: {

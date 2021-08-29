@@ -6,7 +6,6 @@
       <span class="display:flex" >
         <Logo style="display:inline-block;width:50px;height:50px; margin-bottom:50px;"></Logo>
         <span class="sw-light-text-on-dark" style="font-size:32px">Quản lý kho vật tư</span>
-
         <div class="p-d-flex p-flex-column p-jc-center p-mt-4 p-ml-6" >
           <span class="p-input-icon-left p-mt-1">
             <i class="pi pi-user" />
@@ -17,29 +16,8 @@
             <InputText type="password" v-model="password" placeholder="Password" style="background:#222; color:#bbb; border-color:#666; width:100%;font-size:0.875rem"/>
           </span>
           <div class="p-d-flex p-flex-row p-jc-center p-mt-3 ">
-<!--            <Button label="Register" @click="onRegisterClick" class="p-mr-1 p-button-sm p-button-raised" style="border-color:#777; background-color:#777;"/>-->
             <Button label="Login" @click="onLoginClick" class="p-button-sm p-button-raised" style="width: 30%"/>
           </div>
-          <!-- Localization is Disaabled as the vue-i18n is still in beta -->
-<!--          <div class="p-d-flex p-flex-row p-jc-end p-mt-2 p-ai-center" >-->
-<!--            <div class="p-d-flex" @click="onChangeLangClick()" style="fontSize: .75rem; line-height:1rem; color:var(&#45;&#45;primary-color); cursor:pointer">-->
-<!--              <div> CHANGE LANGUAGE {{ t('message.hello') }} </div>-->
-<!--              <i class="pi pi-globe p-ml-1"></i>-->
-<!--            </div>-->
-<!--            <Menu ref="languageMenuEl" :model="languages" :popup="true" class="m-small p-mt-1" style="width:9rem"/>-->
-<!--          </div>-->
-<!--          <div style="margin-top:100px">-->
-<!--            <hr style="border:0; border-top: 1px solid #666;">-->
-<!--            <span style="color: #888; font-size:12px"> Use buttons bellow to login as different roles </span>-->
-<!--            <div class="p-d-flex p-mt-2">-->
-<!--              <Button label="ADMIN" @click="username='admin'; password='password'" class="p-mr-1 m-btn" style="background-color:#adc165; border:0"/>-->
-<!--              <Button label="CUSTOMER" @click="username='customer'; password='password'" class="p-mr-1 m-btn" style="background-color:#ffc73b; border:0"/>-->
-<!--              <Button label="SUPPORT" @click="username='support'; password='password'" class="m-btn" style="background-color:#ff903e; border:0"/>-->
-<!--            </div>-->
-<!--            <div class="p-mt-1">-->
-<!--              <Button label="API DOCS" @click="onApiDocsClick()" class="p-mr-1 m-btn" style="width:100%; background-color:#777;"/>-->
-<!--            </div>-->
-<!--          </div>-->
         </div>
       </span>
     </div>
@@ -66,8 +44,8 @@ export default defineComponent({
   setup(): unknown {
     const router = useRouter();
     const store = useStore();
-    const username = ref('admin');
-    const password = ref('password');
+    const username = ref('');
+    const password = ref('');
     const loginDisabled = ref(false);
     const win = window;
     const toast = useToast();

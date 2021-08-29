@@ -107,4 +107,8 @@ export default {
   async getWarehouseCardByCode(warehouseCardObj: Record<string, string | number>): Promise<AxiosResponse> {
     return api.post('/warehouse_cards/byCode', warehouseCardObj);
   },
+
+  async downloadFileDocx(deliveryBillId: any): Promise<AxiosResponse> {
+    return api.get(`/warehouse_cards/downloadFileDocx/${deliveryBillId}`);
+  },
 };

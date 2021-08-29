@@ -81,9 +81,9 @@ public class WarehouseCardDao extends BaseHibernateDAO {
                 " and wcf.warehouse_card_id = wc.warehouse_card_id ) amountDeliveryBill," +
                 " (select sum(amount) from warehouse_card_flow wcf where wcf.receipt_id IS NOT NULL " +
                 " and wcf.warehouse_card_id = wc.warehouse_card_id ) amountReceipt, " +
-                " ((select sum(amount) from warehouse_card_flow wcf where wcf.delivery_bill_id IS NOT NULL " +
-                " and wcf.warehouse_card_id = wc.warehouse_card_id ) - (select sum(amount) from warehouse_card_flow wcf where wcf.receipt_id IS NOT NULL " +
-                " and wcf.warehouse_card_id = wc.warehouse_card_id ) ) amountInventory " +
+                " ((select sum(amount) from warehouse_card_flow wcf where wcf.receipt_id IS NOT NULL " +
+                " and wcf.warehouse_card_id = wc.warehouse_card_id ) - (select sum(amount) from warehouse_card_flow wcf where wcf.delivery_bill_id IS NOT NULL " +
+                " and wcf.warehouse_card_id = wc.warehouse_card_id )) amountInventory " +
                 " from warehouse_card wc " +
                 " left join supplies s on s.supplies_id = wc.supplies_id" +
                 " left join employees e on e.employee_id = wc.employee_id" +

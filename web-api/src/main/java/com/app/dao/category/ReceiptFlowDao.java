@@ -86,4 +86,31 @@ public class ReceiptFlowDao extends BaseHibernateDAO {
         setResultTransformer(q, ReceiptFlowModel.class);
         return q.list();
     }
+
+    public List<ReceiptFlowModel> getByReceiptId(Long receiptId) {
+        String finalSql = "select rf.receipt_flow_id receiptFlowId," +
+                " rf.amount amount," +
+                " rf.receipt_id receiptId," +
+                " sr.supplier_id supplierId," +
+                " sr.code supplierCode," +
+                " sr.name supplierName," +
+                " s.supplies_id suppliesId," +
+                " s.code suppliesCode," +
+                " s.name suppliesName," +
+                " s.price suppliesPrice," +
+                " u.name suppliesUnit," +
+                " (s.price * rf.amount) calculatePrice," +
+                " sp.name speciesName" +
+                " from receipt_flow rf " +
+                " left join supplier sr on sr.supplier_id = rf.supplier_id" +
+                " left join supplies s on s.supplies_id = rf.supplies_id" +
+                " left join unit u on u.unit_id = s.unit_id" +
+                " left join species sp on sp.species_id = s.species_id" +
+                " where rf.receipt_id = :receiptId";
+        SQLQuery q = createSQLQuery(finalSql);
+        q.setParameter("receiptId", receiptId);
+        q.setResultTransformer(Transformers.aliasToBean(ReceiptFlowModel.class));
+        setResultTransformer(q, ReceiptFlowModel.class);
+        return q.list();
+    }
 }

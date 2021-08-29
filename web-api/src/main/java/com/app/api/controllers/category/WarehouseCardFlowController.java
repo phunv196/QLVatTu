@@ -19,6 +19,7 @@ import jakarta.ws.rs.core.Response;
 import org.hibernate.HibernateException;
 
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 
 @Path("warehouse_card_flows")
@@ -64,6 +65,7 @@ public class WarehouseCardFlowController extends BaseController {
         BaseResponse resp = new BaseResponse();
         try {
             warehouseCardFlowDao.beginTransaction();
+            warehouseCardFlow.setCreateAt(new Date());
             warehouseCardFlowDao.save(warehouseCardFlow);
             warehouseCardFlowDao.commitTransaction();
             resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công id: %s ", warehouseCardFlow.getWarehouseCardFlowId()));

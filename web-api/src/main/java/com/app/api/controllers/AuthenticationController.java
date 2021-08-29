@@ -55,7 +55,7 @@ public class AuthenticationController extends BaseController {
         Query q = dao.createQuery(hql);
         q.setParameter("uid", uid);
         UserModel user = (UserModel)q.uniqueResult();  // can throw org.hibernate.NonUniqueResultExceptio
-        String pwdEncoder = PlainTextPasswordEncoder.encode(loginModel.getPassword(), user.getUserId().toString());
+        String pwdEncoder = PlainTextPasswordEncoder.encode(loginModel.getPassword(), user == null ? "" : user.getUserId().toString());
         if (user!=null && pwdEncoder.equals(user.getPassword())){
             String strToken = TokenUtil.createTokenForUser(user);
             UserOutputModel usrOutput = new UserOutputModel(
@@ -70,8 +70,8 @@ public class AuthenticationController extends BaseController {
             LoginResponse successResp = new LoginResponse(usrOutput);
             return Response.status(Response.Status.OK).entity(successResp).build();
         }
-//        resp.setTypeAndMessage(BaseResponse.MessageTypeEnum.AUTH_FAILED, "Incorrect username/password");
-//        return Response.status(Response.Status.UNAUTHORIZED).entity(resp).build();
-        return Response.ok(false).build();
+        resp.setTypeAndMessage(BaseResponse.MessageTypeEnum.AUTH_FAILED, "Incorrect username/password");
+        return Response.status(Response.Status.UNAUTHORIZED).entity(resp).build();
+//        return Response.ok(false).build();
     }
 }

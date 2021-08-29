@@ -4,6 +4,7 @@ import com.app.model.PageResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -19,6 +20,7 @@ public class WarehouseCardFlowModel {
     @Column(name = "amount")      private Long amount;
     @Column(name = "description")       private String  description;
     @Column(name = "type")       private Long  type;
+    @Column(name = "create_at")       private Date createAt;
 
     @Transient
     private String employeeName;
@@ -28,6 +30,9 @@ public class WarehouseCardFlowModel {
     private String receiptCode;
     @Transient
     private String deliveryBillCode;
+
+    @Transient
+    private Date date;
 
     //Getters and Setters
 
@@ -118,6 +123,22 @@ public class WarehouseCardFlowModel {
 
     public void setDeliveryBillCode(String deliveryBillCode) {
         this.deliveryBillCode = deliveryBillCode;
+    }
+
+    public Date getCreateAt() {
+        return createAt;
+    }
+
+    public void setCreateAt(Date createAt) {
+        this.createAt = createAt;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public static class WarehouseCardFlowResponse extends PageResponse {

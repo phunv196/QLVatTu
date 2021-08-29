@@ -5,9 +5,10 @@ import com.app.dao.base.CommonUtils;
 import com.app.dao.base.converter.DynamicExport;
 import com.app.dao.category.ReceiptDao;
 import com.app.dao.category.ReceiptFlowDao;
+import com.app.dao.category.WarehouseDao;
 import com.app.model.BaseResponse;
 import com.app.model.ExportModel;
-import com.app.model.category.ReceiptModel;
+import com.app.model.category.*;
 import com.app.model.category.ReceiptModel.ReceiptResponse;
 import com.app.model.user.UserModel;
 import com.app.util.TemplateResouces;
@@ -23,18 +24,19 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.commons.io.FileUtils;
+import org.apache.poi.xwpf.usermodel.*;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
-import java.io.File;
+import java.io.*;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.app.util.Constants.COMMON.FOLDER_EXPORT;
-import static com.app.util.Constants.COMMON.TEMPLATE_EXPORT_EXCELL;
+import static com.app.util.Constants.COMMON.*;
+import static com.app.util.Constants.COMMON.FOLDER_EXPORT_DOCX;
 
 @Path("receipts")
 @Tag(name = "Receipts")
@@ -43,6 +45,7 @@ import static com.app.util.Constants.COMMON.TEMPLATE_EXPORT_EXCELL;
 public class ReceiptController extends BaseController {
     ReceiptDao receiptDao = new ReceiptDao();
     ReceiptFlowDao receiptFlowDao = new ReceiptFlowDao();
+    WarehouseDao warehouseDao = new WarehouseDao();
 
     @GET
     @RolesAllowed({"ADMIN", "SUPPORT"})
@@ -309,6 +312,84 @@ public class ReceiptController extends BaseController {
         String[] fileNameNew = filePath.split("/");
         ExportModel exportModel = new ExportModel();
         exportModel.setFileName(fileNameNew[fileNameNew.length - 1]);
+        exportModel.setData(encodedString);
+        resp.setData(exportModel);
+        return Response.ok(resp).build();
+    }
+
+    @GET
+    @Path("downloadFileDocx/{receiptId}")
+    @RolesAllowed({"ADMIN", "SUPPORT"})
+    @Operation(
+            summary = "receipt",
+            responses = {@ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response downloadFileDocx(@Parameter(description = "DeliveryBill Id", example = "601") @PathParam("receiptId") Long receiptId) throws IOException {
+        ExportModel.ExportResponse resp = new ExportModel.ExportResponse();
+        List<ReceiptFlowModel> models = receiptFlowDao.getByReceiptId(receiptId);
+        ReceiptModel receiptModel = receiptDao.getById(receiptId);
+        WarehouseModel warehouseModel = warehouseDao.getById(receiptModel.getWarehouseId());
+        Date date = new Date();
+        String strDate = CommonUtils.convertDateToString(date);
+        String[] arrDate = strDate.split("/");
+        File fileDocx = new File(TEMPLATE_EXPORT_DOCX + "BM_Phieu_Nhap_Kho.docx");
+        String prefixOutPutFile = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "_";
+        try (InputStream is = new FileInputStream(fileDocx);
+             XWPFDocument doc = new XWPFDocument(is)) {
+            Iterator<IBodyElement> docElementsIterator = doc.getBodyElementsIterator();
+            List<XWPFParagraph> xwpfParagraphList = doc.getParagraphs();
+            for (XWPFParagraph xwpfParagraph : xwpfParagraphList) {
+                for (XWPFRun xwpfRun : xwpfParagraph.getRuns()) {
+                    String docText = xwpfRun.getText(0);
+                    //replacement and setting position
+                    if (docText != null) {
+                        docText = docText.replace("day", arrDate[0]);
+                        docText = docText.replace("month", arrDate[1]);
+                        docText = docText.replace("year", arrDate[2]);
+                        docText = docText.replace("warehouse", warehouseModel.getName());
+                        xwpfRun.setText(docText, 0);
+                    }
+                }
+                IBodyElement docElement = docElementsIterator.next();
+                if ("TABLE".equalsIgnoreCase(docElement.getElementType().name())) {
+                    List<XWPFTable> xwpfTableList = docElement.getBody().getTables();
+                    for (XWPFTable xwpfTable : xwpfTableList) {
+                        int index = 1;
+                        int row = 2;
+                        Long sum = 0L;
+                        Long sumAmount = 0L;
+                        for (int i = 0; i < models.size(); i++) {
+                            ReceiptFlowModel model = models.get(i);
+                            int col = 0;
+                            xwpfTable.createRow();
+                            xwpfTable.getRow(row).getCell(col++).setText(String.valueOf(index++));
+                            xwpfTable.getRow(row).getCell(col++).setText(model.getSpeciesName());
+                            xwpfTable.getRow(row).getCell(col++).setText(model.getSuppliesUnit());
+                            xwpfTable.getRow(row).getCell(col++).setText("");
+                            xwpfTable.getRow(row).getCell(col++).setText(String.valueOf(model.getAmount()));
+                            xwpfTable.getRow(row).getCell(col++).setText(model.getSuppliesPrice());
+                            xwpfTable.getRow(row).addNewTableCell().setText(model.getCalculatePrice());
+                            row++;
+                            sumAmount += model.getAmount() == null ? 0L : model.getAmount();
+                            sum += Long.parseLong(CommonUtils.isNullOrEmpty(model.getCalculatePrice()) ? "0" : model.getCalculatePrice());
+                        }
+                        xwpfTable.createRow();
+                        xwpfTable.getRow(row).getCell(1).setText("Tổng cộng:");
+                        xwpfTable.getRow(row).addNewTableCell();
+                        xwpfTable.getRow(row).getCell(4).setText(String.valueOf(sumAmount));
+                        xwpfTable.getRow(row).getCell(6).setText(String.valueOf(sum));
+                    }
+                }
+            }
+            try (FileOutputStream out = new FileOutputStream(FOLDER_EXPORT_DOCX + prefixOutPutFile + "Phieu_Nhap_Kho.docx")) {
+                doc.write(out);
+            }
+        }
+        File file = new File(FOLDER_EXPORT_DOCX + prefixOutPutFile + "Phieu_Nhap_Kho.docx");
+        byte[] fileContent = FileUtils.readFileToByteArray(file);
+        String encodedString = Base64.getEncoder().encodeToString(fileContent);
+        ExportModel exportModel = new ExportModel();
+        exportModel.setFileName(prefixOutPutFile + "Phieu_Nhap_Kho.docx");
         exportModel.setData(encodedString);
         resp.setData(exportModel);
         return Response.ok(resp).build();

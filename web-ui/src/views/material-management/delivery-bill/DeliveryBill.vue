@@ -238,7 +238,6 @@
             @click="onDownloadFileDocx(slotProps.data)"
             class="p-button-sm p-button-rounded p-button-info p-button-text"
           />
-          
         </template>
       </Column>
     </DataTable>

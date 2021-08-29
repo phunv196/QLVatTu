@@ -41,7 +41,7 @@ export default defineComponent({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       AppEvent.on('bad-token', (data:any) => {
         whatEvent.value = 'bad-token';
-        dlgHeader.value = 'Session Expired';
+        dlgHeader.value = 'Phiên đăng nhập đã hết hạn! ';
         dlgContent.value = data.msg;
         showAppDlg.value = true;
         console.log('event-handler for %o', data);

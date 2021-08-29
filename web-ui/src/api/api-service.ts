@@ -28,11 +28,11 @@ function errorResponseParser(err: AxiosError): Promise<AxiosResponse> {
       if (err.response.data && err.response.data.msgType === 'AUTH_FAILED') {
         store.commit('jwt', '');
         store.commit('jwtTime', '');
-        AppEvent.emit('auth-failed', { msg: 'Incorrect username or password' });
+        AppEvent.emit('auth-failed', { msg: 'Username hoặc password không chính xác!' });
       } else if (err.response.data && err.response.data.msgType === 'NO_ACCESS') {
-        AppEvent.emit('no-access', { msg: 'Operation is not allowed for the given role' });
+        AppEvent.emit('no-access', { msg: 'Bạn không có quyền đăng nhập vào hệ thống!' });
       } else if (err.response.data && err.response.data.msgType === 'BAD_TOKEN') {
-        AppEvent.emit('bad-token', { msg: 'Session expired or incorrect token' });
+        AppEvent.emit('bad-token', { msg: 'Phiên đăng nhập đã hết hạn hoặc mã thông báo không chính xác!' });
       }
     } else {
       // AppEvent.emit('server-access-error');
