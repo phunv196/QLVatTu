@@ -46,7 +46,7 @@ public class SupplierController extends BaseController {
     SupplierDao supplierDao = new SupplierDao();
 
     @GET
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get list of Supplier",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = SupplierResponse.class)))}
@@ -102,7 +102,7 @@ public class SupplierController extends BaseController {
 
     @GET
     @Path("all")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get all Supplier",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = SupplierResponse.class)))}
@@ -196,7 +196,7 @@ public class SupplierController extends BaseController {
 
     @POST
     @Path("byCode")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
@@ -218,7 +218,7 @@ public class SupplierController extends BaseController {
 
     @POST
     @Path("export")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
@@ -228,7 +228,7 @@ public class SupplierController extends BaseController {
         ExportModel.ExportResponse resp = new ExportModel.ExportResponse();
         String fileName = "danh_sach_nha_cung_cap.xls";
         Integer startDataRow = 6;
-        DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_EXPORT_FOLDER + fileName), startDataRow, false);
+        DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_EXPORT_EXCELL + fileName), startDataRow, false);
         List<SupplierModel> models = supplierDao.getListExport(supplier.getCode(), supplier.getName(), supplier.getEmail(),
                 supplier.getPhone());
         int stt = 1;

@@ -51,7 +51,7 @@ public class FactoryController extends BaseController {
     EmployeeDao employeeDao = new EmployeeDao();
 
     @GET
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get list of factorys",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = FactoryResponse.class)))}
@@ -99,7 +99,7 @@ public class FactoryController extends BaseController {
 
     @GET
     @Path("all")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get list of factorys",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = FactoryResponse.class)))}
@@ -211,7 +211,7 @@ public class FactoryController extends BaseController {
 
     @POST
     @Path("byCode")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
@@ -234,7 +234,7 @@ public class FactoryController extends BaseController {
 
     @POST
     @Path("export")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
@@ -244,7 +244,7 @@ public class FactoryController extends BaseController {
         ExportModel.ExportResponse resp = new ExportModel.ExportResponse();
         String fileName = "danh_sach_phan_xuong.xls";
         Integer startDataRow = 6;
-        DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_EXPORT_FOLDER + fileName), startDataRow, false);
+        DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_EXPORT_EXCELL + fileName), startDataRow, false);
         List<FactoryModel> models = factoryDao.getListExport(factory.getCode(), factory.getName(), factory.getEmail(),
                 factory.getEmployeeId(), factory.getFormDate(), factory.getToDate(), factory.getFormSuccessDate(), factory.getToSuccessDate());
         int stt = 1;

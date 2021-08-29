@@ -5,10 +5,13 @@ import com.app.dao.base.CommonUtils;
 import com.app.dao.base.converter.DynamicExport;
 import com.app.dao.category.DeliveryBillDao;
 import com.app.dao.category.DeliveryBillFlowDao;
+import com.app.dao.category.WarehouseDao;
 import com.app.model.BaseResponse;
 import com.app.model.ExportModel;
+import com.app.model.category.DeliveryBillFlowModel;
 import com.app.model.category.DeliveryBillModel;
 import com.app.model.category.DeliveryBillModel.DeliveryBillResponse;
+import com.app.model.category.WarehouseModel;
 import com.app.model.user.UserModel;
 import com.app.util.TemplateResouces;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,18 +26,18 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.commons.io.FileUtils;
+import org.apache.poi.xwpf.usermodel.*;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
-import java.io.File;
+import java.io.*;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.app.util.Constants.COMMON.FOLDER_EXPORT;
-import static com.app.util.Constants.COMMON.TEMPLATE_EXPORT_FOLDER;
+import static com.app.util.Constants.COMMON.*;
 
 @Path("delivery_bills")
 @Tag(name = "deliveryBills")
@@ -43,9 +46,10 @@ import static com.app.util.Constants.COMMON.TEMPLATE_EXPORT_FOLDER;
 public class DeliveryBillController extends BaseController {
     DeliveryBillDao deliveryBillDao = new DeliveryBillDao();
     DeliveryBillFlowDao deliveryBillFlowDao = new DeliveryBillFlowDao();
+    WarehouseDao warehouseDao = new WarehouseDao();
 
     @GET
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get list of deliveryBills",
             responses = {@ApiResponse(content = @Content(schema = @Schema(implementation = DeliveryBillResponse.class)))}
@@ -106,7 +110,7 @@ public class DeliveryBillController extends BaseController {
 
     @GET
     @Path("all/{suppliesId}")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get all deliveryBills",
             responses = {@ApiResponse(content = @Content(schema = @Schema(implementation = DeliveryBillResponse.class)))}
@@ -254,7 +258,7 @@ public class DeliveryBillController extends BaseController {
 
     @POST
     @Path("byCode")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
@@ -276,7 +280,7 @@ public class DeliveryBillController extends BaseController {
 
     @POST
     @Path("export")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
@@ -286,7 +290,7 @@ public class DeliveryBillController extends BaseController {
         ExportModel.ExportResponse resp = new ExportModel.ExportResponse();
         String fileName = "danh_sach_phieu_xuat.xls";
         Integer startDataRow = 6;
-        DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_EXPORT_FOLDER + fileName), startDataRow, false);
+        DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_EXPORT_EXCELL + fileName), startDataRow, false);
         List<DeliveryBillModel> models = deliveryBillDao.getListExport(deliveryBill.getCode(), deliveryBill.getName(), deliveryBill.getEmployeeId(),
                 deliveryBill.getWarehouseId(), deliveryBill.getFormDate(), deliveryBill.getToDate(), deliveryBill.getFactoryId());
         int stt = 1;
@@ -318,6 +322,81 @@ public class DeliveryBillController extends BaseController {
         String[] fileNameNew = filePath.split("/");
         ExportModel exportModel = new ExportModel();
         exportModel.setFileName(fileNameNew[fileNameNew.length - 1]);
+        exportModel.setData(encodedString);
+        resp.setData(exportModel);
+        return Response.ok(resp).build();
+    }
+
+    @DELETE
+    @Path("downloadFileDocx/{deliveryBillId}")
+    @RolesAllowed({"ADMIN", "SUPPORT"})
+    @Operation(
+            summary = "Delete a deliveryBill",
+            responses = {@ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response downloadFileDocx(@Parameter(description = "DeliveryBill Id", example = "601") @PathParam("deliveryBillId") Long deliveryBillId) throws IOException {
+        ExportModel.ExportResponse resp = new ExportModel.ExportResponse();
+        List<DeliveryBillFlowModel> models = deliveryBillFlowDao.getByDeliveryBillId(deliveryBillId);
+        DeliveryBillModel deliveryBillModel = deliveryBillDao.getById(deliveryBillId);
+        WarehouseModel warehouseModel = warehouseDao.getById(deliveryBillModel.getWarehouseId());
+        Date date = new Date();
+        String strDate = CommonUtils.convertDateToString(date);
+        String[] arrDate = strDate.split("/");
+        File fileDocx = new File(TEMPLATE_EXPORT_DOCX + "BM_Phieu_Xuat_Kho.docx");
+        String prefixOutPutFile = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "_";
+        try (InputStream is = new FileInputStream(fileDocx);
+             XWPFDocument doc = new XWPFDocument(is)) {
+            Iterator<IBodyElement> docElementsIterator = doc.getBodyElementsIterator();
+            List<XWPFParagraph> xwpfParagraphList = doc.getParagraphs();
+            for (XWPFParagraph xwpfParagraph : xwpfParagraphList) {
+                for (XWPFRun xwpfRun : xwpfParagraph.getRuns()) {
+                    String docText = xwpfRun.getText(0);
+                    //replacement and setting position
+                    if (docText != null) {
+                        docText = docText.replace("day", arrDate[0]);
+                        docText = docText.replace("month", arrDate[1]);
+                        docText = docText.replace("year", arrDate[2]);
+                        docText = docText.replace("warehouse", warehouseModel.getName());
+                        xwpfRun.setText(docText, 0);
+                    }
+                }
+                IBodyElement docElement = docElementsIterator.next();
+                if ("TABLE".equalsIgnoreCase(docElement.getElementType().name())) {
+                    //Get List of table and iterate it
+                    List<XWPFTable> xwpfTableList = docElement.getBody().getTables();
+                    for (XWPFTable xwpfTable : xwpfTableList) {
+                        System.out.println("Total Rows : " + xwpfTable.getNumberOfRows());
+                        int index = 1;
+                        int row = 1;
+                        Long sum = 0L;
+                        for (int i = 0; i < models.size(); i++) {
+                            DeliveryBillFlowModel model = models.get(i);
+                            int col = 0;
+                            xwpfTable.createRow();
+                            xwpfTable.getRow(row).getCell(col++).setText(String.valueOf(index++));
+                            xwpfTable.getRow(row).getCell(col++).setText(model.getSpeciesName());
+                            xwpfTable.getRow(row).getCell(col++).setText(model.getSuppliesUnit());
+                            xwpfTable.getRow(row).getCell(col++).setText(String.valueOf(model.getAmount()));
+                            xwpfTable.getRow(row).getCell(col++).setText(model.getSuppliesPrice());
+                            xwpfTable.getRow(row).getCell(col++).setText(model.getCalculatePrice());
+                            row++;
+                            sum += Long.parseLong(model.getCalculatePrice());
+                        }
+                        xwpfTable.createRow();
+                        xwpfTable.getRow(row).getCell(1).setText("Tổng cộng:");
+                        xwpfTable.getRow(row).getCell(5).setText(String.valueOf(sum));
+                    }
+                }
+            }
+            try (FileOutputStream out = new FileOutputStream(FOLDER_EXPORT_DOCX + prefixOutPutFile + "Phieu_Xuat_Kho.docx")) {
+                doc.write(out);
+            }
+        }
+        File file = new File(FOLDER_EXPORT_DOCX + prefixOutPutFile + "Phieu_Xuat_Kho.docx");
+        byte[] fileContent = FileUtils.readFileToByteArray(file);
+        String encodedString = Base64.getEncoder().encodeToString(fileContent);
+        ExportModel exportModel = new ExportModel();
+        exportModel.setFileName(prefixOutPutFile + "test2.docx");
         exportModel.setData(encodedString);
         resp.setData(exportModel);
         return Response.ok(resp).build();

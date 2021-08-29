@@ -34,7 +34,7 @@ public class DeliveryBillFlowController extends BaseController {
     DeliveryBillDao deliveryBillDao = new DeliveryBillDao();
 
     @GET
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get list of deliveryBillFlows",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = DeliveryBillFlowResponse.class)))}
@@ -138,7 +138,7 @@ public class DeliveryBillFlowController extends BaseController {
 
     @GET
     @Path("delivery_bill_flow")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get list of deliveryBillFlows",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = DeliveryBillFlowResponse.class)))}

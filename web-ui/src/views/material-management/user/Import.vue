@@ -23,6 +23,7 @@
         class="p-button-sm"
       ></Button>
       <Button
+        v-if="$store.getters.role === 'ADMIN'"
         icon="pi pi-send"
         iconPos="left"
         label="Import"

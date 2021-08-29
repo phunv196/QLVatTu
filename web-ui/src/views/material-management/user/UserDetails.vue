@@ -99,6 +99,7 @@
           class="p-button-sm p-button-outlined p-mr-1"
         ></Button>
         <Button
+          v-if="$store.getters.role === 'ADMIN'"
           icon="pi pi-check"
           iconPos="left"
           label="APPLY CHANGES"
@@ -120,8 +121,7 @@ import { useToast } from "primevue/usetoast";
 
 export default defineComponent({
   props: {
-    rec: { type: Object,
-           required: true },
+    rec: { type: Object, required: true },
   },
 
   setup(props, { emit }): unknown {
@@ -129,8 +129,8 @@ export default defineComponent({
     const userMessage = ref("");
     const data = ref(props.rec);
     let recData = ref(props.rec);
-    UsersApi.getById(data.value.userId).then(res => {
-      recData.value = res.data
+    UsersApi.getById(data.value.userId).then((res) => {
+      recData.value = res.data;
     });
     const emp = ref([]);
     const role = ref([]);
@@ -167,7 +167,9 @@ export default defineComponent({
           if (resp.data.msgType === "SUCCESS") {
             toast.add({
               severity: "success",
-              summary: rawUsersObj.userId ? "User Updated" : "User Added",
+              summary: rawUsersObj.userId
+                ? "Sửa thành công!"
+                : "Thêm mới thành công!",
               detail: `${rawUsersObj.loginName} (${rawUsersObj.fullName})`,
               life: 3000,
             });

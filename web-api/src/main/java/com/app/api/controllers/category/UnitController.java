@@ -34,7 +34,7 @@ public class UnitController extends BaseController {
     UnitDao unitDao = new UnitDao();
 
     @GET
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get list of units",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = UnitResponse.class)))}
@@ -76,7 +76,7 @@ public class UnitController extends BaseController {
 
     @GET
     @Path("all")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get all units",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = UnitResponse.class)))}
@@ -168,7 +168,7 @@ public class UnitController extends BaseController {
 
     @POST
     @Path("byCode")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )

@@ -21,6 +21,29 @@ public class DeliveryBillFlowDao extends BaseHibernateDAO {
         return  (DeliveryBillFlowModel) q.uniqueResult();
     }
 
+    public  List<DeliveryBillFlowModel> getByDeliveryBillId( Long deliveryBillId){
+        String sql = "select dbf.delivery_bill_flow_id deliveryBillFlowId," +
+                " dbf.amount amount," +
+                " dbf.delivery_bill_id deliveryBillId," +
+                " s.supplies_id suppliesId," +
+                " s.code suppliesCode," +
+                " s.name suppliesName," +
+                " s.price suppliesPrice," +
+                " u.name suppliesUnit," +
+                " (s.price * dbf.amount) calculatePrice," +
+                " sp.name speciesName" +
+                " from delivery_bill_flow dbf " +
+                " left join supplies s on s.supplies_id = dbf.supplies_id" +
+                " left join species sp on sp.species_id = s.species_id" +
+                " left join unit u on s.unit_id = u.unit_id" +
+                " where dbf.delivery_bill_id = :deliveryBillId";
+        SQLQuery q = createSQLQuery(sql);
+        q.setParameter("deliveryBillId", deliveryBillId);
+        q.setResultTransformer(Transformers.aliasToBean(DeliveryBillFlowModel.class));
+        setResultTransformer(q, DeliveryBillFlowModel.class);
+        return q.list();
+    }
+
     public  int delete(Long deliveryBillFlowId)  throws HibernateException, ConstraintViolationException {
         Query q = createQuery("delete DeliveryBillFlowModel where deliveryBillFlowId = :deliveryBillFlowId");
         q.setParameter("deliveryBillFlowId", deliveryBillFlowId);
@@ -69,12 +92,13 @@ public class DeliveryBillFlowDao extends BaseHibernateDAO {
                 " s.code suppliesCode," +
                 " s.name suppliesName," +
                 " s.price suppliesPrice," +
-                " s.unit suppliesUnit," +
+                " u.name suppliesUnit," +
                 " (s.price * dbf.amount) calculatePrice," +
                 " sp.name speciesName" +
                 " from delivery_bill_flow dbf " +
                 " left join supplies s on s.supplies_id = dbf.supplies_id" +
                 " left join species sp on sp.species_id = s.species_id" +
+                " left join unit u on s.unit_id = u.unit_id" +
                 " where dbf.delivery_bill_id = :deliveryBillId";
         finalSql = finalSql + " order by dbf.delivery_bill_flow_id " + sqlLimit;
         SQLQuery q = createSQLQuery(finalSql);

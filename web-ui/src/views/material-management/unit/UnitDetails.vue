@@ -16,8 +16,8 @@
     <div>
       <div class="p-mt-1">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Mã đơn vị tính <strong class="p-error">*</strong> </label
-        >
+          >Mã đơn vị tính <strong class="p-error">*</strong>
+        </label>
         <InputText
           type="text"
           v-model="recData.code"
@@ -28,7 +28,11 @@
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
           >Tên đơn vị tính <strong class="p-error">*</strong>
         </label>
-        <InputText type="text" v-model="recData.name" class="p-inputtext-sm p-col-8" />
+        <InputText
+          type="text"
+          v-model="recData.name"
+          class="p-inputtext-sm p-col-8"
+        />
       </div>
       <div class="p-mt-3 p-d-flex p-ai-center">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1">
@@ -119,7 +123,9 @@ export default defineComponent({
           if (resp.data.msgType === "SUCCESS") {
             toast.add({
               severity: "success",
-              summary: rawUnitObj.UnitId ? "Sửa thành công!" : "Thêm mới thành công!",
+              summary: rawUnitObj.UnitId
+                ? "Sửa thành công!"
+                : "Thêm mới thành công!",
               detail: `${rawUnitObj.name} (${rawUnitObj.code})`,
               life: 3000,
             });

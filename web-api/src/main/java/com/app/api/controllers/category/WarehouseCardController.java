@@ -43,7 +43,7 @@ import java.util.Date;
 import java.util.List;
 
 import static com.app.util.Constants.COMMON.FOLDER_EXPORT;
-import static com.app.util.Constants.COMMON.TEMPLATE_EXPORT_FOLDER;
+import static com.app.util.Constants.COMMON.TEMPLATE_EXPORT_EXCELL;
 
 @Path("warehouse_cards")
 @Tag(name = "WarehouseCards")
@@ -54,7 +54,7 @@ public class WarehouseCardController extends BaseController {
     WarehouseCardFlowDao warehouseCardFlowDao = new WarehouseCardFlowDao();
 
     @GET
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get list of warehouseCards",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = WarehouseCardResponse.class)))}
@@ -228,7 +228,7 @@ public class WarehouseCardController extends BaseController {
 
     @POST
     @Path("byCode")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = WarehouseCardModel.class)))}
     )
@@ -249,7 +249,7 @@ public class WarehouseCardController extends BaseController {
 
     @POST
     @Path("export")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
@@ -258,7 +258,7 @@ public class WarehouseCardController extends BaseController {
     ) throws Exception {
         ExportModel.ExportResponse resp = new ExportModel.ExportResponse();
         String fileName = "danh_sach_the_kho.xls";
-        DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_EXPORT_FOLDER + fileName), 6, false);
+        DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_EXPORT_EXCELL + fileName), 6, false);
         List<WarehouseCardModel> models = warehouseCardDao.getListExport(warehouseCard.getCode(), warehouseCard.getName(), warehouseCard.getEmployeeId(),
                 warehouseCard.getWarehouseId(), warehouseCard.getSuppliesId(), warehouseCard.getFormDate(), warehouseCard.getToDate());
         int stt = 1;

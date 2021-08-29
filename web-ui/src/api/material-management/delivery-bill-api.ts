@@ -83,6 +83,10 @@ export default {
     return api.delete(`/delivery_bills/${deliveryBillId}`);
   },
 
+  async downloadFileDocx(deliveryBillId: any): Promise<AxiosResponse> {
+    return api.delete(`/delivery_bills/downloadFileDocx/${deliveryBillId}`);
+  },
+
   async addDeliveryBill(deliveryBillObj: Record<string, string | number>): Promise<AxiosResponse> {
     return api.post('/delivery_bills', deliveryBillObj);
   },

@@ -37,7 +37,7 @@ public class SpeciesController extends BaseController {
     SpeciesDao speciesDao = new SpeciesDao();
 
     @GET
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get list of species",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = SpeciesResponse.class)))}
@@ -84,7 +84,7 @@ public class SpeciesController extends BaseController {
 
     @GET
     @Path("all")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get all species",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = SpeciesResponse.class)))}
@@ -176,7 +176,7 @@ public class SpeciesController extends BaseController {
 
     @POST
     @Path("byCode")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )

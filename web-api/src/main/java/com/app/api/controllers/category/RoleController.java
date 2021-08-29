@@ -37,7 +37,7 @@ public class RoleController extends BaseController {
     RoleDao roleDao = new RoleDao();
 
     @GET
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get list of roles",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = RoleModel.RolesResponse.class)))}
@@ -84,7 +84,7 @@ public class RoleController extends BaseController {
 
     @GET
     @Path("all")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get all roles",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = RoleModel.RolesResponse.class)))}
@@ -176,7 +176,7 @@ public class RoleController extends BaseController {
 
     @POST
     @Path("byCode")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )

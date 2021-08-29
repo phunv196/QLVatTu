@@ -34,7 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.app.util.Constants.COMMON.FOLDER_EXPORT;
-import static com.app.util.Constants.COMMON.TEMPLATE_EXPORT_FOLDER;
+import static com.app.util.Constants.COMMON.TEMPLATE_EXPORT_EXCELL;
 
 @Path("receipts")
 @Tag(name = "Receipts")
@@ -45,7 +45,7 @@ public class ReceiptController extends BaseController {
     ReceiptFlowDao receiptFlowDao = new ReceiptFlowDao();
 
     @GET
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get list of receipts",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = ReceiptResponse.class)))}
@@ -85,7 +85,7 @@ public class ReceiptController extends BaseController {
 
     @GET
     @Path("all")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get all receipts",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = ReceiptResponse.class)))}
@@ -225,7 +225,7 @@ public class ReceiptController extends BaseController {
 
     @GET
     @Path("all/{suppliesId}")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get all deliveryBills",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = ReceiptResponse.class)))}
@@ -246,7 +246,7 @@ public class ReceiptController extends BaseController {
 
     @POST
     @Path("byCode")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
@@ -269,7 +269,7 @@ public class ReceiptController extends BaseController {
 
     @POST
     @Path("export")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
@@ -279,7 +279,7 @@ public class ReceiptController extends BaseController {
         ExportModel.ExportResponse resp = new ExportModel.ExportResponse();
         String fileName = "danh_sach_phieu_nhap.xls";
         Integer startDataRow = 6;
-        DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_EXPORT_FOLDER + fileName), startDataRow, false);
+        DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_EXPORT_EXCELL + fileName), startDataRow, false);
         List<ReceiptModel> models = receiptDao.getListExport(receipt.getCode(), receipt.getName(), receipt.getEmployeeId(),
                 receipt.getWarehouseId(), receipt.getFormDate(), receipt.getToDate());
         int stt = 1;

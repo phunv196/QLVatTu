@@ -31,7 +31,7 @@ public class ReceiptFlowController extends BaseController {
     ReceiptFlowDao receiptFlowDao = new ReceiptFlowDao();
 
     @GET
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get list of ReceiptFlows",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = ReceiptFlowResponse.class)))}
@@ -131,7 +131,7 @@ public class ReceiptFlowController extends BaseController {
 
     @GET
     @Path("receipt_flow")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get list of receipt_flows",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = ReceiptFlowResponse.class)))}

@@ -235,7 +235,7 @@ public class EmployeeController extends BaseController {
 
     @POST
     @Path("export")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
@@ -244,7 +244,7 @@ public class EmployeeController extends BaseController {
     ) throws Exception {
         ExportResponse resp = new ExportResponse();
         String fileName = "danh_sach_nhan_vien.xls";
-        DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_EXPORT_FOLDER + fileName), 6, false);
+        DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_EXPORT_EXCELL + fileName), 6, false);
         List<EmployeeModel> models = employeeDao.getListExport(employee.getCode(), employee.getFullName(), employee.getEmail(),
                 employee.getPhone(), employee.getDepartmentId(), employee.getPositionId());
         int stt = 1;
@@ -281,7 +281,7 @@ public class EmployeeController extends BaseController {
 
     @POST
     @Path("byCode")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
@@ -304,7 +304,7 @@ public class EmployeeController extends BaseController {
 
     @GET
     @Path("getEmployeeById/{employeeId}")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )

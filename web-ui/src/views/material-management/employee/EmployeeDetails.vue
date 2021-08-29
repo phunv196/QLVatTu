@@ -224,7 +224,9 @@ export default defineComponent({
           if (resp.data.msgType === "SUCCESS") {
             toast.add({
               severity: "success",
-              summary: rawEmpObj.employeeId ? "Sửa thành công!" : "Thêm mới thành công",
+              summary: rawEmpObj.employeeId
+                ? "Sửa thành công!"
+                : "Thêm mới thành công!",
               detail: `${rawEmpObj.firstName} ${rawEmpObj.lastName}`,
               life: 3000,
             });

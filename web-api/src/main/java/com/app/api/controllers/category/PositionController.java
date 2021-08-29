@@ -37,7 +37,7 @@ public class PositionController extends BaseController {
     PositionDao positionDao = new PositionDao();
 
     @GET
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get list of positions",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = PositionResponse.class)))}
@@ -84,7 +84,7 @@ public class PositionController extends BaseController {
 
     @GET
     @Path("all")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get all positions",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = PositionResponse.class)))}
@@ -178,7 +178,7 @@ public class PositionController extends BaseController {
 
     @POST
     @Path("byCode")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )

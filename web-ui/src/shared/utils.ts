@@ -71,6 +71,20 @@ export function exportFile(data: any, fileName: string) {
   }, 0);
 }
 
+export function exportFileDocx(data: any, fileName: string) {
+  var contentType = "application/msword";
+  const a = document.createElement("a");
+  var blob1 = b64toBlob(data, contentType, "");
+  var url = URL.createObjectURL(blob1);
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  setTimeout(() => {
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  }, 0);
+}
+
 function b64toBlob (b64Data: any, contentType: any, sliceSize: any){
   contentType = contentType || "";
   var sliceSize = sliceSize || 512;

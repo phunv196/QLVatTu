@@ -56,7 +56,7 @@ public class UserController extends BaseController {
     EmployeeDao employeeDao = new EmployeeDao();
 
     @GET
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get list of user ",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = UserListResponse.class)))}
@@ -93,7 +93,7 @@ public class UserController extends BaseController {
 
     @GET
     @Path("/logged-user")
-    @RolesAllowed({"CUSTOMER", "SUPPORT"})
+    @RolesAllowed({"CUSTOMER"})
     @Operation(
       summary = "Get Details of Logged in User",
       responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = LoginResponse.class)))}
@@ -110,7 +110,6 @@ public class UserController extends BaseController {
 
     @GET
     @Path("{loginName}")
-    //@RolesAllowed({"CUSTOMER", "SUPPORT"})
     @Operation(
       summary = "Get Details of a User by id",
       responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = UserResponse.class)))}
@@ -214,7 +213,7 @@ public class UserController extends BaseController {
 
 
     @PUT
-    @RolesAllowed({"ADMIN", "SUPPORT"})
+    @RolesAllowed({"ADMIN"})
     @Operation(
             summary = "Update a User",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
@@ -264,7 +263,6 @@ public class UserController extends BaseController {
 
     @POST
     @Path("changePassword")
-    @RolesAllowed({"ADMIN"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
@@ -325,7 +323,7 @@ public class UserController extends BaseController {
     }
     @POST
     @Path("export")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
@@ -334,7 +332,7 @@ public class UserController extends BaseController {
     ) throws Exception {
         ExportResponse resp = new ExportResponse();
         String fileName = "danh_sach_user.xls";
-        DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_EXPORT_FOLDER + fileName), 6, false);
+        DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_EXPORT_EXCELL + fileName), 6, false);
         List<UserOutputModel> models = userDao.getListExport(model.getLoginName(), model.getRole(),
                 model.getFullName(), model.getEmail(), model.getPhone(), model.getEmployeeId());
         int stt = 1;
@@ -369,7 +367,7 @@ public class UserController extends BaseController {
 
     @GET
     @Path("byId/{userId}")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
@@ -423,7 +421,7 @@ public class UserController extends BaseController {
 
     @POST
     @Path("uploadFile")
-    @RolesAllowed({"ADMIN", "SUPPORT"})
+    @RolesAllowed({"ADMIN"})
     @Operation(
             summary = "Add an employee",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}

@@ -193,7 +193,7 @@ export default defineComponent({
               severity: "success",
               summary: rawDeliveryBillObj.deliveryBillId
                 ? "Sửa thành công!"
-                : "Xóa thành công!",
+                : "Thêm mới thành công!",
               detail: `${rawDeliveryBillObj.name} (${rawDeliveryBillObj.code})`,
               life: 3000,
             });

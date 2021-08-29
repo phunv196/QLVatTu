@@ -85,7 +85,7 @@ public class CartController extends BaseController {
 
     @DELETE
     @Path("{loginName}")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
       summary = "Delete all cart Items of an User",
       responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
@@ -106,7 +106,7 @@ public class CartController extends BaseController {
 
     @DELETE
     @Path("{loginName}/{productId}")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
       summary = "Removes a product from cart of a user",
       responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}

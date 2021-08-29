@@ -30,7 +30,7 @@ public class WarehouseCardFlowController extends BaseController {
     WarehouseCardFlowDao warehouseCardFlowDao = new WarehouseCardFlowDao();
 
     @GET
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get list of warehouseCardFlows",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = WarehouseCardFlowResponse.class)))}

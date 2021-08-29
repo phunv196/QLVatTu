@@ -39,7 +39,7 @@ public class DepartmentController extends BaseController {
     DepartmentDao departmentDao = new DepartmentDao();
 
     @GET
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get list of Departments",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = DepartmentResponse.class)))}
@@ -94,7 +94,7 @@ public class DepartmentController extends BaseController {
 
     @GET
     @Path("all")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get all departments",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = DepartmentResponse.class)))}
@@ -195,7 +195,7 @@ public class DepartmentController extends BaseController {
 
     @POST
     @Path("byCode")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )

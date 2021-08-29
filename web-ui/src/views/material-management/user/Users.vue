@@ -140,6 +140,7 @@
         class="p-ml-1 p-button-sm"
       ></Button>
       <Button
+        v-if="$store.getters.role === 'ADMIN'"
         icon="pi pi-user"
         iconPos="right"
         label="ADD"
@@ -203,31 +204,29 @@
       >
         <template #body="slotProps">
           <template
-            v-if="
-              $store.getters.role === 'ADMIN' ||
-              ($store.getters.role == 'SUPPORT' &&
-                slotProps.data.role !== 'ADMIN')
-            "
-          >
+            v-if="$store.getters.role === 'ADMIN'"> 
             <Button
               icon="pi pi-pencil"
               @click="onEditClick(slotProps.data)"
-              class="
-                p-button-sm p-button-rounded p-button-secondary p-button-text
-              "
-            />
+              class="p-button-sm p-button-rounded p-button-secondary p-button-text"/>
             <Button
+              v-if="$store.getters.role === 'ADMIN'"
               icon="pi pi-trash"
               @click="onDeleteClick(slotProps.data)"
-              class="p-button-sm p-button-rounded p-button-danger p-button-text"
-            />
+              class="p-button-sm p-button-rounded p-button-danger p-button-text"/>
             <Button
+              v-if="$store.getters.role === 'ADMIN'"
               icon="pi pi-undo"
               @click="onResetPasswordClick(slotProps.data)"
               style="color: darkblue"
-              class="p-button-sm p-button-rounded p-button-danger p-button-text"
-            />
-          </template>
+              class="p-button-sm p-button-rounded p-button-danger p-button-text"/>
+        </template>
+        <template v-else>
+            <Button
+              icon="pi pi-eye"
+              @click="onEditClick(slotProps.data)"
+              class="p-button-sm p-button-rounded p-button-secondary p-button-text"/>
+        </template>
         </template>
       </Column>
     </DataTable>

@@ -233,6 +233,12 @@
             @click="onDeleteClick(slotProps.data)"
             class="p-button-sm p-button-rounded p-button-danger p-button-text"
           />
+          <Button
+            icon="pi pi-book"
+            @click="onDownloadFileDocx(slotProps.data)"
+            class="p-button-sm p-button-rounded p-button-info p-button-text"
+          />
+          
         </template>
       </Column>
     </DataTable>
@@ -248,7 +254,7 @@ import WarehouseApi from "@/api/material-management/warehouse-api";
 import DeliveryBillDetails from "@/views/material-management/delivery-bill/DeliveryBillDetails.vue";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
-import { debounce, exportFile } from "@/shared/utils";
+import { debounce, exportFile, exportFileDocx } from "@/shared/utils";
 import EmployeeApi from "@/api/employee-api";
 
 export default defineComponent({
@@ -477,6 +483,13 @@ export default defineComponent({
       selectedRec.value = rec;
     };
 
+    const onDownloadFileDocx = async (rec: Record<string, unknown>) => {
+      DeliveryBillApi.downloadFileDocx(rec.deliveryBillId).then((res) => {
+        const data = res.data.data;
+        exportFileDocx(data.data, data.fileName);
+      });
+    };
+
     onMounted(() => {
       getData(0, pageSize.value);
       lstEmp();
@@ -539,7 +552,8 @@ export default defineComponent({
       searchToDate,
       searchFactory,
       onSearchKeyup,
-      exportExcell
+      exportExcell,
+      onDownloadFileDocx
     };
   },
   components: {

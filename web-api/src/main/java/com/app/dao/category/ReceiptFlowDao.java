@@ -70,12 +70,13 @@ public class ReceiptFlowDao extends BaseHibernateDAO {
                 " s.code suppliesCode," +
                 " s.name suppliesName," +
                 " s.price suppliesPrice," +
-                " s.unit suppliesUnit," +
+                " u.name suppliesUnit," +
                 " (s.price * rf.amount) calculatePrice," +
                 " sp.name speciesName" +
                 " from receipt_flow rf " +
                 " left join supplier sr on sr.supplier_id = rf.supplier_id" +
                 " left join supplies s on s.supplies_id = rf.supplies_id" +
+                " left join unit u on u.unit_id = s.unit_id" +
                 " left join species sp on sp.species_id = s.species_id" +
                 " where rf.receipt_id = :receiptId";
         finalSql = finalSql +" order by rf.receipt_flow_id "+ sqlLimit;

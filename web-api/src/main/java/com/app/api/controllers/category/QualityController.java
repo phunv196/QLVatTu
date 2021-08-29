@@ -38,7 +38,7 @@ public class QualityController extends BaseController {
     QualityDao qualityDao = new QualityDao();
 
     @GET
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get list of qualitys",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = QualityResponse.class)))}
@@ -85,7 +85,7 @@ public class QualityController extends BaseController {
 
     @GET
     @Path("all")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             summary = "Get all qualitys",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = QualityResponse.class)))}
@@ -178,7 +178,7 @@ public class QualityController extends BaseController {
 
     @POST
     @Path("byCode")
-    @RolesAllowed({"ADMIN"})
+    @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )

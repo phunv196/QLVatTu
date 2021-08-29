@@ -378,10 +378,12 @@ public class Constants {
          */
         Integer MAX_ERROR_NUM = 1000;
         String FOLDER_EXPORT = "web-api/src/main/resources/file/folder-export-excel/";
-        String TEMPLATE_EXPORT_FOLDER = "web-api/src/main/resources/file/template-export-excel/";
+        String TEMPLATE_EXPORT_EXCELL = "web-api/src/main/resources/file/template-export-excel/";
         String FOLDER_IMPORT = "web-api/src/main/resources/file/folder-file-import/";
         String TEMPLATE_IMPORT_EXCELL = "web-api/src/main/resources/file/template-import-excell/";
         String FOLDER_EXPORT_TEMPLATE = "web-api/src/main/resources/file/folder-export-template/";
+        String TEMPLATE_EXPORT_DOCX = "web-api/src/main/resources/file/template-export-docx/";
+        String FOLDER_EXPORT_DOCX = "web-api/src/main/resources/file/folder-export-docx/";
 
         String TEMP = "/share/temp/";
         String FONT_FOLDER = CommonUtils.getConfig("fontFolder");

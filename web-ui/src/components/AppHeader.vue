@@ -27,7 +27,7 @@
         <span> {{ $store.getters.role }} </span>
         <span> {{ $store.getters.userName }} </span>
       </div>
-      <Button icon="pi pi-sign-out" class="p-button-rounded" @click="$router.push('/login')"/>
+      <Button style="align-self: center;" icon="pi pi-sign-out" class="p-button-rounded" @click="$router.push('/login')"/>
     </div>
     <Toast />
     <Dialog header="Đổi mật khẩu" v-model:visible="showSlideOut" :style="{width: '30vw' , height: '30vw', background: '#000000'}">
