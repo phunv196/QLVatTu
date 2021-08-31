@@ -37,7 +37,7 @@ public class JerseyApplication extends ResourceConfig {
           "\n UI      : http://localhost:%s/index.html " +
           "\n API     : http://localhost:%s/api " +
           "\n API Docs: http://localhost:%s/api-docs/index.html \n",
-          TomcatStarter.port, TomcatStarter.port, TomcatStarter.port
+          TomcatStarter.port + 1, TomcatStarter.port, TomcatStarter.port
         ));
 
         // Setup OpenAPI

@@ -107,7 +107,7 @@ public class UserDao extends BaseHibernateDAO {
         if (!CommonUtils.isNullOrEmpty(searchEmail))   { sqlWhere = sqlWhere + " and LOWER(u.email) like :searchEmail "; }
         if (!CommonUtils.isNullOrEmpty(searchPhone))   { sqlWhere = sqlWhere + " and LOWER(u.phone) like :searchPhone "; }
         if (!CommonUtils.isNullOrEmpty(searchRole))    { sqlWhere = sqlWhere + " and LOWER(u.role) = :searchRole "; }
-        if (searchEmployeeId >0)   { sqlWhere = sqlWhere + " and u.empluyee_id = :searchEmployeeId "; }
+        if (searchEmployeeId >0)   { sqlWhere = sqlWhere + " and u.employee_id = :searchEmployeeId "; }
         return sqlWhere;
     }
 

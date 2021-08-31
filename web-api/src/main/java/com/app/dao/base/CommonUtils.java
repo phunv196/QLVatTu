@@ -1682,9 +1682,9 @@ public class CommonUtils {
      */
     public static Date getFirstDayOfMonth(int month, int year) throws Exception {
         if (month > 9) {
-            return CommonUtils.convertStringToDate("01/" + month + "/" + year);
+            return CommonUtils.convertStringToDateBasic("01-" + month + "-" + year);
         } else {
-            return CommonUtils.convertStringToDate("01/0" + month + "/" + year);
+            return CommonUtils.convertStringToDateBasic("01-0" + month + "-" + year);
         }
     }
 
@@ -1697,9 +1697,9 @@ public class CommonUtils {
      */
     public static Date getLastDayOfMonth(int month, int year) throws Exception {
         if (month > 9) {
-            return CommonUtils.convertStringToDate(getDaysOfMonth(month, year) + "/" + month + "/" + year);
+            return CommonUtils.convertStringToDateBasic(getDaysOfMonth(month, year) + "-" + month + "-" + year);
         } else {
-            return CommonUtils.convertStringToDate(getDaysOfMonth(month, year) + "/0" + month + "/" + year);
+            return CommonUtils.convertStringToDateBasic(getDaysOfMonth(month, year) + "-0" + month + "-" + year);
         }
     }
 

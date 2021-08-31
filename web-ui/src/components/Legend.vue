@@ -4,7 +4,7 @@
     <div :key="index" v-for="(l, index) in legends" class="m-legend-item">
       <div :style="{backgroundColor:l.color}" class="m-legend-color"></div>
       <div class="m-legend-value-wrap">
-        <div class="m-legend-value">{{l.value}}</div>
+        <div class="m-legend-value">{{l.value}} vnđ</div>
         <div class="m-legend-label">{{l.label}}</div>
       </div>
     </div>

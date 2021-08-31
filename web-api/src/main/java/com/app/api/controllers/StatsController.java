@@ -2,12 +2,13 @@ package com.app.api.controllers;
 
 import com.app.api.BaseController;
 import com.app.dao.StatsDao;
-import com.app.model.stats.CategoryCountModel;
-import com.app.model.stats.CategoryCountModel.CategoryCountResponse;
-import com.app.model.stats.DailyOrderCountModel;
+import com.app.dao.base.CommonUtils;
+import com.app.model.stats.*;
 import com.app.model.stats.DailyOrderCountModel.DailyOrderCountResponse;
-import com.app.model.stats.DailySaleModel;
 import com.app.model.stats.DailySaleModel.DailySaleResponse;
+import com.app.model.stats.QuarterModel.QuarterResponse;
+import com.app.model.stats.MonthStatsModel.MonthStatsResponse;
+import com.app.model.stats.SuppliesStatsModel.SuppliesStatsResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -23,6 +24,9 @@ import org.hibernate.HibernateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Year;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Path("stats")
@@ -34,20 +38,20 @@ public class StatsController extends BaseController {
     StatsDao statsDao = new StatsDao();
 
     @GET
-    @Path("daily-sale")
+    @Path("supplies-stats")
     @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
       summary = "Get Sales by date",
-      responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = DailySaleResponse.class)))}
+      responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = SuppliesStatsResponse.class)))}
     )
-    public Response getDailySale() {
-        DailySaleResponse resp = new DailySaleResponse();
+    public Response getSuppliesStats() {
+        SuppliesStatsResponse resp = new SuppliesStatsResponse();
 
         try {
-            List<DailySaleModel> dailySales = statsDao.getDailySales();
+            List<SuppliesStatsModel> suppliesStats = statsDao.getSuppliesStats();
             statsDao.commitTransaction();
-            resp.setSuccessMessage("Daily Sales");
-            resp.setList(dailySales);
+            resp.setSuccessMessage("Supplies Stats");
+            resp.setList(suppliesStats);
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
             resp.setErrorMessage("Internal Error - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
@@ -56,50 +60,61 @@ public class StatsController extends BaseController {
     }
 
     @GET
-    @Path("daily-order-count")
+    @Path("month-stats")
     @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
       summary = "Get Daily order count",
       responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = DailyOrderCountResponse.class)))}
     )
-    public Response getDailyOrderCount() {
-        DailyOrderCountResponse resp = new DailyOrderCountResponse();
+    public Response getMonthStats() {
+        MonthStatsResponse resp = new MonthStatsResponse();
+        List<MonthStatsModel> models = new ArrayList<>();
+        int year = Year.now().getValue();
         try {
-            statsDao.beginTransaction();
-            List<DailyOrderCountModel> dailyOrderCount = statsDao.getDailyOrderCount();
-            statsDao.commitTransaction();
-            resp.setSuccessMessage("Daily Order Count");
-            resp.setList(dailyOrderCount);
+            for( int i = 1; i < 13 ; i++) {
+                Date startDate = CommonUtils.getFirstDayOfMonth(i , year);
+                Date endDate = CommonUtils.getLastDayOfMonth(i , year);
+                MonthStatsModel model = new MonthStatsModel();
+                model.setMonth("Tháng " + i);
+                Long sumReceipt = statsDao.getSumReceipt(startDate, endDate);
+                model.setSumReceipt(sumReceipt == null ? 0L : sumReceipt);
+                Long sumDeliveryBill = statsDao.getDeliveryBill(startDate, endDate);
+                model.setSumDeliveryBill(sumDeliveryBill == null ? 0L : sumDeliveryBill);
+                model.setSumInventory((sumReceipt == null ? 0L : sumReceipt) - (sumDeliveryBill == null ? 0L : sumDeliveryBill));
+                models.add(model);
+            }
+            resp.setSuccessMessage("Month Stats");
+            resp.setList(models);
             return Response.ok(resp).build();
-        } catch (HibernateException | ConstraintViolationException e) {
+        } catch (Exception e) {
             resp.setErrorMessage("Internal Error - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
     }
 
     @GET
-    @Path("{orderStats: orders-by-status|orders-by-payment-type}")
+    @Path("{stats: by-receipt|by-delivery-bill}")
     @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
-      summary = "Get Orders by status",
-      responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = CategoryCountResponse.class)))}
+      summary = "Get stats",
+      responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = QuarterResponse.class)))}
     )
-    public Response getOrdersByStatus(
-      @Parameter(schema = @Schema(allowableValues = {"orders-by-status","orders-by-payment-type"}), example="orders-by-status")
-      @PathParam("orderStats") String orderStats
+    public Response getStats(
+      @Parameter(schema = @Schema(allowableValues = {"by-receipt","by-delivery-bill"}), example="by-delivery-bill")
+      @PathParam("stats") String stats
     ) {
-        CategoryCountResponse resp = new CategoryCountResponse();
-        List<CategoryCountModel> categoryCountList;
+        QuarterResponse resp = new QuarterResponse();
+        List<QuarterModel> quarterList;
         try {
             statsDao.beginTransaction();
-            if (orderStats.equals("orders-by-status")) {
-                categoryCountList = statsDao.getOrdersByStatus();
+            if (stats.equals("by-receipt")) {
+                quarterList = statsDao.getQuarterReceipt();
             } else {
-                categoryCountList = statsDao.getOrdersByPaymentType();
+                quarterList = statsDao.getQuarterDeliveryBill();
             }
             statsDao.commitTransaction();
             resp.setSuccessMessage("Orders by status");
-            resp.setList(categoryCountList);
+            resp.setList(quarterList);
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
             resp.setErrorMessage("Internal Error - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));

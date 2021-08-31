@@ -178,8 +178,8 @@
         header="Ngày sinh"
         bodyStyle="text-align-last: center;"
       ></Column>
-      <Column field="sexString" header="Giới tính"></Column>
-      <Column field="phone" header="Điện thoại"></Column>
+      <Column field="sexString" header="Giới tính" headerStyle="width:90px;" bodyStyle="text-align-last: center;"></Column>
+      <Column field="phone" header="Điện thoại" headerStyle="width:150px;" bodyStyle="text-align-last: center;"></Column>
       <Column field="email" header="EMAIL" headerStyle="width:210px"></Column>
       <Column
         field="departmentName"

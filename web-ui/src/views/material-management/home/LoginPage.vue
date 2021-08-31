@@ -27,8 +27,6 @@
         <path d="M0 0 Q 155 400 0 800" stroke-width="4px"/>
       </svg>
     </div>
-    <div class="right">
-    </div>
   </div>
 </template>
 

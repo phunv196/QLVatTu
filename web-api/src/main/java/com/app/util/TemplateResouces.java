@@ -36,7 +36,6 @@ public class TemplateResouces {
      */
     public static InputStream getReportFile(String path) throws IOException {
         return new FileInputStream(new File(path));
-//        return new ClassPathResource(path).getInputStream();
     }
     
     public static InputStream getDefaultImageFile(String path) throws IOException {

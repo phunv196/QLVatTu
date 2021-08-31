@@ -2,18 +2,18 @@ import api from '@/api/api-service';
 import { AxiosResponse } from 'axios';
 
 export default {
-  async getDailySale(): Promise<AxiosResponse> {
-    return api.get('/stats/daily-sale');
+  async getSuppliesStats(): Promise<AxiosResponse> {
+    return api.get('/stats/supplies-stats');
   },
 
-  async getDailyOrderCount(): Promise<AxiosResponse> {
-    return api.get('/stats/daily-order-count');
+  async getMonthStats(): Promise<AxiosResponse> {
+    return api.get('/stats/month-stats');
   },
 
-  async getOrdersStats(groupBy: 'by-status' | 'by-payment-type'): Promise<AxiosResponse> {
-    if (groupBy === 'by-status') {
-      return api.get('/stats/orders-by-status');
+  async getStats(groupBy: 'by-receipt' | 'by-delivery-bill'): Promise<AxiosResponse> {
+    if (groupBy === 'by-receipt') {
+      return api.get('/stats/by-receipt');
     }
-    return api.get('/stats/orders-by-payment-type');
+    return api.get('/stats/by-delivery-bill');
   },
 };
