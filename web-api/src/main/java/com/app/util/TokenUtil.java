@@ -1,7 +1,6 @@
  package com.app.util;
 
 import com.app.model.user.UserModel;
-import com.app.model.user.UserViewModel;
 import io.jsonwebtoken.ClaimJwtException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

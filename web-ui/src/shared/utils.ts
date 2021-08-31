@@ -67,7 +67,6 @@ export function exportFile(data: any, fileName: string) {
   a.click();
   setTimeout(() => {
     window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
   }, 0);
 }
 
@@ -81,7 +80,6 @@ export function exportFileDocx(data: any, fileName: string) {
   a.click();
   setTimeout(() => {
     window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
   }, 0);
 }
 

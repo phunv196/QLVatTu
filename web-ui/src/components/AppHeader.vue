@@ -79,7 +79,6 @@ import Logo from '@/components/Logo.vue';
 import Menubar from 'primevue/menubar';
 import { useToast } from "primevue/usetoast";
 import UsersApi from "@/api/users-api";
-import Register from '@/views/material-management/home/Register.vue'
 export default defineComponent({
   props: {
     label: { type: String, default: 'ORDER MANAGEMENT' },
@@ -88,7 +87,6 @@ export default defineComponent({
   components: {
     Logo,
     Menubar,
-    Register
   },
   setup(): unknown {
     const showSlideOut = ref(false);

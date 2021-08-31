@@ -23,17 +23,8 @@
 
     <!-- Mappings -->
     <mapping class="com.app.model.user.UserModel"/>
-    <mapping class="com.app.model.user.UserViewModel"/>
     <mapping class="com.app.model.employee.EmployeeModel"/>
     <mapping class="com.app.model.employee.EmployeeUserModel"/>
-    <mapping class="com.app.model.customer.CustomerModel"/>
-    <mapping class="com.app.model.customer.CustomerUserModel"/>
-    <mapping class="com.app.model.product.ProductModel"/>
-    <mapping class="com.app.model.order.OrderModel"/>
-    <mapping class="com.app.model.order.OrderItemModel"/>
-    <mapping class="com.app.model.order.OrderInfoModel"/>
-    <mapping class="com.app.model.cart.CartModel"/>
-    <mapping class="com.app.model.cart.CartViewModel"/>
     <mapping class="com.app.model.category.DeliveryBillFlowModel"/>
     <mapping class="com.app.model.category.DeliveryBillModel"/>
     <mapping class="com.app.model.category.FactoryModel"/>

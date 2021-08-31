@@ -1,30 +1,26 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import LoginPage from '@/views/material-management/home/LoginPage.vue';
+import LoginPage from '@/views/home/LoginPage.vue';
 import AppShell from '@/components/AppShell.vue';
 import PageContainer from '@/components/PageContainer.vue';
-import Users from '@/views/material-management/user/Users.vue';
-import Customers from '@/views/Customers.vue';
-import Orders from '@/views/Orders.vue';
-import Products from '@/views/Products.vue';
-import Employees from '@/views/material-management/employee/Employees.vue';
-import Register from '@/views/material-management/home/Register.vue';
-import Dashboard from '@/views/material-management/home/Dashboard.vue';
+import Users from '@/views/user/Users.vue';
+import Employees from '@/views/employee/Employees.vue';
+import Dashboard from '@/views/home/Dashboard.vue';
 import store from '@/store';
 // import Home from '../views/Home.vue';
 
 //material management
-import DeliveryBill from '@/views/material-management/delivery-bill/DeliveryBill.vue';
-import Factory from '@/views/material-management/factory/Factory.vue';
-import Position from '@/views/material-management/position/Position.vue';
-import Quality from '@/views/material-management/quality/Quality.vue';
-import Receipt from '@/views/material-management/receipt/Receipt.vue';
-import Unit from '@/views/material-management/unit/Unit.vue';
-import Species from '@/views/material-management/species/Species.vue';
-import Supplier from '@/views/material-management/supplier/Supplier.vue';
-import Supplies from '@/views/material-management/supplies/Supplies.vue';
-import Warehouse from '@/views/material-management/warehouse/Warehouse.vue';
-import WarehouseCard from '@/views/material-management/warehouse-card/WarehouseCard.vue';
-import Department from '@/views/material-management/department/Department.vue';
+import DeliveryBill from '@/views/delivery-bill/DeliveryBill.vue';
+import Factory from '@/views/factory/Factory.vue';
+import Position from '@/views/position/Position.vue';
+import Quality from '@/views/quality/Quality.vue';
+import Receipt from '@/views/receipt/Receipt.vue';
+import Unit from '@/views/unit/Unit.vue';
+import Species from '@/views/species/Species.vue';
+import Supplier from '@/views/supplier/Supplier.vue';
+import Supplies from '@/views/supplies/Supplies.vue';
+import Warehouse from '@/views/warehouse/Warehouse.vue';
+import WarehouseCard from '@/views/warehouse-card/WarehouseCard.vue';
+import Department from '@/views/department/Department.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -36,7 +32,6 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   { path: '/login', component: LoginPage, meta: { permitAll: true } },
-  { path: '/register', component: Register, meta: { permitAll: true } },
   {
     path: '/home',
     redirect: '/home/manage/dashboard',
@@ -49,9 +44,6 @@ const routes: Array<RouteRecordRaw> = [
         children: [
           { path: 'dashboard', component: Dashboard },
           { path: 'users', component: Users },
-          { path: 'customers', component: Customers },
-          { path: 'orders', component: Orders },
-          { path: 'products', component: Products },
           { path: 'employees', component: Employees },
           //material-management
           { path: 'delivery-bill', component: DeliveryBill },
