@@ -30,9 +30,9 @@ function errorResponseParser(err: AxiosError): Promise<AxiosResponse> {
         store.commit('jwtTime', '');
         AppEvent.emit('auth-failed', { msg: 'Username hoặc password không chính xác!' });
       } else if (err.response.data && err.response.data.msgType === 'NO_ACCESS') {
-        AppEvent.emit('no-access', { msg: 'Bạn không có quyền đăng nhập vào hệ thống!' });
+        AppEvent.emit('no-access', { msg: 'Bạn không có quyền sử dụng chức năng trên!' });
       } else if (err.response.data && err.response.data.msgType === 'BAD_TOKEN') {
-        AppEvent.emit('bad-token', { msg: 'Phiên đăng nhập đã hết hạn hoặc mã thông báo không chính xác!' });
+        AppEvent.emit('bad-token', { msg: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!' });
       }
     } else {
       // AppEvent.emit('server-access-error');

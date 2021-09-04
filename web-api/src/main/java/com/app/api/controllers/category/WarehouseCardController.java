@@ -307,11 +307,11 @@ public class WarehouseCardController extends BaseController {
     public Response downloadFileDocx(@Parameter(description = "DeliveryBill Id", example = "601") @PathParam("warehouseCardId") Long warehouseCardId) throws IOException {
         ExportModel.ExportResponse resp = new ExportModel.ExportResponse();
         //lay ra user dang dang nhap -> employeeId -> department
-        UserModel userFromToken = (UserModel)securityContext.getUserPrincipal();
-        EmployeeModel employeeModel = employeeDao.getById(Long.valueOf(userFromToken.getEmployeeId()));
+        WarehouseCardModel warehouseCardModel = warehouseCardDao.getById(warehouseCardId);
+        EmployeeModel employeeModel = employeeDao.getById(Long.valueOf(warehouseCardModel.getEmployeeId()));
         DepartmentModel departmentModel = departmentDao.getById(employeeModel.getDepartmentId());
 
-        WarehouseCardModel warehouseCardModel = warehouseCardDao.getById(warehouseCardId);
+
         SuppliesModel suppliesModel = suppliesDao.getById(warehouseCardModel.getSuppliesId());
         UnitModel unitModel = unitDao.getById(suppliesModel.getUnitId());
         List<WarehouseCardFlowModel> models = warehouseCardFlowDao.getByWarehouseCardId(warehouseCardId);

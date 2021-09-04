@@ -16,6 +16,7 @@ public class DeliveryBillFlowModel {
     @Column(name = "delivery_bill_id", unique = true, nullable = false) private Long deliveryBillId;
     @Column(name = "supplies_id")      private Long  suppliesId;
     @Column(name = "amount")       private Long  amount;
+    @Column(name = "description")       private String  description;
 
     @Transient
     private String suppliesCode;
@@ -111,6 +112,14 @@ public class DeliveryBillFlowModel {
 
     public void setCalculatePrice(String calculatePrice) {
         this.calculatePrice = calculatePrice;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public static class DeliveryBillFlowResponse extends PageResponse {

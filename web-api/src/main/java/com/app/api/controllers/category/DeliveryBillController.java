@@ -5,12 +5,14 @@ import com.app.dao.base.CommonUtils;
 import com.app.dao.base.converter.DynamicExport;
 import com.app.dao.category.DeliveryBillDao;
 import com.app.dao.category.DeliveryBillFlowDao;
+import com.app.dao.category.FactoryDao;
 import com.app.dao.category.WarehouseDao;
 import com.app.model.BaseResponse;
 import com.app.model.ExportModel;
 import com.app.model.category.DeliveryBillFlowModel;
 import com.app.model.category.DeliveryBillModel;
 import com.app.model.category.DeliveryBillModel.DeliveryBillResponse;
+import com.app.model.category.FactoryModel;
 import com.app.model.category.WarehouseModel;
 import com.app.model.user.UserModel;
 import com.app.util.TemplateResouces;
@@ -47,6 +49,7 @@ public class DeliveryBillController extends BaseController {
     DeliveryBillDao deliveryBillDao = new DeliveryBillDao();
     DeliveryBillFlowDao deliveryBillFlowDao = new DeliveryBillFlowDao();
     WarehouseDao warehouseDao = new WarehouseDao();
+    FactoryDao factoryDao = new FactoryDao();
 
     @GET
     @RolesAllowed({"ADMIN", "SUPPORT"})
@@ -338,28 +341,26 @@ public class DeliveryBillController extends BaseController {
         ExportModel.ExportResponse resp = new ExportModel.ExportResponse();
         List<DeliveryBillFlowModel> models = deliveryBillFlowDao.getByDeliveryBillId(deliveryBillId);
         DeliveryBillModel deliveryBillModel = deliveryBillDao.getById(deliveryBillId);
+        FactoryModel factoryModel = factoryDao.getById(deliveryBillModel.getFactoryId());
         WarehouseModel warehouseModel = warehouseDao.getById(deliveryBillModel.getWarehouseId());
         Date date = new Date();
         String strDate = CommonUtils.convertDateToString(date);
         String[] arrDate = strDate.split("/");
         File fileDocx = new File(TEMPLATE_EXPORT_DOCX + "BM_Phieu_Xuat_Kho.docx");
         String prefixOutPutFile = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "_";
+        //map replace
+        Map<String, String> map = new HashMap<>();
+        map.put("day", arrDate[0]);
+        map.put("month", arrDate[1]);
+        map.put("year", arrDate[2]);
+        map.put("factoryName", factoryModel.getName());
+        map.put("description", deliveryBillModel.getDescription());
+        map.put("warehouseName", warehouseModel.getName());
         try (InputStream is = new FileInputStream(fileDocx);
              XWPFDocument doc = new XWPFDocument(is)) {
             Iterator<IBodyElement> docElementsIterator = doc.getBodyElementsIterator();
             List<XWPFParagraph> xwpfParagraphList = doc.getParagraphs();
             for (XWPFParagraph xwpfParagraph : xwpfParagraphList) {
-                for (XWPFRun xwpfRun : xwpfParagraph.getRuns()) {
-                    String docText = xwpfRun.getText(0);
-                    //replacement and setting position
-                    if (docText != null) {
-                        docText = docText.replace("day", arrDate[0]);
-                        docText = docText.replace("month", arrDate[1]);
-                        docText = docText.replace("year", arrDate[2]);
-                        docText = docText.replace("warehouse", warehouseModel.getName());
-                        xwpfRun.setText(docText, 0);
-                    }
-                }
                 IBodyElement docElement = docElementsIterator.next();
                 if ("TABLE".equalsIgnoreCase(docElement.getElementType().name())) {
                     //Get List of table and iterate it
@@ -373,19 +374,23 @@ public class DeliveryBillController extends BaseController {
                             int col = 0;
                             xwpfTable.createRow();
                             xwpfTable.getRow(row).getCell(col++).setText(String.valueOf(index++));
-                            xwpfTable.getRow(row).getCell(col++).setText(model.getSpeciesName());
+                            xwpfTable.getRow(row).getCell(col++).setText(model.getSuppliesName());
+                            xwpfTable.getRow(row).getCell(col++).setText(model.getSuppliesCode());
                             xwpfTable.getRow(row).getCell(col++).setText(model.getSuppliesUnit());
                             xwpfTable.getRow(row).getCell(col++).setText(String.valueOf(model.getAmount()));
                             xwpfTable.getRow(row).getCell(col++).setText(model.getSuppliesPrice());
                             xwpfTable.getRow(row).getCell(col++).setText(model.getCalculatePrice());
+                            xwpfTable.getRow(row).getCell(col++).setText(model.getDescription());
                             row++;
                             sum += Long.parseLong(model.getCalculatePrice());
                         }
                         xwpfTable.createRow();
                         xwpfTable.getRow(row).getCell(1).setText("Tổng cộng:");
-                        xwpfTable.getRow(row).getCell(5).setText(String.valueOf(sum));
+                        xwpfTable.getRow(row).getCell(6).setText(String.valueOf(sum));
+                        map.put("strMoney", CommonUtils.numberToString(sum));
                     }
                 }
+                CommonUtils.replaceParagraph(xwpfParagraph, map);
             }
             try (FileOutputStream out = new FileOutputStream(FOLDER_EXPORT_DOCX + prefixOutPutFile + "Phieu_Xuat_Kho.docx")) {
                 doc.write(out);

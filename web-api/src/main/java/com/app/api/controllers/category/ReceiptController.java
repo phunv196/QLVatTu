@@ -1,8 +1,10 @@
 package com.app.api.controllers.category;
 
 import com.app.api.BaseController;
+import com.app.dao.EmployeeDao;
 import com.app.dao.base.CommonUtils;
 import com.app.dao.base.converter.DynamicExport;
+import com.app.dao.category.DepartmentDao;
 import com.app.dao.category.ReceiptDao;
 import com.app.dao.category.ReceiptFlowDao;
 import com.app.dao.category.WarehouseDao;
@@ -10,6 +12,7 @@ import com.app.model.BaseResponse;
 import com.app.model.ExportModel;
 import com.app.model.category.*;
 import com.app.model.category.ReceiptModel.ReceiptResponse;
+import com.app.model.employee.EmployeeModel;
 import com.app.model.user.UserModel;
 import com.app.util.TemplateResouces;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,6 +49,8 @@ public class ReceiptController extends BaseController {
     ReceiptDao receiptDao = new ReceiptDao();
     ReceiptFlowDao receiptFlowDao = new ReceiptFlowDao();
     WarehouseDao warehouseDao = new WarehouseDao();
+    EmployeeDao employeeDao = new EmployeeDao();
+    DepartmentDao departmentDao = new DepartmentDao();
 
     @GET
     @RolesAllowed({"ADMIN", "SUPPORT"})
@@ -328,28 +333,27 @@ public class ReceiptController extends BaseController {
         ExportModel.ExportResponse resp = new ExportModel.ExportResponse();
         List<ReceiptFlowModel> models = receiptFlowDao.getByReceiptId(receiptId);
         ReceiptModel receiptModel = receiptDao.getById(receiptId);
+        EmployeeModel employeeModel = employeeDao.getById(receiptModel.getEmployeeId());
+        DepartmentModel departmentModel = departmentDao.getById(employeeModel.getDepartmentId());
         WarehouseModel warehouseModel = warehouseDao.getById(receiptModel.getWarehouseId());
         Date date = new Date();
         String strDate = CommonUtils.convertDateToString(date);
         String[] arrDate = strDate.split("/");
         File fileDocx = new File(TEMPLATE_EXPORT_DOCX + "BM_Phieu_Nhap_Kho.docx");
         String prefixOutPutFile = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "_";
+        Map<String, String> map = new HashMap<>();
+        map.put("departmentName", departmentModel == null ? " " : departmentModel.getName());
+        map.put("day", arrDate[0]);
+        map.put("month", arrDate[1]);
+        map.put("year", arrDate[2]);
+        map.put("employeeName", employeeModel == null ? " " : employeeModel.getFullName());
+        map.put("warehouseName", warehouseModel == null ? " " : warehouseModel.getName());
+        map.put("warehouseAddress", warehouseModel == null ? " " : warehouseModel.getAddress());
         try (InputStream is = new FileInputStream(fileDocx);
              XWPFDocument doc = new XWPFDocument(is)) {
             Iterator<IBodyElement> docElementsIterator = doc.getBodyElementsIterator();
             List<XWPFParagraph> xwpfParagraphList = doc.getParagraphs();
             for (XWPFParagraph xwpfParagraph : xwpfParagraphList) {
-                for (XWPFRun xwpfRun : xwpfParagraph.getRuns()) {
-                    String docText = xwpfRun.getText(0);
-                    //replacement and setting position
-                    if (docText != null) {
-                        docText = docText.replace("day", arrDate[0]);
-                        docText = docText.replace("month", arrDate[1]);
-                        docText = docText.replace("year", arrDate[2]);
-                        docText = docText.replace("warehouse", warehouseModel.getName());
-                        xwpfRun.setText(docText, 0);
-                    }
-                }
                 IBodyElement docElement = docElementsIterator.next();
                 if ("TABLE".equalsIgnoreCase(docElement.getElementType().name())) {
                     List<XWPFTable> xwpfTableList = docElement.getBody().getTables();
@@ -363,7 +367,8 @@ public class ReceiptController extends BaseController {
                             int col = 0;
                             xwpfTable.createRow();
                             xwpfTable.getRow(row).getCell(col++).setText(String.valueOf(index++));
-                            xwpfTable.getRow(row).getCell(col++).setText(model.getSpeciesName());
+                            xwpfTable.getRow(row).getCell(col++).setText(model.getSuppliesName());
+                            xwpfTable.getRow(row).getCell(col++).setText(model.getSuppliesCode());
                             xwpfTable.getRow(row).getCell(col++).setText(model.getSuppliesUnit());
                             xwpfTable.getRow(row).getCell(col++).setText("");
                             xwpfTable.getRow(row).getCell(col++).setText(String.valueOf(model.getAmount()));
@@ -376,10 +381,12 @@ public class ReceiptController extends BaseController {
                         xwpfTable.createRow();
                         xwpfTable.getRow(row).getCell(1).setText("Tổng cộng:");
                         xwpfTable.getRow(row).addNewTableCell();
-                        xwpfTable.getRow(row).getCell(4).setText(String.valueOf(sumAmount));
-                        xwpfTable.getRow(row).getCell(6).setText(String.valueOf(sum));
+                        xwpfTable.getRow(row).getCell(5).setText(String.valueOf(sumAmount));
+                        xwpfTable.getRow(row).getCell(7).setText(String.valueOf(sum));
+                        map.put("strMoney", CommonUtils.numberToString(sum));
                     }
                 }
+                CommonUtils.replaceParagraph(xwpfParagraph, map);
             }
             try (FileOutputStream out = new FileOutputStream(FOLDER_EXPORT_DOCX + prefixOutPutFile + "Phieu_Nhap_Kho.docx")) {
                 doc.write(out);

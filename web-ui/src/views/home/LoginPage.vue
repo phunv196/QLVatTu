@@ -4,7 +4,7 @@
     <Toast />
     <div>
       <span class="display:flex" >
-        <Logo style="display:inline-block;width:50px;height:50px; margin-bottom:50px;"></Logo>
+        <Logo style="display:inline-block;width:50px;height:50px; margin-bottom:20px;"></Logo>
         <span class="sw-light-text-on-dark" style="font-size:32px">Quản lý kho vật tư</span>
         <div class="p-d-flex p-flex-column p-jc-center p-mt-4 p-ml-6" >
           <span class="p-input-icon-left p-mt-1">

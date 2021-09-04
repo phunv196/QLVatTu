@@ -8,18 +8,6 @@ import org.hibernate.Query;
 
 public class PositionDao extends BaseHibernateDAO {
 
-//    public  BigDecimal getReferenceCount(Long productId){
-//        String sql = "Select sum(cnt) from ("+
-//                "   select count(*) as cnt from northwind.cart where product_id = :productId "+
-//                "   union "+
-//                "   select count(*) as cnt from northwind.order_items where product_id = :productId "+
-//                " )";
-//
-//        Query q = hbrSession.createSQLQuery(sql);
-//        q.setParameter("productId", productId);
-//        return (BigDecimal) q.uniqueResult();
-//    }
-
     public PositionModel getById(Long positionId){
         String hql = "from PositionModel where positionId = :positionId";
         Query q = createQuery(hql);

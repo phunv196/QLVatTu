@@ -14,7 +14,7 @@
     </transition>
     <div>
       <div class="p-mt-3">
-        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
+        <label class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           >Vật tư <strong class="p-error">*</strong>
         </label>
         <Dropdown
@@ -31,13 +31,25 @@
       </div>
 
       <div class="p-mt-3">
-        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
+        <label class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           >Số lượng <strong class="p-error">*</strong>
         </label>
         <InputText
           type="text"
           v-model="recData.amount"
           class="p-inputtext-sm"
+          style="width: 40%"
+        />
+      </div>
+      <div class="p-mt-3 p-d-flex p-ai-center">
+        <label class="p-d-inline-block m-label-size-3 p-text-left p-mr-1">
+          Ghi chú
+        </label>
+        <textarea
+          rows="3"
+          v-model="recData.description"
+          class="p-inputtext-sm"
+          maxlength="500"
           style="width: 40%"
         />
       </div>

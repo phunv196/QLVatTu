@@ -63,6 +63,7 @@ public class ReceiptFlowDao extends BaseHibernateDAO {
         String finalSql = "select rf.receipt_flow_id receiptFlowId," +
                 " rf.amount amount," +
                 " rf.receipt_id receiptId," +
+                " rf.description description," +
                 " sr.supplier_id supplierId," +
                 " sr.code supplierCode," +
                 " sr.name supplierName," +
@@ -91,6 +92,7 @@ public class ReceiptFlowDao extends BaseHibernateDAO {
         String finalSql = "select rf.receipt_flow_id receiptFlowId," +
                 " rf.amount amount," +
                 " rf.receipt_id receiptId," +
+                " rf.description description," +
                 " sr.supplier_id supplierId," +
                 " sr.code supplierCode," +
                 " sr.name supplierName," +

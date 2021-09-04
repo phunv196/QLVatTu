@@ -25,6 +25,7 @@ public class DeliveryBillFlowDao extends BaseHibernateDAO {
         String sql = "select dbf.delivery_bill_flow_id deliveryBillFlowId," +
                 " dbf.amount amount," +
                 " dbf.delivery_bill_id deliveryBillId," +
+                " dbf.description description," +
                 " s.supplies_id suppliesId," +
                 " s.code suppliesCode," +
                 " s.name suppliesName," +
@@ -88,6 +89,7 @@ public class DeliveryBillFlowDao extends BaseHibernateDAO {
         String finalSql = "select dbf.delivery_bill_flow_id deliveryBillFlowId," +
                 " dbf.amount amount," +
                 " dbf.delivery_bill_id deliveryBillId," +
+                " dbf.description description," +
                 " s.supplies_id suppliesId," +
                 " s.code suppliesCode," +
                 " s.name suppliesName," +

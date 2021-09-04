@@ -15,7 +15,7 @@
 
     <div>
       <div class="p-mt-3">
-        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
+        <label class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           >Vật tư <strong class="p-error">*</strong>
         </label>
         <Dropdown
@@ -31,13 +31,25 @@
         />
       </div>
       <div class="p-mt-3">
-        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
+        <label class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           >Số lượng <strong class="p-error">*</strong>
         </label>
         <InputNumber
           type="text"
           v-model="recData.amount"
           class="p-inputtext-sm"
+          style="width: 40%"
+        />
+      </div>
+      <div class="p-mt-3 p-d-flex p-ai-center">
+        <label class="p-d-inline-block m-label-size-3 p-text-left p-mr-1">
+          Ghi chú
+        </label>
+        <textarea
+          rows="3"
+          v-model="recData.description"
+          class="p-inputtext-sm"
+          maxlength="500"
           style="width: 40%"
         />
       </div>
@@ -93,7 +105,7 @@ export default defineComponent({
 
     const onApplyChanges = async () => {
       const rawReceiptFlowObj = JSON.parse(JSON.stringify(recData.value));
-      delete rawReceiptFlowObj.index
+      delete rawReceiptFlowObj.index;
       let msg: any[];
       msg = [];
       if (!rawReceiptFlowObj.suppliesId) {
@@ -117,9 +129,7 @@ export default defineComponent({
         if (resp.data.msgType === "SUCCESS") {
           toast.add({
             severity: "success",
-            summary: rawReceiptFlowObj.receiptFlowId
-              ? "Sửa"
-              : "Thêm mới",
+            summary: rawReceiptFlowObj.receiptFlowId ? "Sửa" : "Thêm mới",
             detail: "Thao tác thành công",
             life: 3000,
           });
@@ -129,8 +139,8 @@ export default defineComponent({
           changesApplied.value = true;
           emit("changed");
           setTimeout(() => {
-              onCancel();
-            }, 500);
+            onCancel();
+          }, 500);
         } else {
           toast.add({
             severity: "error",
