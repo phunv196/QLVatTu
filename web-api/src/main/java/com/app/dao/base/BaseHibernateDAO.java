@@ -2,6 +2,7 @@ package com.app.dao.base;/*
  * Copyright (C) 2010 HRPlus. All rights reserved.
  * HRPLUS PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  */
+import com.app.util.HibernateUtil;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
@@ -36,15 +37,16 @@ public class BaseHibernateDAO {
     private static final String SORTING_LANGUAGE = "Vietnamese";
     //<editor-fold defaultstate="collapsed" desc="Hang, bien, phuong thuc static">
     public static ThreadLocal<Session> threadLocal = new ThreadLocal();
-    public static final String configFile = "hibernate.cfg.xml";
+    public static final String configFile = "hibernate.cfg.xml.bak";
     public static final Configuration configuration = new Configuration();
     private static SessionFactory sessionFactory;
     Session session = null;
     static {
         try {
-            configuration.configure(configFile);
-//            loadEncryptedDBConfig(configuration);
-            sessionFactory = configuration.buildSessionFactory();
+//            configuration.configure(configFile);
+////            loadEncryptedDBConfig(configuration);
+//            sessionFactory = configuration.buildSessionFactory();
+            sessionFactory = HibernateUtil.getSessionFactory();
         } catch (Exception e) {
             LOGGER.error("", e);
         }

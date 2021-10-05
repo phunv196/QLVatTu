@@ -1,18 +1,10 @@
 package com.app.util;
 
-import com.app.model.cart.CartModel;
-import com.app.model.cart.CartViewModel;
+
 import com.app.model.category.*;
-import com.app.model.customer.CustomerModel;
-import com.app.model.customer.CustomerUserModel;
 import com.app.model.employee.EmployeeModel;
 import com.app.model.employee.EmployeeUserModel;
-import com.app.model.order.OrderInfoModel;
-import com.app.model.order.OrderItemModel;
-import com.app.model.order.OrderModel;
-import com.app.model.product.ProductModel;
 import com.app.model.user.UserModel;
-import com.app.model.user.UserViewModel;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistry;
@@ -35,7 +27,7 @@ public class HibernateUtil {
             //Connection Props
             configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
             configuration.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver");
-            configuration.setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/material_management?useUnicode=yes&characterEncoding=UTF-8");
+            configuration.setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/qlvattu?useUnicode=yes&characterEncoding=UTF-8");
             configuration.setProperty("useUnicode", "true");
             configuration.setProperty("characterEncoding", "UTF-8");
             configuration.setProperty("hibernate.connection.release_mode", "auto");
@@ -46,18 +38,8 @@ public class HibernateUtil {
 
             //Class Mappings
             configuration.addAnnotatedClass(UserModel.class);
-            configuration.addAnnotatedClass(UserViewModel.class);
             configuration.addAnnotatedClass(EmployeeModel.class);
             configuration.addAnnotatedClass(EmployeeUserModel.class);
-            configuration.addAnnotatedClass(CustomerModel.class);
-            configuration.addAnnotatedClass(CustomerUserModel.class);
-            configuration.addAnnotatedClass(ProductModel.class);
-            configuration.addAnnotatedClass(OrderModel.class);
-            configuration.addAnnotatedClass(OrderItemModel.class);
-            configuration.addAnnotatedClass(OrderInfoModel.class);
-            configuration.addAnnotatedClass(CartModel.class);
-            configuration.addAnnotatedClass(CartViewModel.class);
-            //material management
             configuration.addAnnotatedClass(DeliveryBillFlowModel.class);
             configuration.addAnnotatedClass(DeliveryBillModel.class);
             configuration.addAnnotatedClass(FactoryModel.class);
@@ -73,7 +55,8 @@ public class HibernateUtil {
             configuration.addAnnotatedClass(WarehouseCardFlowModel.class);
             configuration.addAnnotatedClass(WarehouseCardModel.class);
             configuration.addAnnotatedClass(WarehouseModel.class);
-
+            configuration.addAnnotatedClass(DepartmentModel.class);
+            //material management
             ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
             sessionFactory = configuration.buildSessionFactory(serviceRegistry);
         }

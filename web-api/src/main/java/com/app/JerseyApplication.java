@@ -1,6 +1,7 @@
 package com.app;
 
 import com.app.api.HandleInputJsonParseException;
+import com.app.dao.base.BaseHibernateDAO;
 import com.app.filters.AuthorizationRequestFilter;
 import com.app.filters.CORSResponseFilter;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
@@ -85,7 +86,7 @@ public class JerseyApplication extends ResourceConfig {
         // Register Source Packages
         packages("com.app.api");
 
-        //Configure Hibernate Session
-        //BaseHibernateDAO.getSessionFactory();
+//        Configure Hibernate Session
+//        BaseHibernateDAO.getSessionFactory();
     }
 }
