@@ -45,7 +45,8 @@ public class JerseyApplication extends ResourceConfig {
         Info info = new Info()
           .title("Mrin Order Processing System")
           .description("This is a sample server Order processing server. using an In-Memory H2 database")
-          .contact(new Contact().email("contact-me@example.com"))
+          .contact(new Contact().email("" +
+                  "phunv196@gmail.com.com"))
           .license(new License()
             .name("Apache 2.0")
             .url("http://www.apache.org/licenses/LICENSE-2.0.html"));

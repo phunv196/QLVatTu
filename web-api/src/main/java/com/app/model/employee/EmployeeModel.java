@@ -16,7 +16,6 @@ public class EmployeeModel {
     @Column(name = "first_name") private String  firstName;
     @Column(name = "full_name") private String  fullName;
     @Column(name = "email") private String  email;
-    @Column(name = "avatar") private String  avatar;
     @Column(name = "phone") private String  phone;
     @Column(name = "address") private String  address;
     @Column(name = "sex") private Long  sex;
@@ -37,7 +36,7 @@ public class EmployeeModel {
     public EmployeeModel(){};
 
     public EmployeeModel(Long employeeId, String code, String lastName, String firstName, String fullName,
-                         String email, String avatar, String phone, String address, Long sex, Date birth,
+                         String email, String phone, String address, Long sex, Date birth,
                          Long positionId, Long departmentId, String positionName, String departmentName) {
         this.employeeId = employeeId;
         this.code = code;
@@ -45,7 +44,6 @@ public class EmployeeModel {
         this.firstName = firstName;
         this.fullName = fullName;
         this.email = email;
-        this.avatar = avatar;
         this.phone = phone;
         this.address = address;
         this.sex = sex;
@@ -75,9 +73,6 @@ public class EmployeeModel {
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
-
-    public String getAvatar() { return avatar; }
-    public void setAvatar(String avatar) { this.avatar = avatar; }
 
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }

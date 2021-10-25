@@ -37,22 +37,15 @@ public class BaseHibernateDAO {
     private static final String SORTING_LANGUAGE = "Vietnamese";
     //<editor-fold defaultstate="collapsed" desc="Hang, bien, phuong thuc static">
     public static ThreadLocal<Session> threadLocal = new ThreadLocal();
-    public static final String configFile = "hibernate.cfg.xml.bak";
-    public static final Configuration configuration = new Configuration();
     private static SessionFactory sessionFactory;
     Session session = null;
     static {
         try {
-//            configuration.configure(configFile);
-////            loadEncryptedDBConfig(configuration);
-//            sessionFactory = configuration.buildSessionFactory();
             sessionFactory = HibernateUtil.getSessionFactory();
         } catch (Exception e) {
             LOGGER.error("", e);
         }
     }
-
-    //</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc="Cac phuong thuc co ban">
     public Session getSession() throws HibernateException {
@@ -105,9 +98,8 @@ public class BaseHibernateDAO {
         if (sessionFactory != null) {
             return sessionFactory;
         }
-        configuration.configure(configFile);
         //loadEncryptedDBConfig(configuration);
-        return configuration.buildSessionFactory();
+        return HibernateUtil.getSessionFactory();
 
     }
 

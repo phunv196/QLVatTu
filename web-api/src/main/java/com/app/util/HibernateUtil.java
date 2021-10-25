@@ -3,7 +3,6 @@ package com.app.util;
 
 import com.app.model.category.*;
 import com.app.model.employee.EmployeeModel;
-import com.app.model.employee.EmployeeUserModel;
 import com.app.model.user.UserModel;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -39,7 +38,6 @@ public class HibernateUtil {
             //Class Mappings
             configuration.addAnnotatedClass(UserModel.class);
             configuration.addAnnotatedClass(EmployeeModel.class);
-            configuration.addAnnotatedClass(EmployeeUserModel.class);
             configuration.addAnnotatedClass(DeliveryBillFlowModel.class);
             configuration.addAnnotatedClass(DeliveryBillModel.class);
             configuration.addAnnotatedClass(FactoryModel.class);
@@ -66,34 +64,6 @@ public class HibernateUtil {
     public static Session getSession(){
         return getSessionFactory().openSession();
     }
-
-    /*
-    //Hibernate 5 Style
-    public static SessionFactory getSessionFactory() {
-        if (sessionFactory == null) {
-
-            try {
-                // Create registry ( DB Connection Properties from hibernate.cfg.bak)
-                registry = new StandardServiceRegistryBuilder().configure().build();
-
-                // Create MetadataSources and MetaData  ( Entity Class Mappings from hibernate.cfg.bak)
-                MetadataSources sources = new MetadataSources(registry);
-                Metadata metadata = sources.getMetadataBuilder().build();
-
-                // Create SessionFactory
-                sessionFactory = metadata.getSessionFactoryBuilder().build();
-
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-                if (registry != null) {
-                    StandardServiceRegistryBuilder.destroy(registry);
-                }
-            }
-        }
-        return sessionFactory;
-    }
-    */
 
     public static void shutdown() {
         if (registry != null) {
