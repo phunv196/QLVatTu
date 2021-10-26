@@ -71,9 +71,9 @@ export default defineComponent({
     };
 
     onMounted(() => {
-      store.commit('baseUrl', 'http://localhost:8080');
+      // store.commit('baseUrl', 'http://localhost:8080');
       // store.commit('baseUrl', 'http://localhost:8080/ql-vt');
-      // store.commit('baseUrl', `${window.location.origin}/`);
+      store.commit('baseUrl', `${window.location.origin}/`);
     });
 
 
