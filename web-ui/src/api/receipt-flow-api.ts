@@ -4,16 +4,9 @@ import { AxiosResponse } from 'axios';
 export default {
   async getReceiptFlows(page = 1, pageSize = 5, receiptId: number): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
-    if (page) {
-      qsParams.page = page;
-    }
-    if (pageSize) {
-      qsParams['page-size'] = pageSize;
-    }
-    if (receiptId) {
-      qsParams.receiptId = receiptId;
-    }
-
+    if (page) { qsParams.page = page; }
+    if (pageSize) { qsParams['page-size'] = pageSize; }
+    if (receiptId) { qsParams.receiptId = receiptId; }
     return api.get('/receipt_flows', { params: qsParams });
   },
 
@@ -37,7 +30,6 @@ export default {
     if (suppliesId) {
       qsParams.suppliesId = suppliesId;
     }
-
     return api.get('/receipt_flows/receipt_flow', { params: qsParams });
   },
 };

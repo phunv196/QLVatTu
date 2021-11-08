@@ -29,80 +29,29 @@ export default {
     return api.post('/users/changePassword', userObj);
   },
 
-  // async getUsers(page = 1, pageSize = 20, loginName?: string, role?: string): Promise<AxiosResponse> {
-  //   const qsParams: Record<string, number|string> = { };
-  //   if (page) { qsParams.page = page; }
-  //   if (pageSize) { qsParams['page-size'] = pageSize; }
-  //   if (loginName) { qsParams['login-name'] = loginName; }
-  //   if (role) { qsParams.role = role; }
-  //   return api.get('/users', { params: qsParams });
-  // },
-
-  async getUsers(page = 1, pageSize = 10,
-    userId = "",
-    searchLoginName = "",
-    searchFullName = "",
-    searchEmail = "",
-    searchPhone = "",
-    searchRole = "",
-    searchEmployeeId = ""): Promise<AxiosResponse> {
+  async getUsers(page = 1, pageSize = 10, userId = "", searchLoginName = "", searchFullName = "",
+    searchEmail = "", searchPhone = "", searchRole = "", searchEmployeeId = ""): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
     if (userId) { qsParams.userId = userId; }
     if (page) { qsParams.page = page; }
     if (pageSize) { qsParams['page-size'] = pageSize; }
-    if (searchLoginName) {
-      qsParams.searchLoginName = searchLoginName;
-    }
-
-    if (searchFullName) {
-      qsParams.searchFullName = searchFullName;
-    }
-    if (searchEmail) {
-      qsParams.searchEmail = searchEmail;
-    }
-    if (searchPhone) {
-      qsParams.searchPhone = searchPhone;
-
-    }
-    if (searchRole) {
-      qsParams.searchRole = searchRole;
-
-    }
-    if (searchEmployeeId) {
-      qsParams.searchEmployeeId = searchEmployeeId;
-
-    }
-
+    if (searchLoginName) { qsParams.searchLoginName = searchLoginName; }
+    if (searchFullName) { qsParams.searchFullName = searchFullName; }
+    if (searchEmail) { qsParams.searchEmail = searchEmail; }
+    if (searchPhone) { qsParams.searchPhone = searchPhone; }
+    if (searchRole) { qsParams.searchRole = searchRole; }
+    if (searchEmployeeId) { qsParams.searchEmployeeId = searchEmployeeId; }
     return api.get('/users', { params: qsParams });
   },
 
-  async export(
-    loginName = "",
-    fullName = "",
-    email = "",
-    phone = "",
-    role = "",
-    employeeId = ""): Promise<AxiosResponse> {
+  async export(loginName = "", fullName = "", email = "", phone = "", role = "", employeeId = ""): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
-    if (loginName) {
-      qsParams.loginName = loginName;
-    }
-    if (fullName) {
-      qsParams.fullName = fullName;
-    }
-    if (email) {
-      qsParams.email = email;
-    }
-    if (phone) {
-      qsParams.phone = phone;
-    }
-    if (role) {
-      qsParams.role = role;
-    }
-    if (employeeId) {
-      qsParams.employeeId = employeeId;
-    }
-
+    if (loginName) { qsParams.loginName = loginName; }
+    if (fullName) { qsParams.fullName = fullName; }
+    if (email) { qsParams.email = email; }
+    if (phone) { qsParams.phone = phone; }
+    if (role) { qsParams.role = role; }
+    if (employeeId) { qsParams.employeeId = employeeId; }
     return api.post('/users/export', qsParams );
   },
 

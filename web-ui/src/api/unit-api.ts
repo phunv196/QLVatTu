@@ -4,22 +4,11 @@ import { AxiosResponse } from 'axios';
 export default {
   async getUnits(page = 1, pageSize = 20, unitId = '', code='', name=''): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
-    if (page) {
-      qsParams.page = page;
-    }
-    if (pageSize) {
-      qsParams['page-size'] = pageSize;
-    }
-    if (unitId) {
-      qsParams.id = unitId;
-    }
-    if (code) {
-      qsParams.code = code;
-    }
-    if (name) {
-      qsParams.name = name;
-    }
-
+    if (page) { qsParams.page = page; }
+    if (pageSize) { qsParams['page-size'] = pageSize; }
+    if (unitId) { qsParams.id = unitId; }
+    if (code) { qsParams.code = code; }
+    if (name) { qsParams.name = name; }
     return api.get('/units', { params: qsParams });
   },
 

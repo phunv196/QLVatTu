@@ -4,15 +4,9 @@ import { AxiosResponse } from 'axios';
 export default {
   async getDeliveryBillFlows(page = 1, pageSize = 5, deliveryBillId:number): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
-    if (page) {
-      qsParams.page = page;
-    }
-    if (pageSize) {
-      qsParams['page-size'] = pageSize;
-    }
-    if (deliveryBillId) {
-      qsParams.deliveryBillId = deliveryBillId;
-    }
+    if (page) { qsParams.page = page; }
+    if (pageSize) { qsParams['page-size'] = pageSize; }
+    if (deliveryBillId) { qsParams.deliveryBillId = deliveryBillId; }
 
     return api.get('/delivery_bill_flows', { params: qsParams });
   },

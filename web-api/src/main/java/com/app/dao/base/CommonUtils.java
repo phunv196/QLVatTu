@@ -557,35 +557,6 @@ public class CommonUtils {
         return sb.toString();
     }
 
-    /**
-     * Luu file len server.
-     *
-     * @param uploadFile Doi tuong FormFile
-     * @param fileName Ten file
-     * @param uploadPath Duong dan thu muc
-     * @throws Exception Exception
-     */
-//    public static void saveFile(FormFile uploadFile, String fileName, String uploadPath) throws Exception {
-//        if (isAllowedType(uploadFile.getFileName())) {
-//            File desDir = new File(uploadPath);
-//            if (!desDir.exists()) {
-//                desDir.mkdir();
-//            }
-//
-//            String url = desDir.getAbsolutePath() + (desDir.getAbsolutePath().endsWith(File.separator) ? "" : File.separator) + getSafeFileName(fileName);
-//            OutputStream outStream = new FileOutputStream(url);
-//            InputStream inStream = uploadFile.getInputStream();
-//            int bytesRead;
-//            byte[] buffer = new byte[1024 * 8];
-//            while ((bytesRead = inStream.read(buffer, 0, 1024 * 8)) != -1) {
-//                outStream.write(buffer, 0, bytesRead);
-//            }
-//            inStream.close();
-//            outStream.close();
-//        } else {
-//            throw new Exception("FILE TYPE NOT ALLOW");
-//        }
-//    }
 
     /**
      * Luu file len server.
@@ -626,28 +597,6 @@ public class CommonUtils {
             throw new Exception("FILE TYPE NOT ALLOW");
         }
     }
-
-    /**
-     * Luu file import Excel.
-     *
-     * @param uploadFile Doi tuong FormFile
-     * @param fileName Ten file
-     * @param uploadPath Duong dan thu muc
-     * @return Doi tuong Workbook
-     * @throws Exception Exception
-     */
-//    public static Workbook saveImportExcelFile(FormFile uploadFile, String fileName, String uploadPath) throws Exception {
-//        fileName = CommonUtils.getSafeFileName(CommonUtils.removeSign(fileName));
-//        if (isAllowedType(fileName)) {
-//            WorkbookSettings ws = new WorkbookSettings();
-//            ws.setEncoding("Cp1252"); // UTF-8
-//            ws.setCellValidationDisabled(true);
-//            Workbook workbook = Workbook.getWorkbook(uploadFile.getInputStream(), ws);
-//            return workbook;
-//        } else {
-//            throw new Exception("FILE TYPE NOT ALLOW");
-//        }
-//    }
 
     /**
      *
@@ -708,14 +657,14 @@ public class CommonUtils {
      * @param array
      * @return
      */
-//    public static List<ListBoxBean> convertArrayToList(String[] array) {
-//        List<ListBoxBean> list = new ArrayList();
-//        // Cac gia tri nay khong duoc bat dau tu 0
-//        for (int i = 1; i < array.length; i++) {
-//            list.add(new ListBoxBean(array[i], i));
-//        }
-//        return list;
-//    }
+    public static List<ListBoxBean> convertArrayToList(String[] array) {
+        List<ListBoxBean> list = new ArrayList();
+        // Cac gia tri nay khong duoc bat dau tu 0
+        for (int i = 1; i < array.length; i++) {
+            list.add(new ListBoxBean(array[i], i));
+        }
+        return list;
+    }
 
     /**
      * copy properties tu form sang BO va nguoc lai

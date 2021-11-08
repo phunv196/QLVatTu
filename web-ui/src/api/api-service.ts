@@ -67,9 +67,8 @@ export default {
     }
     try {
       const resp = await apiService.get(path.replace(/^\/|\/$/g, ''), axiosConfig);
-      debugger
       return resp;
-    } catch (err) {
+    } catch (err:any) {
       return errorResponseParser(err);
     }
   },
@@ -93,7 +92,7 @@ export default {
     try {
       const resp = await apiService.put(path.replace(/^\/|\/$/g, ''), putData, axiosConfig);
       return resp;
-    } catch (err) {
+    } catch (err:any) {
       return errorResponseParser(err);
     }
   },
@@ -122,7 +121,7 @@ export default {
     try {
       const resp = await apiService.post(path.replace(/^\/|\/$/g, ''), postData, axiosConfig);
       return resp;
-    } catch (err) {
+    } catch (err:any) {
       return errorResponseParser(err);
     }
   },
@@ -146,7 +145,7 @@ export default {
     try {
       const resp = await apiService.delete(path.replace(/^\/|\/$/g, ''), axiosConfig);
       return resp;
-    } catch (err) {
+    } catch (err:any) {
       return errorResponseParser(err);
     }
   },

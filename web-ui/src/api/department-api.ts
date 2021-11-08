@@ -2,32 +2,16 @@ import api from '@/api/api-service';
 import { AxiosResponse } from 'axios';
 
 export default {
-  async getDepartment(page = 1, pageSize = 20, departmentId = '', code='', name='', email='', phone=''): Promise<AxiosResponse> {
+  async getDepartment(page = 1, pageSize = 20, departmentId = '', code='', name='', 
+  email='', phone=''): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
-    if (page) {
-      qsParams.page = page;
-    }
-    if (pageSize) {
-      qsParams['page-size'] = pageSize;
-    }
-    if (code) {
-      qsParams.code = code;
-    }
-
-    if (name) {
-      qsParams.name = name;
-    }
-    if (email) {
-      qsParams.email = email;
-    }
-    if (phone) {
-      qsParams.phone = phone;
-
-    }if (departmentId) {
-      qsParams.id = departmentId;
-    }
-
-
+    if (page) { qsParams.page = page; }
+    if (pageSize) { qsParams['page-size'] = pageSize; }
+    if (code) { qsParams.code = code; }
+    if (name) { qsParams.name = name; }
+    if (email) { qsParams.email = email; }
+    if (phone) { qsParams.phone = phone; }
+    if (departmentId) { qsParams.id = departmentId; }
     return api.get('/department', { params: qsParams });
   },
 

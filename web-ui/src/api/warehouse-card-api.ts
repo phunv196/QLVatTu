@@ -3,43 +3,19 @@ import { AxiosResponse } from 'axios';
 
 export default {
   async getWarehouseCards(page = 1, pageSize = 20, warehouseCardId = '', searchCode = "",
-    searchName = "",
-    searchEmployee = "",
-    searchWarehouse = "",
-    searchFormDate = "",
-    searchToDate = "",
-    searchSupplies = ""): Promise<AxiosResponse> {
+    searchName = "", searchEmployee = "", searchWarehouse = "", searchFormDate = "",
+    searchToDate = "", searchSupplies = ""): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
-    if (page) {
-      qsParams.page = page;
-    }
-    if (pageSize) {
-      qsParams['page-size'] = pageSize;
-    }
-    if (warehouseCardId) {
-      qsParams.id = warehouseCardId;
-    }
-    if (searchCode) {
-      qsParams.searchCode = searchCode;
-    }
-    if (searchName) {
-      qsParams.searchName = searchName;
-    }
-    if (searchEmployee) {
-      qsParams.searchEmployee = searchEmployee;
-    }
-    if (searchWarehouse) {
-      qsParams.searchWarehouse = searchWarehouse;
-    }
-    if (searchFormDate) {
-      qsParams.searchFormDate = searchFormDate;
-    }
-    if (searchToDate) {
-      qsParams.searchToDate = searchToDate;
-    }
-    if (searchSupplies) {
-      qsParams.searchSupplies = searchSupplies;
-    }
+    if (page) { qsParams.page = page; }
+    if (pageSize) { qsParams['page-size'] = pageSize; }
+    if (warehouseCardId) { qsParams.id = warehouseCardId; }
+    if (searchCode) { qsParams.searchCode = searchCode; }
+    if (searchName) { qsParams.searchName = searchName; }
+    if (searchEmployee) { qsParams.searchEmployee = searchEmployee; }
+    if (searchWarehouse) { qsParams.searchWarehouse = searchWarehouse; }
+    if (searchFormDate) { qsParams.searchFormDate = searchFormDate; }
+    if (searchToDate) { qsParams.searchToDate = searchToDate; }
+    if (searchSupplies) { qsParams.searchSupplies = searchSupplies; }
     return api.get('/warehouse_cards', { params: qsParams });
   },
 
@@ -52,27 +28,13 @@ export default {
     searchToDate = "",
     searchSupplies = ""): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
-    if (searchCode) {
-      qsParams.code = searchCode;
-    }
-    if (searchName) {
-      qsParams.name = searchName;
-    }
-    if (searchEmployee) {
-      qsParams.employeeId = searchEmployee;
-    }
-    if (searchWarehouse) {
-      qsParams.warehouseId = searchWarehouse;
-    }
-    if (searchFormDate) {
-      qsParams.formDate = searchFormDate;
-    }
-    if (searchToDate) {
-      qsParams.toDate = searchToDate;
-    }
-    if (searchSupplies) {
-      qsParams.suppliesId = searchSupplies;
-    }
+    if (searchCode) { qsParams.code = searchCode; }
+    if (searchName) { qsParams.name = searchName; }
+    if (searchEmployee) { qsParams.employeeId = searchEmployee; }
+    if (searchWarehouse) { qsParams.warehouseId = searchWarehouse; }
+    if (searchFormDate) { qsParams.formDate = searchFormDate; }
+    if (searchToDate) { qsParams.toDate = searchToDate; }
+    if (searchSupplies) { qsParams.suppliesId = searchSupplies; }
     return api.post('/warehouse_cards/export', qsParams);
   },
 

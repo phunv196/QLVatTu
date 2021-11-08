@@ -5,53 +5,22 @@ export default {
   async getSupplier(page = 1, pageSize = 20, supplierId = '',
    code = '', name = '', email = '', phone = ''): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
-    if (page) {
-      qsParams.page = page;
-    }
-    if (pageSize) {
-      qsParams['page-size'] = pageSize;
-    }
-    if (code) {
-      qsParams.code = code;
-    }
-
-    if (name) {
-      qsParams.name = name;
-    }
-    if (email) {
-      qsParams.email = email;
-    }
-    if (phone) {
-      qsParams.phone = phone;
-
-    }
-    if (supplierId) {
-      qsParams.id = supplierId;
-    }
-
-
+    if (page) { qsParams.page = page; }
+    if (pageSize) { qsParams['page-size'] = pageSize; }
+    if (code) { qsParams.code = code; }
+    if (name) { qsParams.name = name; }
+    if (email) { qsParams.email = email; }
+    if (phone) { qsParams.phone = phone; }
+    if (supplierId) { qsParams.id = supplierId; }
     return api.get('/supplier', { params: qsParams });
   },
 
-  async export(
-    searchCode = "",
-    searchName = "",
-    searchEmail = "",
-    searchPhone = "",
-  ): Promise<AxiosResponse> {
+  async export(searchCode = "",searchName = "",searchEmail = "",searchPhone = "",): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
-    if (searchCode) {
-      qsParams.code = searchCode;
-    }
-    if (searchName) {
-      qsParams.name = searchName;
-    }
-    if (searchEmail) {
-      qsParams.email = searchEmail;
-    }
-    if (searchPhone) {
-      qsParams.phone = searchPhone;
-    }
+    if (searchCode) { qsParams.code = searchCode; }
+    if (searchName) { qsParams.name = searchName; }
+    if (searchEmail) { qsParams.email = searchEmail; }
+    if (searchPhone) { qsParams.phone = searchPhone; }
     return api.post('/supplier/export', qsParams);
   },
 

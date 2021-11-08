@@ -2,80 +2,34 @@ import api from '@/api/api-service';
 import { AxiosResponse } from 'axios';
 
 export default {
-  async getDeliveryBills(page = 1, pageSize = 20, deliveryBillId = '',
-    searchCode = "",
-    searchName = "",
-    searchEmployee = "",
-    searchWarehouse = "",
-    searchFormDate = "",
-    searchToDate = "",
-    searchFactory = ""
-  ): Promise<AxiosResponse> {
+  async getDeliveryBills(page = 1, pageSize = 20, deliveryBillId = '', searchCode = "",
+    searchName = "", searchEmployee = "", searchWarehouse = "", searchFormDate = "",
+    searchToDate = "", searchFactory = "" ): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string | Date> = {};
-    if (page) {
-      qsParams.page = page;
-    }
-    if (pageSize) {
-      qsParams['page-size'] = pageSize;
-    }
-    if (deliveryBillId) {
-      qsParams.id = deliveryBillId;
-    }
-    if (searchCode) {
-      qsParams.searchCode = searchCode;
-    }
-    if (searchName) {
-      qsParams.searchName = searchName;
-    }
-    if (searchEmployee) {
-      qsParams.searchEmployee = searchEmployee;
-    }
-    if (searchWarehouse) {
-      qsParams.searchWarehouse = searchWarehouse;
-    }
-    if (searchFormDate) {
-      qsParams.searchFormDate = searchFormDate;
-    }
-    if (searchToDate) {
-      qsParams.searchToDate = searchToDate;
-    }
-    if (searchFactory) {
-      qsParams.searchFactory = searchFactory;
-    }
+    if (page) { qsParams.page = page; }
+    if (pageSize) { qsParams['page-size'] = pageSize; }
+    if (deliveryBillId) { qsParams.id = deliveryBillId; }
+    if (searchCode) { qsParams.searchCode = searchCode; }
+    if (searchName) { qsParams.searchName = searchName; }
+    if (searchEmployee) { qsParams.searchEmployee = searchEmployee; }
+    if (searchWarehouse) { qsParams.searchWarehouse = searchWarehouse; }
+    if (searchFormDate) { qsParams.searchFormDate = searchFormDate; }
+    if (searchToDate) { qsParams.searchToDate = searchToDate; }
+    if (searchFactory) { qsParams.searchFactory = searchFactory; }
     return api.get('/delivery_bills', { params: qsParams });
   },
 
-  async export(
-    searchCode = "",
-    searchName = "",
-    searchEmployee = "",
-    searchWarehouse = "",
-    searchFormDate = "",
-    searchToDate = "",
-    searchFactory = ""
+  async export(searchCode = "", searchName = "", searchEmployee = "", searchWarehouse = "",
+    searchFormDate = "", searchToDate = "", searchFactory = ""
   ): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string | Date> = {};
-    if (searchCode) {
-      qsParams.code = searchCode;
-    }
-    if (searchName) {
-      qsParams.name = searchName;
-    }
-    if (searchEmployee) {
-      qsParams.employeeId = searchEmployee;
-    }
-    if (searchWarehouse) {
-      qsParams.warehouseId = searchWarehouse;
-    }
-    if (searchFormDate) {
-      qsParams.formDate = searchFormDate;
-    }
-    if (searchToDate) {
-      qsParams.toDate = searchToDate;
-    }
-    if (searchFactory) {
-      qsParams.factoryId = searchFactory;
-    }
+    if (searchCode) { qsParams.code = searchCode; }
+    if (searchName) { qsParams.name = searchName; }
+    if (searchEmployee) { qsParams.employeeId = searchEmployee; }
+    if (searchWarehouse) { qsParams.warehouseId = searchWarehouse; }
+    if (searchFormDate) { qsParams.formDate = searchFormDate; }
+    if (searchToDate) { qsParams.toDate = searchToDate; }
+    if (searchFactory) { qsParams.factoryId = searchFactory; }
     return api.post('/delivery_bills/export', qsParams);
   },
 
@@ -98,10 +52,6 @@ export default {
   async getSequence(): Promise<AxiosResponse> {
     return api.get(`/delivery_bills/sequence`);
   },
-
-  // async getAll(): Promise<AxiosResponse> {
-  //   return api.get(`/delivery_bills/all`);
-  // },
 
   async getAllBySuppliesId(suppliesId: number): Promise<AxiosResponse> {
     return api.get(`/delivery_bills/all/${suppliesId}`);

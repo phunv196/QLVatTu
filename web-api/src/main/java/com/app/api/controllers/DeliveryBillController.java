@@ -86,19 +86,9 @@ public class DeliveryBillController extends BaseController {
                 searchFactory = 0l;
             }
             List<DeliveryBillModel> billModelList = deliveryBillDao.getList(page, pageSize, deliveryBillId, searchCode,
-                    searchName,
-                    searchEmployee,
-                    searchWarehouse,
-                    searchFormDate,
-                    searchToDate,
-                    searchFactory);
+                    searchName, searchEmployee, searchWarehouse, searchFormDate, searchToDate, searchFactory);
             BigInteger total = deliveryBillDao.getDeliveryBillCount(deliveryBillId, searchCode,
-                    searchName,
-                    searchEmployee,
-                    searchWarehouse,
-                    searchFormDate,
-                    searchToDate,
-                    searchFactory);
+                    searchName, searchEmployee, searchWarehouse, searchFormDate, searchToDate, searchFactory);
             resp.setList(billModelList);
             resp.setTotal(total.intValue());
             resp.setPageStats(total.intValue(), pageSize, page, "");

@@ -4,23 +4,11 @@ import { AxiosResponse } from 'axios';
 export default {
   async getSpecies(page = 1, pageSize = 20, speciesId = '', code = '', name = ''): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
-    if (page) {
-      qsParams.page = page;
-    }
-    if (pageSize) {
-      qsParams['page-size'] = pageSize;
-    }
-    if (speciesId) {
-      qsParams.id = speciesId;
-    }
-
-    if (code) {
-      qsParams.code = code;
-    }
-    if (name) {
-      qsParams.name = name;
-    }
-
+    if (page) { qsParams.page = page; }
+    if (pageSize) { qsParams['page-size'] = pageSize; }
+    if (speciesId) { qsParams.id = speciesId; }
+    if (code) { qsParams.code = code; }
+    if (name) { qsParams.name = name; }
     return api.get('/species', { params: qsParams });
   },
 

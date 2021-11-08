@@ -4,22 +4,11 @@ import { AxiosResponse } from 'axios';
 export default {
   async getRoles(page = 1, pageSize = 20, roleId = '', code='', name=''): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
-    if (page) {
-      qsParams.page = page;
-    }
-    if (pageSize) {
-      qsParams['page-size'] = pageSize;
-    }
-    if (roleId) {
-      qsParams.id = roleId;
-    }
-    if (code) {
-      qsParams.code = code;
-    }
-    if (name) {
-      qsParams.name = name;
-    }
-
+    if (page) { qsParams.page = page; }
+    if (pageSize) { qsParams['page-size'] = pageSize; }
+    if (roleId) { qsParams.id = roleId; }
+    if (code) { qsParams.code = code; }
+    if (name) { qsParams.name = name; }
     return api.get('/roles', { params: qsParams });
   },
 

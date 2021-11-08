@@ -4,16 +4,9 @@ import { AxiosResponse } from 'axios';
 export default {
   async getWarehouseCardFlows(page = 1, pageSize = 5, warehouseCardId : number): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
-    if (page) {
-      qsParams.page = page;
-    }
-    if (pageSize) {
-      qsParams['page-size'] = pageSize;
-    }
-    if (warehouseCardId) {
-      qsParams.warehouseCardId = warehouseCardId;
-    }
-
+    if (page) { qsParams.page = page; }
+    if (pageSize) { qsParams['page-size'] = pageSize; }
+    if (warehouseCardId) { qsParams.warehouseCardId = warehouseCardId; }
     return api.get('/warehouse_card_flows', { params: qsParams });
   },
 
