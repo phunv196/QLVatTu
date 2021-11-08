@@ -22,7 +22,7 @@ function createAxiosApiService() {
 }
 
 function errorResponseParser(err: AxiosError): Promise<AxiosResponse> {
-  console.error('[ES] - Error Interceptor: %o', err.response ? err.response : err);
+  // console.error('[ES] - Error Interceptor: %o', err.response ? err.response : err);
   if (err.response) {
     if (err.response.status === 401) {
       if (err.response.data && err.response.data.msgType === 'AUTH_FAILED') {
@@ -67,6 +67,7 @@ export default {
     }
     try {
       const resp = await apiService.get(path.replace(/^\/|\/$/g, ''), axiosConfig);
+      debugger
       return resp;
     } catch (err) {
       return errorResponseParser(err);

@@ -2,7 +2,6 @@ package com.app.dao;
 
 import com.app.dao.base.BaseHibernateDAO;
 import com.app.dao.base.CommonUtils;
-import com.app.model.category.SuppliesModel;
 import com.app.model.user.UserModel;
 import com.app.model.user.UserOutputModel;
 import jakarta.validation.ConstraintViolationException;

@@ -43,8 +43,8 @@ public class JerseyApplication extends ResourceConfig {
 
         // Setup OpenAPI
         Info info = new Info()
-          .title("Mrin Order Processing System")
-          .description("This is a sample server Order processing server. using an In-Memory H2 database")
+          .title("Phunv QLVT")
+          .description("This is a sample server Order processing server. using an My SQL database")
           .contact(new Contact().email("" +
                   "phunv196@gmail.com.com"))
           .license(new License()

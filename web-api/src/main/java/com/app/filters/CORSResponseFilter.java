@@ -16,8 +16,8 @@ public class CORSResponseFilter  implements ContainerResponseFilter {
         respHeaderMap.add("Access-Control-Allow-Origin", "*");
         respHeaderMap.add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
         respHeaderMap.add("Access-Control-Allow-Credentials", "true");
-        respHeaderMap.add("Access-Control-Allow-Headers","xsrf-token, X-Total-Results, Origin, X-Requested-With, Content-Type, Content-Disposition, Accept, Accept-Encoding, Accept-Language, Host, Referer, Connection, User-Agent, authorization, timezone-id");
-        //respHeaderMap.add("Access-Control-Allow-Headers", reqHeaderString);
-        respHeaderMap.add("X-Powered-By", "Mrin-Order-API");
+        respHeaderMap.add("Access-Control-Allow-Headers","xsrf-token, X-Total-Results, Origin, X-Requested-With, Content-Type, Content-Disposition, Accept, Accept-Encoding, Accept-Language, Host, Referer, Connection, User-Agent, Authorization, timezone-id");
+        respHeaderMap.add("Access-Control-Allow-Headers", reqHeaderString);
+        respHeaderMap.add("X-Powered-By", "PhuNV-Manager-API");
     }
 }

@@ -1,6 +1,5 @@
 package com.app;
 
-import com.app.task.RefreshDBTask;
 import com.github.lalyos.jfiglet.FigletFont;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.WebResourceSet;
@@ -92,14 +91,6 @@ public class TomcatStarter {
         log.info(" user.dir      :" + System.getProperty("user.dir"));
         log.info(" catalina.home :" + System.getProperty("catalina.home"));
         log.info(" catalina.base :" + System.getProperty("catalina.base") +"\n *** *** *** *** *** \n");
-
-        //Schedule Refresh DB Task
-        ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(1);
-        RefreshDBTask refreshDBTask = new RefreshDBTask(); //DatabaseService.initDB();
-        long period = 1;
-        TimeUnit timeUnit = TimeUnit.HOURS;
-        scheduledThreadPool.scheduleAtFixedRate(refreshDBTask, 0, period, timeUnit);
-        log.info(String.format("\n\nRefreshDB Task Scheduled (The task refreshes the Database every %s %s)", period, timeUnit.toString()));
 
         //Start Web API Server
         String webPort = System.getenv("PORT");

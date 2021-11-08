@@ -1,4 +1,3 @@
-
 <template>
   <div class="m-app-header">
     <Logo style="height:36px;width:36px;margin-left:5px"></Logo>
@@ -6,11 +5,20 @@
       {{label}}
     </div>
     <div class="m-app-header-item-group">
-      <Menubar :model="items">
-        <template #item="{item}">
-          <a :href="item.url">{{item.label}}</a>
-        </template>
-      </Menubar>
+      <ul v-if="items?.length > 1">
+        <li v-for="(item, i) of items" :key="i">
+          <router-link tag="span" :to="item.to ? item.to : ''" class="m-app-header-item">
+              <span :class="item.icon"></span> {{item.label}}
+          </router-link>
+          <ul v-if="item.items?.length > 1">
+              <li v-for="(el, j) of item.items" :key="j">
+                <router-link tag="span" :to="el.to" class="m-app-header-el">
+                    <span :class="item.icon"></span> {{el.label}}
+                </router-link>
+            </li>
+          </ul>
+        </li>
+      </ul>
     </div>
     <div style="flex:1"></div>
     <div class="p-d-flex p-flex-row p-jc-end" style="color:var(--fg-alt); font-size:0.75rem">
@@ -81,7 +89,7 @@ import { useToast } from "primevue/usetoast";
 import UsersApi from "@/api/users-api";
 export default defineComponent({
   props: {
-    label: { type: String, default: 'ORDER MANAGEMENT' },
+    label: { type: String, default: 'QLVT' },
     items: { type: Array, required: true },
   },
   components: {
@@ -168,22 +176,94 @@ export default defineComponent({
     align-items: center;
     flex-wrap: nowrap;
     overflow: hidden;
-    .m-app-header-item {
-      display:inline-block;
-      cursor: pointer;
-      color  :#ccc;
-      border : 0;
-      margin : 0 3px;
-      padding: 0 16px;
-      height : 100%;
-      font-size:14px;
-      line-height: $m-header-height;
-      &:hover{
-        background-color: #000;
-        color:var(--primary-color);
-      }
-      &.router-link-exact-active{
-        color: var(--primary-color);
+    .m-app-header-item-group {
+      ul {
+        z-index: 1000000;
+        display: flex;
+        flex-wrap: nowrap;
+        // background: blue;
+        width: 100%;
+        flex-direction: row;
+        align-items: baseline;
+        list-style: none;
+        li {
+          .m-app-header-item {
+            display:inline-block;
+            cursor: pointer;
+            color  :#ccc;
+            border : 0;
+            margin : 0 3px;
+            padding: 0 16px;
+            height : 100%;
+            font-size:14px;
+            line-height: $m-header-height;
+            &:hover{
+              background-color: #000;
+              color:var(--primary-color);
+            }
+            &.router-link-exact-active{
+              color: var(--primary-color);
+            }
+          }
+          &:hover ul{
+              display: block;
+            }
+          ul {
+            display: none;
+            position: absolute;
+            flex-direction: column;
+            width: 200px;
+            padding: 0;
+            margin: 0;
+            background: #333;
+            margin-top: 9px;
+            border-radius: 5px;
+            li {
+              width: 100%;
+              margin: 0px;
+              .m-app-header-el {
+                display:inline-block;
+                cursor: pointer;
+                color  :#ccc;
+                border : 0;
+                margin : 0 3px;
+                padding: 0 16px;
+                height : 97%;
+                min-width: 97%;
+                font-size:14px;
+                line-height: $m-header-height;
+                &:hover{
+                  background-color: #000;
+                  color:var(--primary-color);
+                }
+                &.router-link-exact-active{
+                  color: var(--primary-color);
+                }
+              }
+            }
+            &:before {
+                content: "";
+                width: 100%;
+                height: 30px;
+                top: -22px;
+                left: 0;
+                position: absolute;
+            }
+            &:after {
+                bottom: 100%;
+                left: 68px;
+                border: solid transparent;
+                content: " ";
+                height: 0;
+                width: 0;
+                position: absolute;
+                pointer-events: none;
+                border-color: rgba(23,158,255,0);
+                border-bottom-color: #333;
+                border-width: 9px;
+            }
+          }
+        }
       }
     }
   }

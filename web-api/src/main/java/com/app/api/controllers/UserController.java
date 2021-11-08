@@ -377,6 +377,10 @@ public class UserController extends BaseController {
         BaseResponse resp = new BaseResponse();
         try {
             UserModel foundProd  = userDao.getById(userId);
+            if (foundProd == null) {
+                resp.setErrorMessage(String.format("Bản ghi không tồn tại (code:%s)", foundProd.getLoginName()));
+                return Response.ok(resp).build();
+            }
             UserOutputModel model = new UserOutputModel();
             CommonUtils.copyProperties(model, foundProd);
             return Response.ok(model).build();

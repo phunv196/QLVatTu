@@ -7,13 +7,13 @@ import com.app.dao.base.ImportFileExcell;
 import com.app.dao.base.ImportFileExcell.ImportBean;
 import com.app.dao.base.ImportFileExcell.ImportErrorBean;
 import com.app.dao.base.converter.DynamicExport;
-import com.app.dao.category.DepartmentDao;
-import com.app.dao.category.PositionDao;
+import com.app.dao.DepartmentDao;
+import com.app.dao.PositionDao;
 import com.app.model.BaseResponse;
 import com.app.model.ExportModel;
 import com.app.model.ExportModel.ExportResponse;
-import com.app.model.category.DepartmentModel;
-import com.app.model.category.PositionModel;
+import com.app.model.department.DepartmentModel;
+import com.app.model.position.PositionModel;
 import com.app.model.employee.EmployeeModel;
 import com.app.model.employee.EmployeeModel.EmployeeResponse;
 import com.app.util.Constants;
@@ -34,7 +34,6 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -47,7 +46,6 @@ import static com.app.util.Constants.COMMON.*;
 @Tag(name = "Employees")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@CrossOrigin
 public class EmployeeController extends BaseController {
     EmployeeDao employeeDao = new EmployeeDao();
     DepartmentDao departmentDao = new DepartmentDao();

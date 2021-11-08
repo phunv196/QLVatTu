@@ -2,15 +2,12 @@ package com.app.dao;
 
 import com.app.dao.base.BaseHibernateDAO;
 import com.app.dao.base.CommonUtils;
-import com.app.model.category.FactoryModel;
 import com.app.model.employee.EmployeeModel;
-import com.app.model.user.UserOutputModel;
 import org.hibernate.*;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.transform.Transformers;
 
 import java.math.BigInteger;
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 

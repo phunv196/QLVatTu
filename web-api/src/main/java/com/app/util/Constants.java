@@ -3,27 +3,12 @@
  * Copyright (C) 2018 Viettel Telecom. All rights reserved. VIETTEL PROPRIETARY/CONFIDENTIAL. Use is
  */
 package com.app.util;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.app.dao.base.CommonUtils;
-import com.app.dao.base.converter.DynamicExport;
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-
-
 /**
- * @author d2tsoftware
+ * @author phunv
  * @since Nov 20, 2018
  * @version 1.0
  */
 public class Constants {
-    public static final String URL_PRODUCTION = "http://localhost:8081/";
 
     public static class UserRoleConstants {
         public final static String ROLE_ADMIN     = "ADMIN";
@@ -48,26 +33,14 @@ public class Constants {
         String SQLDATE_FORMAT = "yyyy-MM-dd";
         String DATE_TIME_FORMAT = "dd/MM/yyyy HH:mm:ss";
 
-        String FOLDER_EXPORT = "web-api/src/main/resources/file/folder-export-excel/";
-        String TEMPLATE_EXPORT_EXCELL = "web-api/src/main/resources/file/template-export-excel/";
-        String FOLDER_IMPORT = "web-api/src/main/resources/file/folder-file-import/";
-        String TEMPLATE_IMPORT_EXCELL = "web-api/src/main/resources/file/template-import-excell/";
-        String FOLDER_EXPORT_TEMPLATE = "web-api/src/main/resources/file/folder-export-template/";
-        String TEMPLATE_EXPORT_DOCX = "web-api/src/main/resources/file/template-export-docx/";
-        String FOLDER_EXPORT_DOCX = "web-api/src/main/resources/file/folder-export-docx/";
-
-        String EXPORT_FOLDER = CommonUtils.getConfig("exportFolder");
-
+        String FOLDER_EXPORT = "D:/file/folder-export-excel/";
+        String TEMPLATE_EXPORT_EXCELL = "D:/file/template-export-excel/";
+        String FOLDER_IMPORT = "D:/file/folder-file-import/";
+        String TEMPLATE_IMPORT_EXCELL = "D:/file/template-import-excell/";
+        String FOLDER_EXPORT_TEMPLATE = "D:/file/folder-export-template/";
+        String TEMPLATE_EXPORT_DOCX = "D:/file/template-export-docx/";
+        String FOLDER_EXPORT_DOCX = "D:/file/folder-export-docx/";
+        String EXPORT_FOLDER = "D:/file";
     }
-    
-    /**
-     * 
-     * @author DATDC key cho xuat bao cao hoac trinh ky
-     *
-     */
-    public static class DATE_TIME {
-        public static final String MONTH = "tháng";
-        public static final String DAY = "ngày";
-        public static final String YEAR = "năm";
-    }
+
 }
