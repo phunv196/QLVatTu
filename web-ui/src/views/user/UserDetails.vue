@@ -1,10 +1,7 @@
 <template>
   <div class="m-font-regular">
     <BlockUI :blocked="isLoading" :fullScreen="true"></BlockUI>
-    <!--    <div v-if="$props.isRegister">-->
-    <!--      <h4>USER REGISTRATION</h4>-->
-    <!--      <span class="m-gray-text">Provide some fake details, the data will be refreshed at certain interval</span>-->
-    <!--    </div>-->
+ 
     <Toast />
     <div>
       <span class="m-font-bold">USER ID: </span>
@@ -12,7 +9,6 @@
         {{ recData.userId ? recData.userId : "New" }}</span
       >
       &nbsp;
-      <!--      <span class="m-font-bold">ROLE: </span> <span style="color: var(&#45;&#45;primary-color)"> {{ $props.rec.role }} </span>-->
     </div>
     <div class="p-mt-4"></div>
     <transition name="p-message">
@@ -21,7 +17,6 @@
       >
     </transition>
     <div>
-      <!-- ID & Password -->
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
           >Tên đăng nhập <strong class="p-error">*</strong>
@@ -149,7 +144,7 @@ export default defineComponent({
         msg.push("tên đầy đủ");
       }
       if (msg.length > 0) {
-        userMessage.value = "Trường " + msg.join(", ") + "không được để trống!";
+        userMessage.value = "Trường " + msg.join(", ") + " không được để trống!";
         showMessage.value = true;
       } else {
         delete rawUsersObj.index;

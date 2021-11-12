@@ -201,10 +201,10 @@ public class DeliveryBillDao extends BaseHibernateDAO {
                 " left join warehouse w on w.warehouse_id = db.warehouse_id");
         List<Object> paramList = new ArrayList<>();
         StringBuilder strCondition = new StringBuilder(" WHERE 1 = 1");
-        CommonUtils.filter(code, strCondition, paramList, "r.code");
-        CommonUtils.filter(name, strCondition, paramList, "r.name");
-        CommonUtils.filter(employeeId, strCondition, paramList, "r.employee_id");
-        CommonUtils.filter(warehouseId, strCondition, paramList, "r.warehouse_id");
+        CommonUtils.filter(code, strCondition, paramList, "db.code");
+        CommonUtils.filter(name, strCondition, paramList, "db.name");
+        CommonUtils.filter(employeeId, strCondition, paramList, "db.employee_id");
+        CommonUtils.filter(warehouseId, strCondition, paramList, "db.warehouse_id");
         CommonUtils.filterBetweenDate(CommonUtils.convertStringToDateOther(formDate),CommonUtils.convertStringToDateOther(toDate)
                 , strCondition, paramList, "db.date_delivery_bill","db.date_delivery_bill");
         querySelect.append(strCondition);

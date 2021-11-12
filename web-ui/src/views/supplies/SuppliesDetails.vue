@@ -24,7 +24,7 @@
           style="width: 30%"
         />
         <label class="p-d-inline-block m-label-size-2 p-text-left p-mr-1 p-ml-5"
-          >Tên vvật tư <strong class="p-error">*</strong>
+          >Tên vật tư <strong class="p-error">*</strong>
         </label>
         <InputText
           type="text"

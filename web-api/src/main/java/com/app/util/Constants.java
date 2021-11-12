@@ -33,14 +33,14 @@ public class Constants {
         String SQLDATE_FORMAT = "yyyy-MM-dd";
         String DATE_TIME_FORMAT = "dd/MM/yyyy HH:mm:ss";
 
-        String FOLDER_EXPORT = "D:/file/folder-export-excel/";
-        String TEMPLATE_EXPORT_EXCELL = "D:/file/template-export-excel/";
-        String FOLDER_IMPORT = "D:/file/folder-file-import/";
-        String TEMPLATE_IMPORT_EXCELL = "D:/file/template-import-excell/";
-        String FOLDER_EXPORT_TEMPLATE = "D:/file/folder-export-template/";
-        String TEMPLATE_EXPORT_DOCX = "D:/file/template-export-docx/";
-        String FOLDER_EXPORT_DOCX = "D:/file/folder-export-docx/";
-        String EXPORT_FOLDER = "D:/file";
+        String FOLDER_EXPORT = "D:/tomcat/file/folder-export-excel/";
+        String TEMPLATE_EXPORT_EXCELL = "D:/tomcat/file/template-export-excel/";
+        String FOLDER_IMPORT = "D:/tomcat/file/folder-file-import/";
+        String TEMPLATE_IMPORT_EXCELL = "D:/tomcat/file/template-import-excell/";
+        String FOLDER_EXPORT_TEMPLATE = "D:/tomcat/file/folder-export-template/";
+        String TEMPLATE_EXPORT_DOCX = "D:/tomcat/file/template-export-docx/";
+        String FOLDER_EXPORT_DOCX = "D:/tomcat/file/folder-export-docx/";
+        String EXPORT_FOLDER = "D:/tomcat/file";
     }
 
 }

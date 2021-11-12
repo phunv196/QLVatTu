@@ -28,14 +28,12 @@
           style="padding-top: 7px"
           >Mã vật tư
         </label>
-        <span class="p-input-icon-left">
-          <InputText
-            type="text"
-            v-model="searchCode"
-            class="p-inputtext-sm"
-            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
-          />
-        </span>
+        <InputText
+          type="text"
+          v-model="searchCode"
+          class="p-inputtext-sm"
+          style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+        />
       </div>
       <div>
         <label
@@ -43,14 +41,12 @@
           style="padding-top: 7px"
           >Tên vật tư
         </label>
-        <span class="p-input-icon-left">
-          <InputText
-            type="text"
-            v-model="searchName"
-            class="p-inputtext-sm"
-            style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
-          />
-        </span>
+        <InputText
+          type="text"
+          v-model="searchName"
+          class="p-inputtext-sm"
+          style="width: 200px; height: 30px; margin: 1px 0px 0 0px"
+        />
       </div>
       <div>
         <label
@@ -128,7 +124,7 @@
         </label>
         <Dropdown
           class="p-inputtext-sm"
-          style="width: 200px"
+          style="width: 200px; max-width: 250px"
           v-model="searchQuality"
           :options="quality"
           :filter="true"
@@ -240,7 +236,11 @@
         header="Giá vật tư"
         headerStyle="width:160px"
       ></Column>
-      <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px; text-align: center;">
+      <Column
+        header="ACTION"
+        headerStyle="width:100px"
+        bodyStyle="padding:3px; text-align: center;"
+      >
         <template #body="slotProps">
           <Button
             icon="pi pi-pencil"
@@ -317,6 +317,10 @@ export default defineComponent({
     ) => {
       searchFormPrice = searchFormPrice === "null" ? "0" : searchFormPrice;
       searchToPrice = searchToPrice === "null" ? "0" : searchToPrice;
+      searchSupplier = searchSupplier === "null" ? "0" : searchSupplier;
+      searchSpecies = searchSpecies === "null" ? "0" : searchSpecies;
+      searchQuality = searchQuality === "null" ? "0" : searchQuality;
+      searchUnit = searchUnit === "null" ? "0" : searchUnit;
       try {
         const resp = await SuppliesApi.getSupplies(
           page,
@@ -551,7 +555,7 @@ export default defineComponent({
       exportExcell,
       showImport,
       showDialog,
-      unit
+      unit,
     };
   },
   components: {

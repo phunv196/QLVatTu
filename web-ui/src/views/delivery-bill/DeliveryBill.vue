@@ -277,8 +277,8 @@ export default defineComponent({
     let factory = ref([]);
     let searchFormDate = ref("");
     let searchToDate = ref("");
-    let searchName = ref("");
     let searchCode = ref("");
+    let searchName = ref("");
     let searchEmployee = ref("");
     let searchWarehouse = ref("");
     let searchFactory = ref("");
@@ -389,8 +389,8 @@ export default defineComponent({
           currentPage,
           pageSize.value,
           "",
-          `${searchName.value}`,
           `${searchCode.value}`,
+          `${searchName.value}`,
           `${searchEmployee.value}`,
           `${searchWarehouse.value}`,
           `${searchFormDate.value.toString()}`,
@@ -406,8 +406,8 @@ export default defineComponent({
           1,
           pageSize.value,
           "",
-          `${searchName.value}`,
           `${searchCode.value}`,
+          `${searchName.value}`,
           `${searchEmployee.value}`,
           `${searchWarehouse.value}`,
           `${searchFormDate.value.toString()}`,
@@ -419,8 +419,8 @@ export default defineComponent({
 
     const exportExcell = async () => {
       await DeliveryBillApi.export(
-        `${searchName.value}`,
           `${searchCode.value}`,
+          `${searchName.value}`,
           `${searchEmployee.value}`,
           `${searchWarehouse.value}`,
           `${searchFormDate.value.toString()}`,

@@ -4,7 +4,7 @@
     <h4>
       Unit #
       <span style="color: var(--primary-color)">
-        {{ recData.UnitId ? recData.UnitId : "NEW" }}
+        {{ recData.unitId ? recData.unitId : "NEW" }}
       </span>
     </h4>
     <transition name="p-message">
@@ -115,7 +115,7 @@ export default defineComponent({
           showMessage.value = true;
         } else {
           let resp;
-          if (rawUnitObj.UnitId) {
+          if (rawUnitObj.unitId) {
             resp = await UnitApi.updateUnit(rawUnitObj);
           } else {
             resp = await UnitApi.addUnit(rawUnitObj);
@@ -123,13 +123,13 @@ export default defineComponent({
           if (resp.data.msgType === "SUCCESS") {
             toast.add({
               severity: "success",
-              summary: rawUnitObj.UnitId
+              summary: rawUnitObj.unitId
                 ? "Sửa thành công!"
                 : "Thêm mới thành công!",
               detail: `${rawUnitObj.name} (${rawUnitObj.code})`,
               life: 3000,
             });
-            if (!rawUnitObj.UnitId) {
+            if (!rawUnitObj.unitId) {
               recData.value.id = "CREATED";
             }
             changesApplied.value = true;

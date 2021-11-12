@@ -11,7 +11,6 @@
         :showCancelButton="false"
         :customUpload="true"
         @select="importFile($event)"
-        @uploader="uploadFile()"
       />
     </div>
     <div class="p-mt-2 p-d-flex p-flex-row p-jc-center" style="width: 100%">
