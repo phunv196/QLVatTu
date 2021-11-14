@@ -117,7 +117,7 @@ export default defineComponent({
           { label: "Quý III", value: byReceipt["3"], color: "#A5BE00" },
           { label: "Quý IV", value: byReceipt["4"], color: "#FFB41E" },
         ];
-      } catch (err) {
+      } catch (err:any) {
         console.log("REST ERROR: %O", err.response ? err.response : err);
       }
     };
@@ -152,7 +152,7 @@ export default defineComponent({
           { label: "Quý III", value: byDeliveryBill["3"], color: "#A5BE00" },
           { label: "Quý IV", value: byDeliveryBill["4"], color: "#FFB41E" },
         ];
-      } catch (err) {
+      } catch (err:any) {
         console.log("REST ERROR: %O", err.response ? err.response : err);
       }
     };
@@ -194,7 +194,7 @@ export default defineComponent({
             },
           ],
         };
-      } catch (err) {
+      } catch (err:any) {
         console.log("REST ERROR: %O", err.response ? err.response : err);
       }
     };
@@ -248,7 +248,7 @@ export default defineComponent({
             },
           ],
         };
-      } catch (err) {
+      } catch (err:any) {
         console.log("REST ERROR: %O", err.response ? err.response : err);
       }
     };

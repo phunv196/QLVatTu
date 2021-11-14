@@ -158,7 +158,7 @@
       showGridlines
       @page="onPageChange($event)"
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4"
-      style="width: 1250px"
+      style="width: 1250px; line-height: 1.3rem; word-wrap: break-word;"
     >
       <Column
         field="index"
@@ -305,7 +305,7 @@ export default defineComponent({
         currentPage = resp.data.currentPage;
         totalPages.value = resp.data.totalPages;
         totalRecs.value = resp.data.total;
-      } catch (err) {
+      } catch (err:any) {
         console.log("REST ERROR: %O", err.response ? err.response : err);
         isLoading.value = false;
       }

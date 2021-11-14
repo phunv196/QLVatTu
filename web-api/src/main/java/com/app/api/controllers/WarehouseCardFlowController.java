@@ -1,10 +1,15 @@
 package com.app.api.controllers;
 
 import com.app.api.BaseController;
+import com.app.dao.ReceiptFlowDao;
+import com.app.dao.WarehouseCardDao;
 import com.app.dao.WarehouseCardFlowDao;
 import com.app.model.BaseResponse;
+import com.app.model.receipt.ReceiptFlowModel;
+import com.app.model.supplier.SupplierModel;
 import com.app.model.warehouseCard.WarehouseCardFlowModel;
 import com.app.model.warehouseCard.WarehouseCardFlowModel.WarehouseCardFlowResponse;
+import com.app.model.warehouseCard.WarehouseCardModel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,7 +21,10 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -28,7 +36,9 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 public class WarehouseCardFlowController extends BaseController {
 
+    WarehouseCardDao warehouseCardDao = new WarehouseCardDao();
     WarehouseCardFlowDao warehouseCardFlowDao = new WarehouseCardFlowDao();
+    ReceiptFlowDao receiptFlowDao = new ReceiptFlowDao();
 
     @GET
     @RolesAllowed({"ADMIN", "SUPPORT"})
@@ -38,6 +48,7 @@ public class WarehouseCardFlowController extends BaseController {
     )
     public Response getWarehouseCardFlowList(
             @Parameter(description="WarehouseCard Id") @QueryParam("warehouseCardId") Long warehouseCardId,
+            @Parameter(description="supplies Id") @QueryParam("suppliesId") Long suppliesId,
             @Parameter(description="Name", example="nikon%") @QueryParam("name") String name,
             @Parameter(description="Page No, Starts from 1 ", example="1") @DefaultValue("1") @QueryParam("page") int page,
             @Parameter(description="Items in each page", example="5") @DefaultValue("5") @QueryParam("page-size") int pageSize
@@ -46,8 +57,11 @@ public class WarehouseCardFlowController extends BaseController {
         if (warehouseCardId == null) {
             warehouseCardId = 0l;
         }
-        List<WarehouseCardFlowModel> cardFlowModels = warehouseCardFlowDao.getList(page, pageSize, warehouseCardId);
-        BigInteger total = warehouseCardFlowDao.getWarehouseCardFlowCount(warehouseCardId);
+        if (suppliesId == null) {
+            suppliesId = 0l;
+        }
+        List<WarehouseCardFlowModel> cardFlowModels = warehouseCardFlowDao.getList(page, pageSize, warehouseCardId, suppliesId);
+        BigInteger total = warehouseCardFlowDao.getWarehouseCardFlowCount(warehouseCardId, suppliesId);
         resp.setList(cardFlowModels);
         resp.setTotal(total.intValue());
         resp.setPageStats(total.intValue(),pageSize, page,"");
@@ -68,12 +82,24 @@ public class WarehouseCardFlowController extends BaseController {
             warehouseCardFlow.setCreateAt(new Date());
             warehouseCardFlowDao.save(warehouseCardFlow);
             warehouseCardFlowDao.commitTransaction();
+            if( check(warehouseCardFlow.getWarehouseCardId()) && warehouseCardFlow.getReceiptId() != null) {
+                updateRecepit(warehouseCardFlow);
+            }
             resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công id: %s ", warehouseCardFlow.getWarehouseCardFlowId()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
             resp.setErrorMessage("Không thể thêm mới bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
+    }
+
+    public void updateRecepit(WarehouseCardFlowModel warehouseCardFlow) {
+        WarehouseCardModel cardModel = warehouseCardDao.getById(warehouseCardFlow.getWarehouseCardId());
+        ReceiptFlowModel model = receiptFlowDao.getModel(warehouseCardFlow.getReceiptId(), cardModel.getSuppliesId());
+        model.setReceived(model.getReceived() == null ? warehouseCardFlow.getAmount() : model.getReceived() + warehouseCardFlow.getAmount());
+        receiptFlowDao.beginTransaction();
+        receiptFlowDao.save(model);
+        receiptFlowDao.commitTransaction();
     }
 
     @PUT
@@ -90,6 +116,9 @@ public class WarehouseCardFlowController extends BaseController {
                 warehouseCardFlowDao.beginTransaction();
                 warehouseCardFlowDao.update(warehouseCardFlow);
                 warehouseCardFlowDao.commitTransaction();
+                if (check(warehouseCardFlow.getWarehouseCardId()) && warehouseCardFlow.getReceiptId() != null) {
+                    updateRecepit(warehouseCardFlow);
+                }
                 resp.setSuccessMessage(String.format("Sửa bản ghi thành công (id:%s)", warehouseCardFlow.getWarehouseCardFlowId()));
                 return Response.ok(resp).build();
             } else {
@@ -128,5 +157,13 @@ public class WarehouseCardFlowController extends BaseController {
             resp.setErrorMessage("Không thể xóa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
+    }
+
+    boolean check(Long id) {
+        Criteria criteria = warehouseCardDao.createCriteria(WarehouseCardModel.class);
+        criteria.add(Restrictions.eq("warehouseCardId",  id ));
+        criteria.setProjection(Projections.rowCount());
+        Long rowCount = (Long)criteria.uniqueResult();
+        return rowCount > 0;
     }
 }

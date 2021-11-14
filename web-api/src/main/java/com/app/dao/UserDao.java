@@ -64,10 +64,12 @@ public class UserDao extends BaseHibernateDAO {
                 " u.email email," +
                 " u.phone phone," +
                 " u.role role," +
+                " r.name roleName," +
                 " u.employee_id employeeId," +
                 " e.code employeeCode" +
                 " from users u " +
-                " left join employees e on e.employee_id = u.employee_id" ;
+                " left join employees e on e.employee_id = u.employee_id" +
+                " left join role r on r.code = u.role" ;
         finalSql = finalSql + sql + " order by u.user_id " + sqlLimit;
 
         SQLQuery q = createSQLQuery(finalSql);

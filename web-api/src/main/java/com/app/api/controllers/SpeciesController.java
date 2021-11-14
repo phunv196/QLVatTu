@@ -180,7 +180,6 @@ public class SpeciesController extends BaseController {
     public Response getByCode(
             SpeciesModel model
     ) {
-        int recordFrom = 0;
         Criteria criteria = speciesDao.createCriteria(SpeciesModel.class);
         if (model.getSpeciesId() != null){
             criteria.add(Restrictions.ne("speciesId", model.getSpeciesId()));

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.persistence.Column;
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.security.Principal;
 import java.util.List;
@@ -23,6 +24,7 @@ public class UserOutputModel implements Serializable, Principal {
     private Integer employeeId;
     private String employeeCode;
     private String token;
+    private String roleName;
 
     //Constructors
     public UserOutputModel(){}
@@ -92,6 +94,14 @@ public class UserOutputModel implements Serializable, Principal {
 
     public String getToken() {return token; }
     public void setToken(String token) {this.token = token; }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
 
     //User Response Classes
     public static class UserListResponse extends PageResponse {

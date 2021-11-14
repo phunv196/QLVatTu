@@ -199,7 +199,7 @@ public class ReceiptController extends BaseController {
     )
     public Response getSequence() throws Exception {
         Long id = receiptDao.getSequence();
-        return Response.ok(id == null ? 1 : id).build();
+        return Response.ok(id == null ? 1 : id - 1).build();
     }
 
     @GET
@@ -264,7 +264,6 @@ public class ReceiptController extends BaseController {
     public Response getByCode(
             ReceiptModel model
     ) {
-        int recordFrom = 0;
         Criteria criteria = receiptDao.createCriteria(ReceiptModel.class);
         if (model.getReceiptId() != null){
             criteria.add(Restrictions.ne("receiptId", model.getReceiptId()));
@@ -373,9 +372,10 @@ public class ReceiptController extends BaseController {
                             xwpfTable.getRow(row).getCell(col++).setText(model.getSuppliesName());
                             xwpfTable.getRow(row).getCell(col++).setText(model.getSuppliesCode());
                             xwpfTable.getRow(row).getCell(col++).setText(model.getSuppliesUnit());
-                            xwpfTable.getRow(row).getCell(col++).setText("");
                             xwpfTable.getRow(row).getCell(col++).setText(String.valueOf(model.getAmount()));
-                            xwpfTable.getRow(row).getCell(col++).setText(model.getSuppliesPrice());
+                            xwpfTable.getRow(row).getCell(col++).setText(String.valueOf(model.getReceived() == null ? 0 : model.getReceived()));
+                            xwpfTable.getRow(row).getCell(col++).setText(String.valueOf(model.getMissing()));
+                            xwpfTable.getRow(row).addNewTableCell().setText(model.getSuppliesPrice());
                             xwpfTable.getRow(row).addNewTableCell().setText(model.getCalculatePrice());
                             row++;
                             sumAmount += model.getAmount() == null ? 0L : model.getAmount();
@@ -384,8 +384,9 @@ public class ReceiptController extends BaseController {
                         xwpfTable.createRow();
                         xwpfTable.getRow(row).getCell(1).setText("Tổng cộng:");
                         xwpfTable.getRow(row).addNewTableCell();
-                        xwpfTable.getRow(row).getCell(5).setText(String.valueOf(sumAmount));
-                        xwpfTable.getRow(row).getCell(7).setText(String.valueOf(sum));
+                        xwpfTable.getRow(row).getCell(4).setText(String.valueOf(sumAmount));
+                        xwpfTable.getRow(row).addNewTableCell();
+                        xwpfTable.getRow(row).getCell(8).setText(String.valueOf(sum));
                         map.put("strMoney", CommonUtils.numberToString(sum));
                     }
                 }

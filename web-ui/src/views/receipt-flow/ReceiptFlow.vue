@@ -3,10 +3,10 @@
     <Toast/>
     <Sidebar v-model:visible="showSlideOut" position="right" style="width:700px">
       <ReceiptFlowDetails :rec="selectedRec" @cancel="showSlideOut = false" @changed="getData()"
-                   :arrSupplies="arrSupplies" :arrSupplier="arrSupplier" :isNew="isNewRec"></ReceiptFlowDetails>
+                   :arrSupplies="arrSupplies" :isNew="isNewRec"></ReceiptFlowDetails>
     </Sidebar>
     <h3> Danh sách vật tư nhập </h3>
-    <div class="p-d-flex p-flex-row p-mb-1" style="width:1000px">
+    <div class="p-d-flex p-flex-row p-mb-1" style="width:1180px">
       <div style="display:inline-block; flex:1"></div>
       <Button icon="pi pi-user" iconPos="right" label="ADD" @click="onAddClick()"
               class="p-ml-1 p-button-sm"></Button>
@@ -20,13 +20,15 @@
       :loading="isLoading"
       stripedRows showGridlines
       @page="onPageChange($event)"
-      class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4" style="width:1000px">
+      class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4" style="width:1180px; line-height: 1.3rem; word-wrap: break-word;">
       <Column field="index" header="STT" headerStyle="width:50px;" bodyStyle="text-align-last: center;"></Column>
       <Column field="suppliesCode" header="Mã vật tư" headerStyle="width:80px"></Column>
       <Column field="suppliesName" header="Tên vật tư" headerStyle="width:160px"></Column>
       <Column field="supplierCode" header="Nhà sản xuất" headerStyle="width:160px"></Column>
       <Column field="speciesName" header="Chủng loại" headerStyle="width:90px"></Column>
       <Column field="amount" header="Số lượng" headerStyle="width:90px"></Column>
+      <Column field="received" header="Đã nhập" headerStyle="width:90px"></Column>
+      <Column field="missing" header="Còn thiếu" headerStyle="width:88px"></Column>
       <Column field="suppliesUnit" header="Đơn vị tính" headerStyle="width:90px"></Column>
       <Column field="suppliesPrice" header="Giá" headerStyle="width:90px"></Column>
       <Column field="calculatePrice" header="Thành tiền" headerStyle="width:90px"></Column>
@@ -50,7 +52,6 @@ import ReceiptFlowDetails from '@/views/receipt-flow/ReceiptFlowDetails.vue';
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
 import SuppliesApi from '@/api/supplies-api';
-import SupplierApi from '@/api/supplier-api';
 
 export default defineComponent({
   props: {
@@ -67,7 +68,6 @@ export default defineComponent({
     const isCustomer = ref(false);
     const list = ref([]);
     const arrSupplies = ref([]);
-    const arrSupplier = ref([]);
     const confirm = useConfirm();
     const toast = useToast();
     let currentPage = 1;
@@ -93,7 +93,7 @@ export default defineComponent({
         currentPage = resp.data.currentPage;
         totalPages.value = resp.data.totalPages;
         totalRecs.value = resp.data.total;
-      } catch (err) {
+      } catch (err:any) {
         console.log('REST ERROR: %O', err.response ? err.response : err);
         isLoading.value = false;
       }
@@ -153,13 +153,6 @@ export default defineComponent({
       }
       arrSupplies.value = itemSupplies;
 
-      const sup = await SupplierApi.getAll()
-      let itemSupplier: any;
-      if(supp.data.list){
-        itemSupplier = sup.data.list;
-      }
-      arrSupplier.value = itemSupplier;
-
       isNewRec.value = true;
       selectedRec.value = { receiptFlowId: '' , receiptId : receiptId};
       showSlideOut.value = true;
@@ -177,13 +170,6 @@ export default defineComponent({
       }
       arrSupplies.value = itemSupplies;
 
-      const sup = await SupplierApi.getAll()
-      let itemSupplier: any;
-      if(supp.data.list){
-        itemSupplier = sup.data.list;
-      }
-      arrSupplier.value = itemSupplier;
-
       showSlideOut.value = true;
       selectedRec.value = rec;
     };
@@ -195,7 +181,6 @@ export default defineComponent({
     return {
       list,
       arrSupplies,
-      arrSupplier,
       isLoading,
       showSlideOut,
       pageSize,

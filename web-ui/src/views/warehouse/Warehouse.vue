@@ -229,7 +229,7 @@ export default defineComponent({
         currentPage = resp.data.currentPage;
         totalPages.value = resp.data.totalPages;
         totalRecs.value = resp.data.total;
-      } catch (err) {
+      } catch (err:any) {
         console.log("REST ERROR: %O", err.response ? err.response : err);
         isLoading.value = false;
       }

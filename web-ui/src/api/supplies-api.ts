@@ -53,6 +53,11 @@ export default {
   async getAll(): Promise<AxiosResponse> {
     return api.get(`/supplies/all`);
   },
+
+  async getByWarehouseId(warehouseId: ""): Promise<AxiosResponse> {
+    return api.get(`/supplies/by-warehouse/${warehouseId}`);
+  },
+
   async getSuppliesByCode(suppliesObj: Record<string, string | number>): Promise<AxiosResponse> {
     return api.post('/supplies/byCode', suppliesObj);
   },

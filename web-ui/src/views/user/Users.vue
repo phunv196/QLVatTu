@@ -159,7 +159,7 @@
       showGridlines
       @page="onPageChange($event)"
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4"
-      style="width: 1250px"
+      style="width: 1250px; line-height: 1.3rem; word-wrap: break-word;"
     >
       <Column
         field="index"
@@ -174,7 +174,7 @@
         bodyStyle="min-width:110px;"
       ></Column>
       <Column
-        field="role"
+        field="roleName"
         header="Quyền"
         headerStyle="min-width:110px"
         bodyStyle="min-width:110px;"

@@ -22,6 +22,7 @@
           v-model="recData.code"
           class="p-inputtext-sm p-mr-1"
           style="width: 30%"
+          v-bind:disabled="isDisabled"
         />
         <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
           >Tên thẻ kho <strong class="p-error">*</strong>
@@ -44,42 +45,44 @@
           style="width: 320px"
           v-model="recData.dateCreated"
           inputFormat="dd/MM/yyy"
+          v-bind:disabled="isDisabled"
         />
       </div>
       <div class="p-mt-3">
         <label
           class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
           style="padding-top: 10px; margin-right: 10px"
-          >Vật tư <strong class="p-error">*</strong>
-        </label>
-        <Dropdown
-          style="width: 30%"
-          class="p-inputtext-sm"
-          v-model="recData.suppliesId"
-          :options="arrSupplies"
-          :filter="true"
-          :disabled="checkDate"
-          :showClear="true"
-          optionLabel="name"
-          @change="change()"
-          optionValue="suppliesId"
-          placeholder="--Hãy chọn--"
-        />
-        <label
-          class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
-          style="padding-top: 10px; margin-right: 10px"
           >Kho <strong class="p-error">*</strong>
         </label>
         <Dropdown
-          style="width: 30%; left: 5px"
+          style="width: 30%; "
           class="p-inputtext-sm"
           v-model="recData.warehouseId"
           :options="arrWarehouse"
           :filter="true"
-          :disabled="checkDate"
+          :disabled="isDisabled"
           :showClear="true"
           optionLabel="name"
           optionValue="warehouseId"
+          placeholder="--Hãy chọn--"
+          @change="changeArrSupplies(recData.warehouseId)"
+        />
+        <label
+          class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
+          style="padding-top: 10px; margin-right: 10px"
+          >Vật tư <strong class="p-error">*</strong>
+        </label>
+        <Dropdown
+          style="width: 30%; left: 5px"
+          class="p-inputtext-sm"
+          v-model="recData.suppliesId"
+          :options="arrSupplies"
+          :filter="true"
+          :disabled="isDisabled"
+          :showClear="true"
+          optionLabel="name"
+          @change="change()"
+          optionValue="suppliesId"
           placeholder="--Hãy chọn--"
         />
       </div>
@@ -96,7 +99,7 @@
         />
       </div>
     </div>
-    <div v-if="test1">
+    <div v-if="checkSupplies">
       <WarehouseCardFlow
         :requence="recData.warehouseCardId"
         :suppliesId="recData.suppliesId"
@@ -134,6 +137,8 @@ import { defineComponent, ref } from "vue";
 import WarehouseCardApi from "@/api/warehouse-card-api";
 import { useToast } from "primevue/usetoast";
 import WarehouseCardFlow from "@/views/warehouse-card-flow/WarehouseCardFlow.vue";
+import suppliesApi from "@/api/supplies-api";
+import { async } from "rxjs";
 export default defineComponent({
   props: {
     rec: {
@@ -141,25 +146,22 @@ export default defineComponent({
       required: true,
     },
     arrWarehouse: [],
-    arrSupplies: [],
+    isDisabled: Boolean,
   },
   setup(props, { emit }): unknown {
     const toast = useToast();
     const showMessage = ref(false);
     const userMessage = ref("");
     const changesApplied = ref(false);
-    let test1 = ref(false);
+    const arrSupplies = ref([]);
     const recData = ref(JSON.parse(JSON.stringify(props.rec))); // do not create direct refs to props to avoid making changes to props, instead use a cloned value of prop
     let suppliesId = recData.suppliesId == null ? 0 : recData.suppliesId;
-    let checkDate = false;
-    test1.value = recData.value.suppliesId != null ? true : false;
+    let checkSupplies = ref(false);
+    checkSupplies.value = recData.value.suppliesId != null ? true : false;
     const change = async () => {
-      // const today = new Date().getDate();
-      // const dateCreated = new Date(recData.value.dateCreated).getDate();
-      // checkDate = dateCreated == today ? false : true;
-      test1.value = false;
+      checkSupplies.value = false;
       setTimeout(() => {
-        return (test1.value = true);
+        return (checkSupplies.value = true);
       }, 1);
     };
     const onApplyChanges = async () => {
@@ -191,7 +193,7 @@ export default defineComponent({
           rawWarehouseCardObj
         );
         if (check.data) {
-          userMessage.value = "Mã thẻ kho bị trùng. Vui lòng nhập lại!";
+          userMessage.value = "Mã thẻ kho hoặc vật tư bị trùng. Vui lòng nhập lại!";
           showMessage.value = true;
         } else {
           let resp;
@@ -237,6 +239,15 @@ export default defineComponent({
       emit("cancel");
     };
 
+    const changeArrSupplies = async (id: any) => {
+      const supp = await suppliesApi.getByWarehouseId(id);
+      let itemSupplies: any;
+      if(supp.data.list){
+        itemSupplies = supp.data.list;
+      }
+      arrSupplies.value = itemSupplies;
+    }
+
     return {
       showMessage,
       userMessage,
@@ -245,9 +256,10 @@ export default defineComponent({
       onApplyChanges,
       onCancel,
       suppliesId,
-      checkDate,
-      test1,
+      checkSupplies,
       change,
+      changeArrSupplies,
+      arrSupplies
     };
   },
   components: {

@@ -12,9 +12,9 @@
         :rec="selectedRec"
         @cancel="showSlideOut = false; getData()"
         @changed="getData()"
-        :arrSupplies="arrSupplies"
         :arrWarehouse="arrWarehouse"
         :isNew="isNewRec"
+        :isDisabled="isDisabled"
       ></WarehouseCardDetails>
     </Sidebar>
     <h3>Quản lý thẻ kho</h3>
@@ -166,7 +166,7 @@
       stripedRows showGridlines
       @page="onPageChange($event)"
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4"
-      style="width: 1500px"
+      style="width: 1500px; line-height: 1.3rem; word-wrap: break-word;"
     >
       <Column field="index" header="STT" headerStyle="width:70px;" bodyStyle="text-align-last: center;"></Column>
       <Column
@@ -265,6 +265,7 @@ import EmployeeApi from "@/api/employee-api";
 import { debounce, exportFile, exportFileDocx } from "@/shared/utils";
 export default defineComponent({
   setup(): unknown {
+    const isDisabled = ref(false);
     const isLoading = ref(false);
     const showSlideOut = ref(false);
     const pageSize = ref(10);
@@ -342,7 +343,7 @@ export default defineComponent({
         currentPage = resp.data.currentPage;
         totalPages.value = resp.data.totalPages;
         totalRecs.value = resp.data.total;
-      } catch (err) {
+      } catch (err:any) {
         console.log("REST ERROR: %O", err.response ? err.response : err);
         isLoading.value = false;
       }
@@ -414,13 +415,6 @@ export default defineComponent({
         warehouseItem = resp.data.list;
       }
       arrWarehouse.value = warehouseItem;
-
-      const supp = await SuppliesApi.getAll();
-      let itemSupplies: any;
-      if (supp.data.list) {
-        itemSupplies = supp.data.list;
-      }
-      arrSupplies.value = itemSupplies;
       const sequence = await WarehouseCardApi.getSequence();
       let sequenceId: any;
       if (sequence.data) {
@@ -430,6 +424,7 @@ export default defineComponent({
       isNewRec.value = true;
       selectedRec.value = { warehouseCardId: sequenceId, dateCreated: today };
       showSlideOut.value = true;
+      isDisabled.value = false;
     };
 
     const onDeleteClick = (rec: Record<string, unknown>) => {
@@ -443,14 +438,8 @@ export default defineComponent({
         warehouseItem = resp.data.list;
       }
       arrWarehouse.value = warehouseItem;
-
-      const supp = await SuppliesApi.getAll();
-      let itemSupplies: any;
-      if (supp.data.list) {
-        itemSupplies = supp.data.list;
-      }
-      arrSupplies.value = itemSupplies;
       showSlideOut.value = true;
+      isDisabled.value = true;
       selectedRec.value = rec;
     };
 
@@ -530,8 +519,8 @@ export default defineComponent({
     return {
       list,
       arrWarehouse,
-      arrSupplies,
       isLoading,
+      isDisabled,
       showSlideOut,
       pageSize,
       totalPages,

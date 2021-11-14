@@ -173,7 +173,8 @@ public class ReceiptDao extends BaseHibernateDAO {
         String finalSql = "select r.receipt_id receiptId" +
                 " from receipt r " +
                 " left join receipt_flow rf on rf.receipt_id = r.receipt_id" +
-                " where rf.supplies_id = :suppliesId";
+                " where rf.supplies_id = :suppliesId" +
+                " and (rf.amount - if(rf.received is null, 0, rf.received)) > 0";
         SQLQuery q = createSQLQuery(finalSql);
         q.setParameter("suppliesId", suppliesId);
         return (List<Integer>) q.list();

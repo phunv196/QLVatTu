@@ -5,6 +5,7 @@ import com.app.dao.ReceiptFlowDao;
 import com.app.model.BaseResponse;
 import com.app.model.receipt.ReceiptFlowModel;
 import com.app.model.receipt.ReceiptFlowModel.ReceiptFlowResponse;
+import com.app.model.warehouseCard.WarehouseCardModel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,6 +19,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import java.math.BigInteger;
@@ -122,7 +124,6 @@ public class ReceiptFlowController extends BaseController {
                 resp.setSuccessMessage(String.format("Xóa bản ghi thành công (id:%s)", receiptFlowId));
                 return Response.ok(resp).build();
             }
-//            }
         } catch (HibernateException | ConstraintViolationException e) {
             resp.setErrorMessage("Không thể xóa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
@@ -149,8 +150,30 @@ public class ReceiptFlowController extends BaseController {
             criteria.add(Restrictions.eq("suppliesId",  suppliesId ));
         }
         criteria.setProjection(null);
-        List<ReceiptFlowModel> receiptFlowList = criteria.list();
+        ReceiptFlowModel receiptFlow = (ReceiptFlowModel) criteria.uniqueResult();
 
-        return Response.ok(receiptFlowList).build();
+        return Response.ok(receiptFlow).build();
+    }
+
+    @GET
+    @Path("check_receipt_flow")
+    @RolesAllowed({"ADMIN", "SUPPORT"})
+    @Operation(
+            summary = "Get list of receipt_flows",
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = ReceiptFlowResponse.class)))}
+    )
+    public Response checkReceiptFlow(@Parameter(description="receipt Id") @QueryParam("receiptId") Long receiptId,
+                  @Parameter(description="supplies Id") @QueryParam("suppliesId") Long suppliesId
+    ) {
+        Criteria criteria = receiptFlowDao.createCriteria(ReceiptFlowModel.class);
+        if (receiptId != null){
+            criteria.add(Restrictions.eq("receiptId",  receiptId ));
+        }
+        if (suppliesId != null){
+            criteria.add(Restrictions.eq("suppliesId",  suppliesId ));
+        }
+        criteria.setProjection(Projections.rowCount());
+        Long rowCount = (Long)criteria.uniqueResult();
+        return Response.ok(rowCount > 0).build();
     }
 }

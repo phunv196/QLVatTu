@@ -93,7 +93,6 @@ export default defineComponent({
       required: true,
     },
     arrSupplies: [],
-    arrSupplier: [],
   },
 
   setup(props, { emit }): unknown {
@@ -119,34 +118,40 @@ export default defineComponent({
           "Trường " + msg.join(", ") + " không được để trống!";
         showMessage.value = true;
       } else {
-        let resp;
-        delete rawReceiptFlowObj.index;
-        if (rawReceiptFlowObj.receiptFlowId) {
-          resp = await ReceiptFlowApi.updateReceiptFlow(rawReceiptFlowObj);
+        const check = await ReceiptFlowApi.checkReceiptFlow(rawReceiptFlowObj.receiptId, rawReceiptFlowObj.suppliesId)
+        if (check.data) {
+          userMessage.value = "Danh sách vật tư nhập không được trùng!";
+          showMessage.value = true;
         } else {
-          resp = await ReceiptFlowApi.addReceiptFlow(rawReceiptFlowObj);
-        }
-        if (resp.data.msgType === "SUCCESS") {
-          toast.add({
-            severity: "success",
-            summary: rawReceiptFlowObj.receiptFlowId ? "Sửa" : "Thêm mới",
-            detail: "Thao tác thành công",
-            life: 3000,
-          });
-          if (!rawReceiptFlowObj.receiptFlowId) {
-            recData.value.id = "CREATED";
+          let resp;
+          delete rawReceiptFlowObj.index;
+          if (rawReceiptFlowObj.receiptFlowId) {
+            resp = await ReceiptFlowApi.updateReceiptFlow(rawReceiptFlowObj);
+          } else {
+            resp = await ReceiptFlowApi.addReceiptFlow(rawReceiptFlowObj);
           }
-          changesApplied.value = true;
-          emit("changed");
-          setTimeout(() => {
-            onCancel();
-          }, 500);
-        } else {
-          toast.add({
-            severity: "error",
-            summary: "Lỗi xảy ra!",
-            detail: resp.data.msg,
-          });
+          if (resp.data.msgType === "SUCCESS") {
+            toast.add({
+              severity: "success",
+              summary: rawReceiptFlowObj.receiptFlowId ? "Sửa" : "Thêm mới",
+              detail: "Thao tác thành công",
+              life: 3000,
+            });
+            if (!rawReceiptFlowObj.receiptFlowId) {
+              recData.value.id = "CREATED";
+            }
+            changesApplied.value = true;
+            emit("changed");
+            setTimeout(() => {
+              onCancel();
+            }, 500);
+          } else {
+            toast.add({
+              severity: "error",
+              summary: "Lỗi xảy ra!",
+              detail: resp.data.msg,
+            });
+          }
         }
       }
     };

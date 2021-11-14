@@ -32,21 +32,27 @@ public class WarehouseCardFlowDao extends BaseHibernateDAO {
         q.executeUpdate();
     }
 
-    public BigInteger getWarehouseCardFlowCount(Long warehouseCardId) {
-        String sql = createSqlWhereString(warehouseCardId);
+    public BigInteger getWarehouseCardFlowCount(Long warehouseCardId, Long suppliesId ) {
+        String sql = createSqlWhereString(warehouseCardId, suppliesId);
         String countSql = "select count(*) " + sql ;
         SQLQuery q = createSQLQuery(countSql);
         if (warehouseCardId >0)   { q.setParameter("warehouseCardId", warehouseCardId); }
+        if (suppliesId >0)   { q.setParameter("suppliesId", suppliesId); }
         return (BigInteger)q.uniqueResult();
     }
 
-    private  String createSqlWhereString(Long warehouseCardId){
+    private  String createSqlWhereString(Long warehouseCardId, Long suppliesId ){
         String sqlWhere = " where  1 = 1 ";
-        if (warehouseCardId > 0)   { sqlWhere = sqlWhere + " and warehouse_card_id = :warehouseCardId "; }
-        return " from warehouse_card_flow " + sqlWhere;
+        if (warehouseCardId > 0)   { sqlWhere = sqlWhere + " and wcf.warehouse_card_id = :warehouseCardId "; }
+        if (suppliesId > 0)   { sqlWhere = sqlWhere + " and (dbf.supplies_id = :suppliesId || rf.supplies_id = :suppliesId) "; }
+        return  " from warehouse_card_flow wcf " +
+                " left join delivery_bill db on db.delivery_bill_id = wcf.delivery_bill_id" +
+                " left join delivery_bill_flow dbf on db.delivery_bill_id = dbf.delivery_bill_id" +
+                " left join receipt r on r.receipt_id = wcf.receipt_id" +
+                " left join receipt_flow rf on r.receipt_id = rf.receipt_id" + sqlWhere;
     }
 
-    public List<WarehouseCardFlowModel> getList(int from, int limit, Long warehouseCardId)  throws HibernateException, ConstraintViolationException {
+    public List<WarehouseCardFlowModel> getList(int from, int limit, Long warehouseCardId, Long suppliesId)  throws HibernateException, ConstraintViolationException {
 
         String sqlLimit = "";
         if ( limit <= 0 || limit > 1000 ){
@@ -76,13 +82,17 @@ public class WarehouseCardFlowDao extends BaseHibernateDAO {
                 " (concat(e.first_name, ' ' , e.last_name)) ))  employeeName" +
                 " from warehouse_card_flow wcf " +
                 " left join delivery_bill db on db.delivery_bill_id = wcf.delivery_bill_id" +
+                " left join delivery_bill_flow dbf on db.delivery_bill_id = dbf.delivery_bill_id" +
                 " left join receipt r on r.receipt_id = wcf.receipt_id" +
+                " left join receipt_flow rf on r.receipt_id = rf.receipt_id" +
                 " left join employees e on e.employee_id = db.employee_id" +
                 " left join employees emp on emp.employee_id = r.employee_id" +
-                " where wcf.warehouse_card_id = :warehouseCardId";
+                " where wcf.warehouse_card_id = :warehouseCardId" +
+                " and dbf.supplies_id = :suppliesId || rf.supplies_id = :suppliesId";
         finalSql = finalSql + " order by wcf.warehouse_card_flow_id " + sqlLimit;
         SQLQuery q = createSQLQuery(finalSql);
         q.setParameter("warehouseCardId", warehouseCardId);
+        q.setParameter("suppliesId", suppliesId);
         q.setResultTransformer(Transformers.aliasToBean(WarehouseCardFlowModel.class));
         setResultTransformer(q, WarehouseCardFlowModel.class);
         return q.list();
@@ -95,6 +105,7 @@ public class WarehouseCardFlowDao extends BaseHibernateDAO {
                 " wcf.amount amount," +
                 " wcf.warehouse_card_id warehouseCardId," +
                 " wcf.description description," +
+                " wcf.create_at createAt," +
                 " db.delivery_bill_id deliveryBillId," +
                 " db.code deliveryBillCode," +
                 " r.receipt_id receiptId," +

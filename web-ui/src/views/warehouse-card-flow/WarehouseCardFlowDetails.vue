@@ -19,36 +19,11 @@
           v-model="recData.type"
           class="p-inputtext-sm p-mr-1 p-d-inline-block"
           :options="[
-            { label: 'Phiếu nhập', code: 1 },
-            { label: 'Phiếu xuất', code: 2 },
+            { label: 'Phiếu nhập', code: 2 },
+            { label: 'Phiếu xuất', code: 1 },
           ]"
           optionLabel="label"
           optionValue="code"
-        />
-      </div>
-      <div
-        class="p-mt-3"
-        v-if="
-          recData.type == 1 ||
-          (recData.deliveryBillId && recData.receiptId == null)
-        "
-      >
-        <label
-          class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          style="padding-top: 10px; margin-right: 10px"
-          >Phiếu nhập <strong class="p-error">*</strong>
-        </label>
-        <Dropdown
-          style="width: 76.3%"
-          class="p-inputtext-sm"
-          v-model="recData.deliveryBillId"
-          :options="arrDeliveryBill"
-          :filter="true"
-          :showClear="true"
-          @change="getAmountDelivery()"
-          optionLabel="code"
-          optionValue="deliveryBillId"
-          placeholder="--Hãy chọn--"
         />
       </div>
       <div
@@ -61,7 +36,7 @@
         <label
           class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
           style="padding-top: 10px; margin-right: 10px"
-          >Phiếu xuất <strong class="p-error">*</strong>
+          >Phiếu nhập <strong class="p-error">*</strong>
         </label>
         <Dropdown
           style="width: 76.3%"
@@ -73,6 +48,31 @@
           @change="getAmountReceipt()"
           optionLabel="code"
           optionValue="receiptId"
+          placeholder="--Hãy chọn--"
+        />
+      </div>
+      <div
+        class="p-mt-3"
+        v-if="
+          recData.type == 1 ||
+          (recData.deliveryBillId && recData.receiptId == null)
+        "
+      >
+        <label
+          class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
+          style="padding-top: 10px; margin-right: 10px"
+          >Phiếu xuất <strong class="p-error">*</strong>
+        </label>
+        <Dropdown
+          style="width: 76.3%"
+          class="p-inputtext-sm"
+          v-model="recData.deliveryBillId"
+          :options="arrDeliveryBill"
+          :filter="true"
+          :showClear="true"
+          @change="getAmountDelivery()"
+          optionLabel="code"
+          optionValue="deliveryBillId"
           placeholder="--Hãy chọn--"
         />
       </div>
@@ -128,11 +128,13 @@
 </template>
 
 <script lang='ts'>
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, onMounted } from "vue";
 import WarehouseCardFlowApi from "@/api/warehouse-card-flow-api";
 import DeliveryBillFlowApi from "@/api/delivery-bill-flow-api";
 import { useToast } from "primevue/usetoast";
 import ReceiptFlowApi from "@/api/receipt-flow-api";
+import receiptApi from "@/api/receipt-api";
+import deliveryBillApi from "@/api/delivery-bill-api";
 
 export default defineComponent({
   props: {
@@ -140,13 +142,14 @@ export default defineComponent({
       type: Object,
       required: true,
     },
-    arrReceipt: [],
-    arrDeliveryBill: [],
     suppliesId: {},
   },
 
   setup(props, { emit }): unknown {
     const toast = useToast();
+    const maxAmount = ref();
+    const arrReceipt = ref([]);
+    const arrDeliveryBill = ref([]);
     const showMessage = ref(false);
     const userMessage = ref("");
     const changesApplied = ref(false);
@@ -174,49 +177,54 @@ export default defineComponent({
           "Trường " + msg.join(", ") + " không được để trống!";
         showMessage.value = true;
       } else {
-        let resp;
-        if (rawWarehouseCardFlowObj.warehouseCardFlowId) {
-          if (rawWarehouseCardFlowObj.type < 2) {
-            rawWarehouseCardFlowObj.receiptId = null;
-          } else {
-            rawWarehouseCardFlowObj.deliveryBillId = null;
-          }
-          resp = await WarehouseCardFlowApi.updateWarehouseCardFlow(
-            rawWarehouseCardFlowObj
-          );
+        if (rawWarehouseCardFlowObj.amount > maxAmount.value) {
+          userMessage.value = "Số lượng không được lớn hơn " + maxAmount.value +" !"
+          showMessage.value = true;
         } else {
-          if (rawWarehouseCardFlowObj.type < 2) {
-            rawWarehouseCardFlowObj.receiptId = null;
+          let resp;
+          if (rawWarehouseCardFlowObj.warehouseCardFlowId) {
+            if (rawWarehouseCardFlowObj.type < 2) {
+              rawWarehouseCardFlowObj.receiptId = null;
+            } else {
+              rawWarehouseCardFlowObj.deliveryBillId = null;
+            }
+            resp = await WarehouseCardFlowApi.updateWarehouseCardFlow(
+              rawWarehouseCardFlowObj
+            );
           } else {
-            rawWarehouseCardFlowObj.deliveryBillId = null;
+            if (rawWarehouseCardFlowObj.type < 2) {
+              rawWarehouseCardFlowObj.receiptId = null;
+            } else {
+              rawWarehouseCardFlowObj.deliveryBillId = null;
+            }
+            resp = await WarehouseCardFlowApi.addWarehouseCardFlow(
+              rawWarehouseCardFlowObj
+            );
           }
-          resp = await WarehouseCardFlowApi.addWarehouseCardFlow(
-            rawWarehouseCardFlowObj
-          );
-        }
-        if (resp.data.msgType === "SUCCESS") {
-          toast.add({
-            severity: "success",
-            summary: rawWarehouseCardFlowObj.warehouseCardFlowId
-              ? "Sửa thành công!"
-              : "Thêm mới thành công!",
-            detail: `${rawWarehouseCardFlowObj.name} (${rawWarehouseCardFlowObj.code})`,
-            life: 3000,
-          });
-          if (!rawWarehouseCardFlowObj.warehouseCardFlowId) {
-            recData.value.id = "CREATED";
-          }
-          changesApplied.value = true;
-          emit("changed");
-          setTimeout(() => {
+          if (resp.data.msgType === "SUCCESS") {
+            toast.add({
+              severity: "success",
+              summary: rawWarehouseCardFlowObj.warehouseCardFlowId
+                ? "Sửa thành công!"
+                : "Thêm mới thành công!",
+              detail: `${rawWarehouseCardFlowObj.name} (${rawWarehouseCardFlowObj.code})`,
+              life: 3000,
+            });
+            if (!rawWarehouseCardFlowObj.warehouseCardFlowId) {
+              recData.value.id = "CREATED";
+            }
+            changesApplied.value = true;
+            emit("changed");
+            setTimeout(() => {
               onCancel();
             }, 500);
-        } else {
-          toast.add({
-            severity: "error",
-            summary: "Lỗi xảy ra!",
-            detail: resp.data.msg,
-          });
+          } else {
+            toast.add({
+              severity: "error",
+              summary: "Lỗi xảy ra!",
+              detail: resp.data.msg,
+            });
+          }
         }
       }
     };
@@ -248,11 +256,12 @@ export default defineComponent({
         suppliesId.value
       );
       if (
-        receiptFlow.data.length > 0 &&
+        receiptFlow.data &&
         suppliesId.value > 0 &&
         recData.value.receiptId
       ) {
-        const data = receiptFlow.data[0].amount;
+        const data = receiptFlow.data.received ? receiptFlow.data.amount - receiptFlow.data.received : receiptFlow.data.amount;
+        maxAmount.value = data;
         recData.value.amount = data || 0;
       } else {
         recData.value.amount = 0;
@@ -260,14 +269,31 @@ export default defineComponent({
     };
 
     const setValue = () => {
-      if (recData.type > 1) {
+      if (recData.value.type === 1) {
         recData.value.receiptId = null;
         recData.value.amount = null;
-      } else {
+      }
+      if (recData.value.type === 2) {
         recData.value.deliveryBillId = null;
         recData.value.amount = null;
       }
     };
+
+    onMounted(async () => {
+      const rece = await receiptApi.getAllBySuppliesId(suppliesId.value);
+      let itemReceipt: any;
+      if (rece.data.list) {
+        itemReceipt = rece.data.list;
+      }
+      arrReceipt.value = itemReceipt;
+
+      const deli = await deliveryBillApi.getAllBySuppliesId(suppliesId.value);
+      let itemDeliveryBill: any;
+      if (deli.data.list) {
+        itemDeliveryBill = deli.data.list;
+      }
+      arrDeliveryBill.value = itemDeliveryBill;
+    });
 
     return {
       showMessage,
@@ -280,6 +306,9 @@ export default defineComponent({
       setValue,
       getAmountReceipt,
       suppliesId,
+      arrReceipt,
+      arrDeliveryBill,
+      maxAmount
     };
   },
 });

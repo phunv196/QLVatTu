@@ -183,7 +183,6 @@ public class QualityController extends BaseController {
     public Response getByCode(
             QualityModel model
     ) {
-        int recordFrom = 0;
         Criteria criteria = qualityDao.createCriteria(QualityModel.class);
         if (model.getQualityId() != null){
             criteria.add(Restrictions.ne("qualityId", model.getQualityId()));

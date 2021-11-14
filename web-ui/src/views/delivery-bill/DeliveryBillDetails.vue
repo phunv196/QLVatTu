@@ -79,6 +79,7 @@
           optionLabel="name"
           optionValue="warehouseId"
           placeholder="--Hãy chọn--"
+          @change="change()"
         />
       </div>
       <div class="p-mt-3 p-d-flex p-ai-center">
@@ -94,8 +95,9 @@
         />
       </div>
     </div>
-    <DeliveryBillFlow :requence="recData.deliveryBillId"></DeliveryBillFlow>
-
+    <div v-if="checkWarehouse">
+      <DeliveryBillFlow :requence="recData.deliveryBillId" :warehouseId="recData.warehouseId"></DeliveryBillFlow>
+    </div>
     <!--button-->
     <div class="p-mt-2 p-d-flex p-flex-row p-jc-end" style="width: 100%">
       <template v-if="changesApplied">
@@ -129,6 +131,7 @@ import { defineComponent, ref } from "vue";
 import DeliveryBillApi from "@/api/delivery-bill-api";
 import { useToast } from "primevue/usetoast";
 import DeliveryBillFlow from "@/views/delivery-bill-flow/DeliveryBillFlow.vue";
+import warehouseApi from "@/api/warehouse-api";
 
 export default defineComponent({
   props: {
@@ -219,6 +222,14 @@ export default defineComponent({
     const onCancel = () => {
       emit("cancel");
     };
+    let checkWarehouse = ref(false);
+    checkWarehouse.value = recData.value.warehouseId != null ? true : false;
+    const change = async () => {
+      checkWarehouse.value = false;
+      setTimeout(() => {
+        return (checkWarehouse.value = true);
+      }, 1);
+    };
 
     return {
       showMessage,
@@ -227,6 +238,8 @@ export default defineComponent({
       recData,
       onApplyChanges,
       onCancel,
+      change,
+      checkWarehouse
     };
   },
   components: {

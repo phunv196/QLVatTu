@@ -199,7 +199,6 @@ public class DepartmentController extends BaseController {
     public Response getByCode(
             DepartmentModel model
     ) {
-        int recordFrom = 0;
         Criteria criteria = departmentDao.createCriteria(DepartmentModel.class);
         if (model.getDepartmentId() != null){
             criteria.add(Restrictions.ne("departmentId", model.getDepartmentId()));

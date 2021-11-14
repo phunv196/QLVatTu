@@ -20,8 +20,8 @@
         <InputText
           type="text"
           v-model="recData.code"
-          class="p-inputtext-sm p-mr-1"
-          style="width: 30%"
+          class="p-inputtext-sm p-mr-1 "
+          style="width: 35%"
         />
         <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
           >Tên phiếu nhập <strong class="p-error">*</strong>
@@ -30,7 +30,7 @@
           type="text"
           v-model="recData.name"
           class="p-inputtext-sm"
-          style="width: 30%"
+          style="width: 35%"
         />
       </div>
       <div class="p-mt-3"></div>
@@ -42,7 +42,7 @@
         </label>
         <Datepicker
           class="p-inputtext-sm"
-          style="width: 320px"
+          style="min-width: 426px"
           v-model="recData.dateWarehousing"
           inputFormat="dd/MM/yyy"
         />
@@ -52,7 +52,7 @@
           >Kho <strong class="p-error">*</strong>
         </label>
         <Dropdown
-          style="width: 30%; left: 5px"
+          style="width: 35%; left: 5px"
           class="p-inputtext-sm"
           v-model="recData.warehouseId"
           :options="arrWarehouse"
@@ -72,7 +72,7 @@
           v-model="recData.description"
           class="p-inputtext-sm"
           maxlength="500"
-          style="width: 72.5%"
+          style="width: 81%"
         />
       </div>
     </div>

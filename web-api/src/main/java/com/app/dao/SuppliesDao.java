@@ -161,4 +161,25 @@ public class SuppliesDao extends BaseHibernateDAO {
         setResultTransformer(q, SuppliesModel.class);
         return q.list();
     }
+
+    public List<SuppliesModel> getByWarehouseId(Long warehouseId) {
+        StringBuilder querySelect = new StringBuilder("select s.supplies_id suppliesId," +
+                " s.code code," +
+                " s.name name" +
+                " from supplies s " +
+                " left join receipt_flow rf on rf.supplies_id = s.supplies_id" +
+                " left join receipt r on r.receipt_id = rf.receipt_id");
+        List<Object> paramList = new ArrayList<>();
+        StringBuilder strCondition = new StringBuilder(" WHERE 1 = 1");
+        CommonUtils.filter(warehouseId, strCondition, paramList, "r.warehouse_id");
+        querySelect.append(strCondition);
+        querySelect.append(" ORDER BY s.supplies_id ");
+        SQLQuery q = createSQLQuery(querySelect.toString());
+        for (int i = 0; i < paramList.size(); i++) {
+            q.setParameter(i, paramList.get(i));
+        }
+        q.setResultTransformer(Transformers.aliasToBean(SuppliesModel.class));
+        setResultTransformer(q, SuppliesModel.class);
+        return q.list();
+    }
 }

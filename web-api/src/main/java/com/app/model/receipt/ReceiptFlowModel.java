@@ -16,7 +16,7 @@ public class ReceiptFlowModel {
     @Column(name = "receipt_id")       private Long  receiptId;
     @Column(name = "supplies_id")      private Long  suppliesId;
     @Column(name = "amount")       private Long  amount;
-    @Column(name = "supplier_id")       private Long supplierId;
+    @Column(name = "received")       private Long  received;
     @Column(name = "description")       private String  description;
 
     //nhà cung cấp
@@ -38,6 +38,8 @@ public class ReceiptFlowModel {
     private String speciesName;
     @Transient
     private String calculatePrice;
+    @Transient
+    private Long missing;
     //Getters and Setters
 
 
@@ -73,13 +75,17 @@ public class ReceiptFlowModel {
         this.amount = amount;
     }
 
-    public Long getSupplierId() {
-        return supplierId;
+    public Long getReceived() {
+        return received;
     }
 
-    public void setSupplierId(Long supplierId) {
-        this.supplierId = supplierId;
+    public void setReceived(Long received) {
+        this.received = received;
     }
+
+    public Long getMissing() { return missing; }
+
+    public void setMissing(Long missing) { this.missing = missing; }
 
     public String getSupplierName() {
         return supplierName;

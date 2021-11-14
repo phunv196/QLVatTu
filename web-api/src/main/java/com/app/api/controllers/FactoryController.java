@@ -199,7 +199,6 @@ public class FactoryController extends BaseController {
                 resp.setSuccessMessage(String.format("Xóa bản ghi thành công (code:%s)", foundProd.getCode()));
                 return Response.ok(resp).build();
             }
-//            }
         } catch (HibernateException | ConstraintViolationException e) {
             resp.setErrorMessage("Không thể xóa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
@@ -215,7 +214,6 @@ public class FactoryController extends BaseController {
     public Response getByCode(
             FactoryModel model
     ) {
-        int recordFrom = 0;
         Criteria criteria = factoryDao.createCriteria(FactoryModel.class);
         if (model.getFactoryId() != null){
             criteria.add(Restrictions.ne("factoryId", model.getFactoryId()));

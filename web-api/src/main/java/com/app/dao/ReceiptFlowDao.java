@@ -2,6 +2,7 @@ package com.app.dao;
 
 import com.app.dao.base.BaseHibernateDAO;
 import com.app.model.receipt.ReceiptFlowModel;
+import com.app.model.unit.UnitModel;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -62,9 +63,11 @@ public class ReceiptFlowDao extends BaseHibernateDAO {
         sqlLimit = sqlLimit + " offset " + from;
         String finalSql = "select rf.receipt_flow_id receiptFlowId," +
                 " rf.amount amount," +
+                " if(rf.received is null, 0, rf.received) received," +
+                " (rf.amount - if(rf.received is null, 0, rf.received)) missing," +
                 " rf.receipt_id receiptId," +
                 " rf.description description," +
-                " sr.supplier_id supplierId," +
+                " s.supplier_id supplierId," +
                 " sr.code supplierCode," +
                 " sr.name supplierName," +
                 " s.supplies_id suppliesId," +
@@ -75,8 +78,8 @@ public class ReceiptFlowDao extends BaseHibernateDAO {
                 " (s.price * rf.amount) calculatePrice," +
                 " sp.name speciesName" +
                 " from receipt_flow rf " +
-                " left join supplier sr on sr.supplier_id = rf.supplier_id" +
                 " left join supplies s on s.supplies_id = rf.supplies_id" +
+                " left join supplier sr on sr.supplier_id = s.supplier_id" +
                 " left join unit u on u.unit_id = s.unit_id" +
                 " left join species sp on sp.species_id = s.species_id" +
                 " where rf.receipt_id = :receiptId";
@@ -102,10 +105,12 @@ public class ReceiptFlowDao extends BaseHibernateDAO {
                 " s.price suppliesPrice," +
                 " u.name suppliesUnit," +
                 " (s.price * rf.amount) calculatePrice," +
+                " rf.received received," +
+                " (rf.amount - if(rf.received is null, 0, rf.received)) missing," +
                 " sp.name speciesName" +
                 " from receipt_flow rf " +
-                " left join supplier sr on sr.supplier_id = rf.supplier_id" +
                 " left join supplies s on s.supplies_id = rf.supplies_id" +
+                " left join supplier sr on sr.supplier_id = s.supplier_id" +
                 " left join unit u on u.unit_id = s.unit_id" +
                 " left join species sp on sp.species_id = s.species_id" +
                 " where rf.receipt_id = :receiptId";
@@ -114,5 +119,13 @@ public class ReceiptFlowDao extends BaseHibernateDAO {
         q.setResultTransformer(Transformers.aliasToBean(ReceiptFlowModel.class));
         setResultTransformer(q, ReceiptFlowModel.class);
         return q.list();
+    }
+
+    public ReceiptFlowModel getModel(Long receiptId, Long suppliesId) {
+        String hql = "from ReceiptFlowModel where receiptId = :receiptId and suppliesId = :suppliesId";
+        Query q = createQuery(hql);
+        q.setParameter("receiptId", receiptId);
+        q.setParameter("suppliesId", suppliesId);
+        return  (ReceiptFlowModel) q.uniqueResult();
     }
 }

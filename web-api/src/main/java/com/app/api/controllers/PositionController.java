@@ -182,9 +182,6 @@ public class PositionController extends BaseController {
     public Response getByCode(
             PositionModel model
     ) {
-        if(model.getPositionId() != null) {
-            return Response.ok(true).build();
-        }
         Criteria criteria = positionDao.createCriteria(PositionModel.class);
         if (model.getPositionId() != null){
             criteria.add(Restrictions.ne("positionId", model.getPositionId()));

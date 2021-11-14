@@ -121,25 +121,25 @@
       showGridlines
       @page="onPageChange($event)"
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4"
-      style="width: 1000px"
+      style="width: 1180px; line-height: 1.3rem; word-wrap: break-word;"
     >
       <Column
         field="index"
         header="STT"
-        headerStyle="width:90px;"
+        headerStyle="width:70px;"
         bodyStyle="text-align-last: center;"
       ></Column>
       <Column
         field="code"
         header="Mã nhà cung cấp"
-        headerStyle="width:90px"
+        headerStyle="width:150px"
       ></Column>
       <Column
         field="name"
         header="Tên nhà cung cấp"
-        headerStyle="width:160px"
+        headerStyle="width:200px"
       ></Column>
-      <Column field="email" header="Email" headerStyle="width:160px"></Column>
+      <Column field="email" header="Email" headerStyle="width:160px" ></Column>
       <Column
         field="phone"
         header="Điện thoại"
@@ -148,9 +148,8 @@
       <Column
         field="address"
         header="Địa chỉ"
-        headerStyle="width:160px"
+        headerStyle="width:260px"
       ></Column>
-      <!--      <Column field="description" header="Ghi chú" headerStyle="width:160px"></Column>-->
       <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px; text-align: center;">
         <template #body="slotProps">
           <Button
@@ -238,7 +237,7 @@ export default defineComponent({
         currentPage = resp.data.currentPage;
         totalPages.value = resp.data.totalPages;
         totalRecs.value = resp.data.total;
-      } catch (err) {
+      } catch (err:any) {
         console.log("REST ERROR: %O", err.response ? err.response : err);
         isLoading.value = false;
       }

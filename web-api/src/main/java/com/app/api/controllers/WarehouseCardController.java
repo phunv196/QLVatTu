@@ -47,6 +47,7 @@ import static com.app.util.Constants.COMMON.FOLDER_EXPORT_DOCX;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class WarehouseCardController extends BaseController {
+    WarehouseCardFlowController warehouseCardFlowController = new WarehouseCardFlowController();
     WarehouseCardDao warehouseCardDao = new WarehouseCardDao();
     WarehouseCardFlowDao warehouseCardFlowDao = new WarehouseCardFlowDao();
     SuppliesDao suppliesDao = new SuppliesDao();
@@ -120,12 +121,22 @@ public class WarehouseCardController extends BaseController {
             warehouseCardDao.beginTransaction();
             warehouseCardDao.save(warehouseCard);
             warehouseCardDao.commitTransaction();
+            updateReceipt(warehouseCard);
             resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công code: %s ", warehouseCard.getCode()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
             resp.setErrorMessage("Không thể thêm mới bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
+    }
+
+    private void updateReceipt(WarehouseCardModel warehouseCard) {
+        List<WarehouseCardFlowModel> list = warehouseCardFlowDao.getList(0, 0, warehouseCard.getWarehouseCardId(), warehouseCard.getSuppliesId());
+        list.removeIf(e -> e.getReceiptId() == null);
+        list.forEach(e -> {
+            warehouseCardFlowController.updateRecepit(e);
+        });
+
     }
 
     @PUT
@@ -192,7 +203,7 @@ public class WarehouseCardController extends BaseController {
     )
     public Response getSequence() throws Exception {
         Long id = warehouseCardDao.getSequence();
-        return Response.ok(id == null ? 1 : id).build();
+        return Response.ok(id == null ? 1 : id -1).build();
     }
 
     @GET
@@ -240,9 +251,13 @@ public class WarehouseCardController extends BaseController {
         if (model.getWarehouseCardId() != null){
             criteria.add(Restrictions.ne("warehouseCardId", model.getWarehouseCardId()));
         }
-        if (!CommonUtils.isNullOrEmpty(model.getCode())){
-            criteria.add(Restrictions.eq("code", model.getCode()).ignoreCase());
+        if (CommonUtils.isNullOrEmpty(model.getCode()) || model.getSuppliesId() == null){
+            return Response.ok(true).build();
         }
+        criteria.add(Restrictions.disjunction()
+                .add(Restrictions.eq("suppliesId", model.getSuppliesId()))
+                .add(Restrictions.eq("code", model.getCode()).ignoreCase()));
+
         criteria.setProjection(Projections.rowCount());
         Long rowCount = (Long)criteria.uniqueResult();
         return Response.ok(rowCount > 0).build();
@@ -355,12 +370,12 @@ public class WarehouseCardController extends BaseController {
                             int col = 0;
                             xwpfTable.createRow();
                             xwpfTable.getRow(row).getCell(col++).setText(String.valueOf(index++));
-                            xwpfTable.getRow(row).getCell(col++).setText(CommonUtils.convertDateToString(model.getCreateAt()));
+                            xwpfTable.getRow(row).getCell(col++).setText(CommonUtils.convertDateToString(model.getDate()));
                             xwpfTable.getRow(row).getCell(col++).setText(model.getReceiptCode());
                             xwpfTable.getRow(row).addNewTableCell();
                             xwpfTable.getRow(row).getCell(col++).setText(model.getDeliveryBillCode());
                             xwpfTable.getRow(row).getCell(col++).setText(model.getDescription());
-                            xwpfTable.getRow(row).getCell(col++).setText(CommonUtils.convertDateToString(model.getDate()));
+                            xwpfTable.getRow(row).getCell(col++).setText(CommonUtils.convertDateToString(model.getCreateAt()));
                             xwpfTable.getRow(row).getCell(col++).setText( model.getReceiptId() != null ? String.valueOf(model.getAmount()) : "");
                             xwpfTable.getRow(row).addNewTableCell();
                             xwpfTable.getRow(row).getCell(col++).setText( model.getDeliveryBillId() != null ? String.valueOf(model.getAmount()) : "");

@@ -194,13 +194,15 @@ public class UserController extends BaseController {
             Long id = userDao.getSequence();
             if (id == null) {
                 id = 0l;
+            } else  {
+                id--;
             }
             UserModel model = new UserModel();
             CommonUtils.copyProperties(model, addUser);
-            model.setPassword(PlainTextPasswordEncoder.encode(PASSWORD, id.toString()));
             if (CommonUtils.isNullOrEmpty(addUser.getRole())) {
                 model.setRole(Constants.UserRoleConstants.ROLE_SUPPORT);
             }
+            model.setPassword(PlainTextPasswordEncoder.encode(PASSWORD, id.toString()));
             userDao.beginTransaction();
             userDao.save(model);
             userDao.commitTransaction();

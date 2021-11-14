@@ -20,7 +20,7 @@
       :loading="isLoading"
       stripedRows showGridlines
       @page="onPageChange($event)"
-      class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4" style="width:1000px">
+      class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4" style="width:1000px; line-height: 1.3rem; word-wrap: break-word;">
       <Column field="index" header="STT" headerStyle="width:90px;" bodyStyle="text-align-last: center;"></Column>
       <Column field="receiptCode" header="Mã phiếu nhập" headerStyle="width:90px"></Column>
       <Column field="deliveryBillCode" header="Mã phiếu xuất" headerStyle="width:90px"></Column>
@@ -48,6 +48,7 @@ import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
 import ReceiptApi from '@/api/receipt-api';
 import DeliveryBillApi from '@/api/delivery-bill-api';
+import suppliesApi from '@/api/supplies-api';
 
 export default defineComponent({
   props : {
@@ -78,7 +79,7 @@ export default defineComponent({
     const getData = async (page: number, requestedPageSize: number, warehouseCardFlowId = '') => {
       // isLoading.value = true;
       try {
-        const resp = await WarehouseCardFlowApi.getWarehouseCardFlows(page, requestedPageSize, warehouseCardId.value);
+        const resp = await WarehouseCardFlowApi.getWarehouseCardFlows(page, requestedPageSize, warehouseCardId.value, supplies.value);
         let i = 1;
         list.value = resp.data.list.map((v: Record<string, unknown>) => {
           let index = 1;
@@ -96,7 +97,7 @@ export default defineComponent({
         currentPage = resp.data.currentPage;
         totalPages.value = resp.data.totalPages;
         totalRecs.value = resp.data.total;
-      } catch (err) {
+      } catch (err:any) {
         console.log('REST ERROR: %O', err.response ? err.response : err);
         isLoading.value = false;
       }
@@ -149,19 +150,6 @@ export default defineComponent({
     };
 
     const onAddClick = async () => {
-      const Rece = await ReceiptApi.getAllBySuppliesId(supplies.value)
-      let itemReceipt: any;
-      if(Rece.data.list){
-        itemReceipt = Rece.data.list;
-      }
-      arrReceipt.value = itemReceipt;
-
-      const deli = await DeliveryBillApi.getAllBySuppliesId(supplies.value)
-      let itemDeliveryBill: any;
-      if(deli.data.list){
-        itemDeliveryBill = deli.data.list;
-      }
-      arrDeliveryBill.value = itemDeliveryBill;
       isNewRec.value = true;
       selectedRec.value = { warehouseCardFlowId: '', warehouseCardId: warehouseCardId.value };
       showSlideOut.value = true;
@@ -172,19 +160,6 @@ export default defineComponent({
     };
 
     const onEditClick = async (rec: Record<string, unknown>) => {
-      const Rece = await ReceiptApi.getAllBySuppliesId(supplies.value)
-      let itemReceipt: any;
-      if(Rece.data.list){
-        itemReceipt = Rece.data.list;
-      }
-      arrReceipt.value = itemReceipt;
-
-      const deli = await DeliveryBillApi.getAllBySuppliesId(supplies.value)
-      let itemDeliveryBill: any;
-      if(deli.data.list){
-        itemDeliveryBill = deli.data.list;
-      }
-      arrDeliveryBill.value = itemDeliveryBill;
       showSlideOut.value = true;
       selectedRec.value = rec;
     };

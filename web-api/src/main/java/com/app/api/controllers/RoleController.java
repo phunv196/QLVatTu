@@ -180,7 +180,6 @@ public class RoleController extends BaseController {
     public Response getByCode(
             RoleModel model
     ) {
-        int recordFrom = 0;
         Criteria criteria = roleDao.createCriteria(RoleModel.class);
         if (model.getRoleId() != null){
             criteria.add(Restrictions.ne("roleId", model.getRoleId()));

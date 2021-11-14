@@ -202,7 +202,6 @@ public class SupplierController extends BaseController {
     public Response getByCode(
             SupplierModel supplier
     ) {
-        int recordFrom = 0;
         Criteria criteria = supplierDao.createCriteria(SupplierModel.class);
         if (supplier.getSupplierId() != null){
             criteria.add(Restrictions.ne("supplierId", supplier.getSupplierId()));

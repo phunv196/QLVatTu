@@ -138,6 +138,25 @@ public class SuppliesController extends BaseController {
         return Response.ok(resp).build();
     }
 
+    @GET
+    @Path("by-warehouse/{warehouseId}")
+    @RolesAllowed({"ADMIN", "SUPPORT"})
+    @Operation(
+            summary = "Get list Supplies by WarehouseId",
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = SuppliesResponse.class)))}
+    )
+    public Response getByWarehouseId(
+            @Parameter(description="warehouse Id", example="601") @PathParam("warehouseId") Long warehouseId
+    ) {
+//        Criteria criteria = suppliesDao.createCriteria(SuppliesModel.class);
+//        criteria.setProjection(null);
+        List<SuppliesModel> suppliesList = suppliesDao.getByWarehouseId(warehouseId);
+        SuppliesResponse resp = new SuppliesResponse();
+        resp.setList(suppliesList);
+        resp.setSuccessMessage("List of suppliess");
+        return Response.ok(resp).build();
+    }
+
     @POST
     @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(

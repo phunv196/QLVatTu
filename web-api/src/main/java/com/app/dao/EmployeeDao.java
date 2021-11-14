@@ -59,8 +59,8 @@ public class EmployeeDao extends BaseHibernateDAO {
                 " e.birth birth," +
                 " e.sex sex," +
                 " (case" +
-                "   when e.sex = 1 then 'Nữ'" +
-                "   when e.sex = 2 then 'Nam'" +
+                "   when e.sex = 1 then 'Nam'" +
+                "   when e.sex = 2 then 'Nữ'" +
                 "   END) sexString ," +
                 " e.email email," +
                 " e.department_id departmentId, " +

@@ -11,7 +11,6 @@ import java.util.List;
 public class SupplierModel {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "supplier_id", unique = true, nullable = false) private Long supplierId;
-
     @Schema(example="601")
     @Column(name = "code")       private String  code;
     @Column(name = "name")      private String  name;

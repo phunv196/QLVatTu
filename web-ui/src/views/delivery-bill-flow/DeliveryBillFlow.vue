@@ -20,7 +20,7 @@
       :loading="isLoading"
       stripedRows showGridlines
       @page="onPageChange($event)"
-      class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4" style="width:1000px">
+      class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4" style="width:1000px; line-height: 1.3rem; word-wrap: break-word;">
       <Column field="index" header="STT" headerStyle="width:50px;" bodyStyle="text-align-last: center;"></Column>
       <Column field="suppliesCode" header="Mã vật tư" headerStyle="width:90px"></Column>
       <Column field="suppliesName" header="Tên vật tư" headerStyle="width:160px"></Column>
@@ -53,6 +53,7 @@ import { useToast } from 'primevue/usetoast';
 export default defineComponent({
   props: {
     requence: {},
+    warehouseId: Number
   },
   setup(props): unknown {
     const isLoading = ref(false);
@@ -69,6 +70,7 @@ export default defineComponent({
     const toast = useToast();
     let currentPage = 1;
     const deliveryBillId = ref(JSON.parse(JSON.stringify(props.requence)));
+    const warehouseId = ref(JSON.parse(JSON.stringify(props.warehouseId)));
     const getData = async (page: number, requestedPageSize: number, deliveryBillFlowId = '') => {
       // isLoading.value = true;
       try {
@@ -90,7 +92,7 @@ export default defineComponent({
         currentPage = resp.data.currentPage;
         totalPages.value = resp.data.totalPages;
         totalRecs.value = resp.data.total;
-      } catch (err) {
+      } catch (err:any) {
         console.log('REST ERROR: %O', err.response ? err.response : err);
         isLoading.value = false;
       }
@@ -143,14 +145,14 @@ export default defineComponent({
     };
 
     const onAddClick = async () => {
-      const supp = await SuppliesApi.getAll()
+      const supp = await SuppliesApi.getByWarehouseId(warehouseId.value)
       let itemSupplies: any;
       if(supp.data.list){
         itemSupplies = supp.data.list;
       }
       arrSupplies.value = itemSupplies;
       isNewRec.value = true;
-      selectedRec.value = { deliveryBillFlowId: '' , deliveryBillId : deliveryBillId };
+      selectedRec.value = { deliveryBillFlowId: '' , deliveryBillId : deliveryBillId, };
       showSlideOut.value = true;
     };
 
@@ -159,7 +161,7 @@ export default defineComponent({
     };
 
     const onEditClick = async (rec: Record<string, unknown>) => {
-      const supp = await SuppliesApi.getAll()
+      const supp = await SuppliesApi.getByWarehouseId(warehouseId.value)
       let itemSupplies: any;
       if(supp.data.list){
         itemSupplies = supp.data.list;

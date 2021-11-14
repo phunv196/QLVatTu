@@ -63,7 +63,7 @@
       :loading="isLoading"
       stripedRows showGridlines
       @page="onPageChange($event)"
-      class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4" style="width:1000px">
+      class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4" style="width:1000px; line-height: 1.3rem; word-wrap: break-word;">
       <Column field="index" header="STT" headerStyle="width:90px;" bodyStyle="text-align-last: center;"></Column>
       <Column field="code" header="Mã chức vụ" headerStyle="width:90px"></Column>
       <Column field="name" header="Tên chức vụ" headerStyle="width:160px"></Column>
@@ -126,7 +126,7 @@ export default defineComponent({
         currentPage = resp.data.currentPage;
         totalPages.value = resp.data.totalPages;
         totalRecs.value = resp.data.total;
-      } catch (err) {
+      } catch (err:any) {
         console.log('REST ERROR: %O', err.response ? err.response : err);
         isLoading.value = false;
       }

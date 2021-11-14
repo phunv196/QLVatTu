@@ -213,7 +213,7 @@ public class DeliveryBillController extends BaseController {
     )
     public Response getSequence() throws Exception {
         Long id = deliveryBillDao.getSequence();
-        return Response.ok(id == null ? 1 : id).build();
+        return Response.ok(id == null ? 1 : id - 1).build();
     }
 
     @GET
@@ -258,7 +258,6 @@ public class DeliveryBillController extends BaseController {
     public Response getByCode(
             DeliveryBillModel model
     ) {
-        int recordFrom = 0;
         Criteria criteria = deliveryBillDao.createCriteria(DeliveryBillModel.class);
         if (model.getDeliveryBillId() != null){
             criteria.add(Restrictions.ne("deliveryBillId", model.getDeliveryBillId()));
