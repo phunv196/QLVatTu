@@ -3,6 +3,9 @@
  * Copyright (C) 2018 Viettel Telecom. All rights reserved. VIETTEL PROPRIETARY/CONFIDENTIAL. Use is
  */
 package com.app.util;
+
+import com.app.dao.base.CommonUtils;
+
 /**
  * @author phunv
  * @since Nov 20, 2018
@@ -33,14 +36,14 @@ public class Constants {
         String SQLDATE_FORMAT = "yyyy-MM-dd";
         String DATE_TIME_FORMAT = "dd/MM/yyyy HH:mm:ss";
 
-        String FOLDER_EXPORT = "D:/tomcat/file/folder-export-excel/";
-        String TEMPLATE_EXPORT_EXCELL = "D:/tomcat/file/template-export-excel/";
-        String FOLDER_IMPORT = "D:/tomcat/file/folder-file-import/";
-        String TEMPLATE_IMPORT_EXCELL = "D:/tomcat/file/template-import-excell/";
-        String FOLDER_EXPORT_TEMPLATE = "D:/tomcat/file/folder-export-template/";
-        String TEMPLATE_EXPORT_DOCX = "D:/tomcat/file/template-export-docx/";
-        String FOLDER_EXPORT_DOCX = "D:/tomcat/file/folder-export-docx/";
-        String EXPORT_FOLDER = "D:/tomcat/file";
+        String FOLDER_EXPORT = CommonUtils.getConfig("folder") + "folder-export-excel/";
+        String TEMPLATE_EXPORT_EXCELL = CommonUtils.getConfig("folder") + "template-export-excel/";
+        String FOLDER_IMPORT = CommonUtils.getConfig("folder") + "folder-file-import/";
+        String TEMPLATE_IMPORT_EXCELL = CommonUtils.getConfig("folder") + "template-import-excell/";
+        String FOLDER_EXPORT_TEMPLATE = CommonUtils.getConfig("folder") + "folder-export-template/";
+        String TEMPLATE_EXPORT_DOCX = CommonUtils.getConfig("folder") + "template-export-docx/";
+        String FOLDER_EXPORT_DOCX = CommonUtils.getConfig("folder") + "folder-export-docx/";
+        String EXPORT_FOLDER = CommonUtils.getConfig("folder") + "";
     }
 
 }

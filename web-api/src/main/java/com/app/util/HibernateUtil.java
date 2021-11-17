@@ -1,6 +1,7 @@
 package com.app.util;
 
 
+import com.app.dao.base.CommonUtils;
 import com.app.model.delivery.DeliveryBillFlowModel;
 import com.app.model.delivery.DeliveryBillModel;
 import com.app.model.department.DepartmentModel;
@@ -41,12 +42,12 @@ public class HibernateUtil {
             //Connection Props
             configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
             configuration.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver");
-            configuration.setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/qlvattu?useUnicode=yes&characterEncoding=UTF-8");
+            configuration.setProperty("hibernate.connection.url", CommonUtils.getConfig("databaseUrl"));
             configuration.setProperty("useUnicode", "true");
             configuration.setProperty("characterEncoding", "UTF-8");
             configuration.setProperty("hibernate.connection.release_mode", "auto");
-            configuration.setProperty("hibernate.connection.username", "root");
-            configuration.setProperty("hibernate.connection.password", "123456a@");
+            configuration.setProperty("hibernate.connection.username", CommonUtils.getConfig("databaseUserName"));
+            configuration.setProperty("hibernate.connection.password", CommonUtils.getConfig("databasePassWord"));
             configuration.setProperty("hibernate.show_sql", "true");
             configuration.setProperty("hibernate.format_sql", "true");
 

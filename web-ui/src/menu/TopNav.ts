@@ -6,7 +6,7 @@ export default {
     { id: '2', label: 'My Cart', icon: 'shopping-cart', to: '/home/my-cart' },
   ],
   SUPPORT: [
-    { id: '0', label: 'Trang chủ', icon:'pi pi-home', to: '/home/manage/dashboard' },
+    { id: '0', label: 'Trang chủ', icon:'pi pi-home', to: '/home/dashboard' },
     {
       id: '1',
       label:'Quản lý danh mục',
@@ -15,17 +15,17 @@ export default {
         {
           id: '2',
           label:'Quản lý chất lượng',
-          to: '/home/manage/quality',
+          to: '/home/quality',
         },
         {
           id: '2',
           label:'Chủng loại',
-          to: '/home/manage/species'
+          to: '/home/species'
         },
         {
           id: '2',
           label:'Đơn vị tính',
-          to: '/home/manage/unit'
+          to: '/home/unit'
         },
       ]
     },
@@ -37,22 +37,22 @@ export default {
         {
           id: '2',
           label:'Quản lý user',
-          to: '/home/manage/users',
+          to: '/home/users',
         },
         {
           id: '2',
           label:'Quản lý nhân viên',
-          to: '/home/manage/employees'
+          to: '/home/employees'
         },
         {
           id: '2',
           label:'Chức vụ',
-          to: '/home/manage/position'
+          to: '/home/position'
         },
         {
           id: '2',
           label:'Phòng ban',
-          to: '/home/manage/department'
+          to: '/home/department'
         }
       ]
     },
@@ -64,22 +64,22 @@ export default {
         {
           id: '2',
           label:'Phân xưởng',
-          to: '/home/manage/factory'
+          to: '/home/factory'
         },
         {
           id: '2',
           label:'Nhà cung cấp',
-          to: '/home/manage/supplier'
+          to: '/home/supplier'
         },
         {
           id: '2',
           label:'Vật tư',
-          to: '/home/manage/supplies'
+          to: '/home/supplies'
         },
         {
           id: '2',
           label:'Kho',
-          to: '/home/manage/warehouse'
+          to: '/home/warehouse'
         }
       ]
     },
@@ -91,23 +91,23 @@ export default {
         {
           id: '2',
           label:'Phiếu nhập kho',
-          to: '/home/manage/receipt'
+          to: '/home/receipt'
         },
         {
           id: '2',
           label:'Phiếu xuất kho',
-          to: '/home/manage/delivery-bill',
+          to: '/home/delivery-bill',
         },
         {
           id: '2',
           label:'Thẻ kho',
-          to: '/home/manage/warehouse-card'
+          to: '/home/warehouse-card'
         },
       ]
     },
   ],
   ADMIN: [
-    { label: 'Trang chủ', icon:'pi pi-home', to: '/home/manage/dashboard' },
+    { label: 'Trang chủ', icon:'pi pi-home', to: '/home/dashboard' },
     {
       id: '1',
       label:'Quản lý danh mục',
@@ -116,17 +116,17 @@ export default {
         {
           id: '2',
           label:'Quản lý chất lượng',
-          to: '/home/manage/quality',
+          to: '/home/quality',
         },
         {
           id: '2',
           label:'Chủng loại',
-          to: '/home/manage/species'
+          to: '/home/species'
         },
         {
           id: '2',
           label:'Đơn vị tính',
-          to: '/home/manage/unit'
+          to: '/home/unit'
         },
       ]
     },
@@ -137,22 +137,22 @@ export default {
       items:[
         {
           label:'Quản lý user',
-          to: '/home/manage/users',
+          to: '/home/users',
         },
         {
           id: '2',
           label:'Quản lý nhân viên',
-          to: '/home/manage/employees'
+          to: '/home/employees'
         },
         {
           id: '2',
           label:'Chức vụ',
-          to: '/home/manage/position'
+          to: '/home/position'
         },
         {
           id: '2',
           label:'Phòng ban',
-          to: '/home/manage/department'
+          to: '/home/department'
         }
       ]
     },
@@ -163,16 +163,16 @@ export default {
       items:[
         {
           label:'Phân xưởng',
-          to: '/home/manage/factory'
+          to: '/home/factory'
         },{
           label:'Nhà cung cấp',
-          to: '/home/manage/supplier'
+          to: '/home/supplier'
         },{
           label:'Vật tư',
-          to: '/home/manage/supplies'
+          to: '/home/supplies'
         },{
           label:'Kho',
-          to: '/home/manage/warehouse'
+          to: '/home/warehouse'
         }
       ]
     },
@@ -183,15 +183,15 @@ export default {
       items:[
         {
           label:'Phiếu nhập kho',
-          to: '/home/manage/receipt'
+          to: '/home/receipt'
         },
         {
           id: '2',
           label:'Phiếu xuất kho',
-          to: '/home/manage/delivery-bill',
+          to: '/home/delivery-bill',
         },{
           label:'Thẻ kho',
-          to: '/home/manage/warehouse-card'
+          to: '/home/warehouse-card'
         },
       ]
     },
