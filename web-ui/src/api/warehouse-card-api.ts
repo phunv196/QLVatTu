@@ -73,4 +73,8 @@ export default {
   async downloadFileDocx(deliveryBillId: any): Promise<AxiosResponse> {
     return api.get(`/warehouse_cards/downloadFileDocx/${deliveryBillId}`);
   },
+
+  async getAmountInventory(suppliesId: any): Promise<AxiosResponse> {
+    return api.get(`/warehouse_cards/inventory/${suppliesId}`);
+  },
 };

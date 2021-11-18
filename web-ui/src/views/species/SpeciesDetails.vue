@@ -106,12 +106,18 @@ export default defineComponent({
         userMessage.value =
           "Trường " + msg.join(", ") + " không được để trống!";
         showMessage.value = true;
+        setTimeout(() => {
+          return (showMessage.value = false);
+        }, 2000);
       } else {
         delete rawSpeciesObj.index;
         const check = await SpeciesApi.getSpeciesByCode(rawSpeciesObj);
         if (check.data) {
           userMessage.value = "Mã chủng loại bị trùng. Vui lòng nhập lại!";
           showMessage.value = true;
+          setTimeout(() => {
+            return (showMessage.value = false);
+          }, 2000);
         } else {
           let resp;
           if (rawSpeciesObj.speciesId) {

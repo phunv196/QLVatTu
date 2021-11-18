@@ -27,6 +27,7 @@
           optionLabel="name"
           optionValue="suppliesId"
           placeholder="--Hãy chọn--"
+          @change="changeSupplies()"
         />
       </div>
 
@@ -56,7 +57,7 @@
     </div>
     <!--button-->
     <div class="p-mt-2 p-d-flex p-flex-row p-jc-end" style="width: 100%">
-      <template v-if="changesApplied">
+      <template v-if="changesApplied || $store.getters.role !== 'ADMIN'">
         <Button
           label="CLOSE"
           @click="$emit('cancel')"
@@ -85,6 +86,8 @@
 import { defineComponent, ref } from "vue";
 import DeliveryBillFlowApi from "@/api/delivery-bill-flow-api";
 import { useToast } from "primevue/usetoast";
+import { async } from "rxjs";
+import warehouseCardApi from "@/api/warehouse-card-api";
 
 export default defineComponent({
   props: {
@@ -101,7 +104,7 @@ export default defineComponent({
     const userMessage = ref("");
     const changesApplied = ref(false);
     const recData = ref(JSON.parse(JSON.stringify(props.rec))); // do not create direct refs to props to avoid making changes to props, instead use a cloned value of prop
-    const recData2 = props.arrSupplies;
+    const maxAmount = ref("");
     const onApplyChanges = async () => {
       const rawDeliveryBillFlowObj = JSON.parse(JSON.stringify(recData.value));
       delete rawDeliveryBillFlowObj.index;
@@ -117,43 +120,60 @@ export default defineComponent({
         userMessage.value =
           "Trường " + msg.join(", ") + " không được để trống!";
         showMessage.value = true;
+        setTimeout(() => {
+          return (showMessage.value = false);
+        }, 2000);
       } else {
-        let resp;
-        if (rawDeliveryBillFlowObj.deliveryBillFlowId) {
-          resp = await DeliveryBillFlowApi.updateDeliveryBillFlow(
-            rawDeliveryBillFlowObj
-          );
-        } else {
-          resp = await DeliveryBillFlowApi.addDeliveryBillFlow(
-            rawDeliveryBillFlowObj
-          );
-        }
-        if (resp.data.msgType === "SUCCESS") {
-          toast.add({
-            severity: "success",
-            summary: rawDeliveryBillFlowObj.deliveryBillFlowId
-              ? "Sửa thành công!"
-              : "Thêm mới thành công",
-            detail: `${rawDeliveryBillFlowObj.name} (${rawDeliveryBillFlowObj.code})`,
-            life: 3000,
-          });
-          if (!rawDeliveryBillFlowObj.deliveryBillFlowId) {
-            recData.value.id = "CREATED";
-          }
-          changesApplied.value = true;
-          emit("changed");
+        if (recData.value.amount > maxAmount.value) {
+          userMessage.value = "Số lượng vật tư xuất không thể lớn hơn " + maxAmount.value;
+          showMessage.value = true;
           setTimeout(() => {
+            return (showMessage.value = false);
+          }, 2000);
+        } else {
+          let resp;
+          if (rawDeliveryBillFlowObj.deliveryBillFlowId) {
+            resp = await DeliveryBillFlowApi.updateDeliveryBillFlow(
+              rawDeliveryBillFlowObj
+            );
+          } else {
+            resp = await DeliveryBillFlowApi.addDeliveryBillFlow(
+              rawDeliveryBillFlowObj
+            );
+          }
+          if (resp.data.msgType === "SUCCESS") {
+            toast.add({
+              severity: "success",
+              summary: rawDeliveryBillFlowObj.deliveryBillFlowId
+                ? "Sửa thành công!"
+                : "Thêm mới thành công",
+              detail: `${rawDeliveryBillFlowObj.name} (${rawDeliveryBillFlowObj.code})`,
+              life: 3000,
+            });
+            if (!rawDeliveryBillFlowObj.deliveryBillFlowId) {
+              recData.value.id = "CREATED";
+            }
+            changesApplied.value = true;
+            emit("changed");
+            setTimeout(() => {
               onCancel();
             }, 500);
-        } else {
-          toast.add({
-            severity: "error",
-            summary: "Lỗi xảy ra!",
-            detail: resp.data.msg,
-          });
+          } else {
+            toast.add({
+              severity: "error",
+              summary: "Lỗi xảy ra!",
+              detail: resp.data.msg,
+            });
+          }
         }
       }
     };
+
+    const changeSupplies = async () => {
+      const res = await warehouseCardApi.getAmountInventory(recData.value.suppliesId);
+      recData.value.amount = res.data;
+      maxAmount.value = res.data;
+    }
 
     const onCancel = () => {
       emit("cancel");
@@ -166,6 +186,8 @@ export default defineComponent({
       recData,
       onApplyChanges,
       onCancel,
+      changeSupplies,
+      maxAmount
     };
   },
 });

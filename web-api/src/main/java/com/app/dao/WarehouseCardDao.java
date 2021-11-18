@@ -29,6 +29,9 @@ public class WarehouseCardDao extends BaseHibernateDAO {
     }
 
     public  int delete(Long warehouseCardId)  throws HibernateException, ConstraintViolationException {
+        Query query = createQuery("delete WarehouseCardFlowModel where warehouseCardId = :warehouseCardId");
+        query.setParameter("warehouseCardId", warehouseCardId);
+        query.executeUpdate();
         Query q = createQuery("delete WarehouseCardModel where warehouseCardId = :warehouseCardId");
         q.setParameter("warehouseCardId", warehouseCardId);
         return q.executeUpdate();
@@ -210,8 +213,8 @@ public class WarehouseCardDao extends BaseHibernateDAO {
                 " and wcf.warehouse_card_id = wc.warehouse_card_id ) amountDeliveryBill," +
                 " (select if(sum(amount) is null , 0, sum(amount)) from warehouse_card_flow wcf where wcf.receipt_id IS NOT NULL " +
                 " and wcf.warehouse_card_id = wc.warehouse_card_id ) amountReceipt, " +
-                " ((select if(sum(amount) is null , 0, sum(amount)) from warehouse_card_flow wcf where wcf.delivery_bill_id IS NOT NULL " +
-                " and wcf.warehouse_card_id = wc.warehouse_card_id ) - (select if(sum(amount) is null , 0, sum(amount)) from warehouse_card_flow wcf where wcf.receipt_id IS NOT NULL " +
+                " ((select if(sum(amount) is null , 0, sum(amount)) from warehouse_card_flow wcf where wcf.receipt_id IS NOT NULL " +
+                " and wcf.warehouse_card_id = wc.warehouse_card_id ) - (select if(sum(amount) is null , 0, sum(amount)) from warehouse_card_flow wcf where wcf.delivery_bill_id IS NOT NULL " +
                 " and wcf.warehouse_card_id = wc.warehouse_card_id ) ) amountInventory " +
                 " from warehouse_card wc " +
                 " left join supplies s on s.supplies_id = wc.supplies_id" +
@@ -236,4 +239,25 @@ public class WarehouseCardDao extends BaseHibernateDAO {
         setResultTransformer(q, WarehouseCardModel.class);
         return q.list();
      }
+
+    public WarehouseCardModel getAmountInventory(Long suppliesId) {
+        StringBuilder querySelect = new StringBuilder("select " +
+                " ((select if(sum(amount) is null , 0, sum(amount)) from warehouse_card_flow wcf where wcf.receipt_id IS NOT NULL " +
+                " and wcf.warehouse_card_id = wc.warehouse_card_id ) - (select if(sum(amount) is null , 0, sum(amount)) from warehouse_card_flow wcf where wcf.delivery_bill_id IS NOT NULL " +
+                " and wcf.warehouse_card_id = wc.warehouse_card_id ) ) amountInventory " +
+                " from warehouse_card wc " +
+                " left join supplies s on s.supplies_id = wc.supplies_id");
+        List<Object> paramList = new ArrayList<>();
+        StringBuilder strCondition = new StringBuilder(" WHERE 1 = 1");
+        CommonUtils.filter(suppliesId, strCondition, paramList, "s.supplies_id");
+        querySelect.append(strCondition);
+        querySelect.append(" ORDER BY wc.warehouse_card_id ");
+        SQLQuery q = createSQLQuery(querySelect.toString());
+        for (int i = 0; i < paramList.size(); i++) {
+            q.setParameter(i, paramList.get(i));
+        }
+        q.setResultTransformer(Transformers.aliasToBean(WarehouseCardModel.class));
+        setResultTransformer(q, WarehouseCardModel.class);
+        return (WarehouseCardModel) q.uniqueResult();
+    }
 }

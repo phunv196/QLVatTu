@@ -96,11 +96,14 @@
       </div>
     </div>
     <div v-if="checkWarehouse">
-      <DeliveryBillFlow :requence="recData.deliveryBillId" :warehouseId="recData.warehouseId"></DeliveryBillFlow>
+      <DeliveryBillFlow
+        :requence="recData.deliveryBillId"
+        :warehouseId="recData.warehouseId"
+      ></DeliveryBillFlow>
     </div>
     <!--button-->
     <div class="p-mt-2 p-d-flex p-flex-row p-jc-end" style="width: 100%">
-      <template v-if="changesApplied">
+      <template v-if="changesApplied || $store.getters.role !== 'ADMIN'">
         <Button
           label="CLOSE"
           @click="$emit('cancel')"
@@ -131,7 +134,6 @@ import { defineComponent, ref } from "vue";
 import DeliveryBillApi from "@/api/delivery-bill-api";
 import { useToast } from "primevue/usetoast";
 import DeliveryBillFlow from "@/views/delivery-bill-flow/DeliveryBillFlow.vue";
-import warehouseApi from "@/api/warehouse-api";
 
 export default defineComponent({
   props: {
@@ -174,6 +176,9 @@ export default defineComponent({
         userMessage.value =
           "Trường " + msg.join(", ") + " không được để trống!";
         showMessage.value = true;
+        setTimeout(() => {
+          return (showMessage.value = false);
+        }, 2000);
       } else {
         const check = await DeliveryBillApi.getDeliveryBillByCode(
           rawDeliveryBillObj
@@ -181,6 +186,9 @@ export default defineComponent({
         if (check.data) {
           userMessage.value = "Mã phiếu xuất bị trùng. Vui lòng nhập lại!";
           showMessage.value = true;
+          setTimeout(() => {
+            return (showMessage.value = false);
+          }, 2000);
         } else {
           let resp;
           const checkId = await DeliveryBillApi.checkId(
@@ -239,7 +247,7 @@ export default defineComponent({
       onApplyChanges,
       onCancel,
       change,
-      checkWarehouse
+      checkWarehouse,
     };
   },
   components: {

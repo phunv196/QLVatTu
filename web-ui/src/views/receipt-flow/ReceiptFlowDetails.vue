@@ -56,7 +56,7 @@
     </div>
     <!--button-->
     <div class="p-mt-2 p-d-flex p-flex-row p-jc-end" style="width: 100%">
-      <template v-if="changesApplied">
+      <template v-if="changesApplied || $store.getters.role !== 'ADMIN'">
         <Button
           label="CLOSE"
           @click="$emit('cancel')"
@@ -117,11 +117,20 @@ export default defineComponent({
         userMessage.value =
           "Trường " + msg.join(", ") + " không được để trống!";
         showMessage.value = true;
+        setTimeout(() => {
+          return (showMessage.value = false);
+        }, 2000);
       } else {
-        const check = await ReceiptFlowApi.checkReceiptFlow(rawReceiptFlowObj.receiptId, rawReceiptFlowObj.suppliesId)
+        const check = await ReceiptFlowApi.checkReceiptFlow(
+          rawReceiptFlowObj.receiptId,
+          rawReceiptFlowObj.suppliesId
+        );
         if (check.data) {
           userMessage.value = "Danh sách vật tư nhập không được trùng!";
           showMessage.value = true;
+          setTimeout(() => {
+            return (showMessage.value = false);
+          }, 2000);
         } else {
           let resp;
           delete rawReceiptFlowObj.index;

@@ -48,6 +48,10 @@ export default {
     return api.get(`/warehouses/all`);
   },
 
+  async getByReceipt(): Promise<AxiosResponse> {
+    return api.get(`/warehouses/by-receipt`);
+  },
+
   async getAllBySuppliesId(suppliesId: number): Promise<AxiosResponse> {
     return api.get(`/warehouses/all/${suppliesId}`);
   },

@@ -28,6 +28,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -110,6 +111,22 @@ public class WarehouseController extends BaseController {
         Criteria criteria = warehouseDao.createCriteria(WarehouseModel.class);
         criteria.setProjection(null);
         List<WarehouseModel> warehouseList = criteria.list();
+        WarehouseResponse resp = new WarehouseResponse();
+        resp.setList(warehouseList);
+        resp.setSuccessMessage("List of warehouse");
+        return Response.ok(resp).build();
+    }
+
+    @GET
+    @Path("by-receipt")
+    @RolesAllowed({"ADMIN", "SUPPORT"})
+    @Operation(
+            summary = "Get all warehouses",
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = WarehouseResponse.class)))}
+    )
+    public Response getByRecepit(
+    ) {
+        List<WarehouseModel> warehouseList = warehouseDao.getByRecepit();
         WarehouseResponse resp = new WarehouseResponse();
         resp.setList(warehouseList);
         resp.setSuccessMessage("List of warehouse");

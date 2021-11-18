@@ -6,7 +6,7 @@
                    :arrSupplies="arrSupplies" :isNew="isNewRec"></ReceiptFlowDetails>
     </Sidebar>
     <h3> Danh sách vật tư nhập </h3>
-    <div class="p-d-flex p-flex-row p-mb-1" style="width:1180px">
+    <div class="p-d-flex p-flex-row p-mb-1" style="width:1180px" v-if="$store.getters.role === 'ADMIN'">
       <div style="display:inline-block; flex:1"></div>
       <Button icon="pi pi-user" iconPos="right" label="ADD" @click="onAddClick()"
               class="p-ml-1 p-button-sm"></Button>
@@ -34,10 +34,19 @@
       <Column field="calculatePrice" header="Thành tiền" headerStyle="width:90px"></Column>
       <Column header="ACTION" headerStyle="width:95px" bodyStyle="padding:3px; text-align: center;">
         <template #body="slotProps">
-          <Button icon="pi pi-pencil" @click="onEditClick(slotProps.data)"
-                  class="p-button-sm p-button-rounded p-button-secondary p-button-text"/>
-          <Button icon="pi pi-trash" @click="onDeleteClick(slotProps.data)"
-                  class="p-button-sm p-button-rounded p-button-danger p-button-text"/>
+          <template v-if="$store.getters.role === 'ADMIN'">
+            <Button icon="pi pi-pencil" @click="onEditClick(slotProps.data)"
+                    class="p-button-sm p-button-rounded p-button-secondary p-button-text"/>
+            <Button icon="pi pi-trash" @click="onDeleteClick(slotProps.data)"
+                    class="p-button-sm p-button-rounded p-button-danger p-button-text"/>
+          </template>
+          <template v-else>
+            <Button
+              icon="pi pi-eye"
+              @click="onEditClick(slotProps.data)"
+              class="p-button-sm p-button-rounded p-button-secondary p-button-text"/>
+          </template>
+            
         </template>
       </Column>
     </DataTable>

@@ -20,7 +20,7 @@
         <InputText
           type="text"
           v-model="recData.code"
-          class="p-inputtext-sm p-mr-1 "
+          class="p-inputtext-sm p-mr-1"
           style="width: 35%"
         />
         <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
@@ -80,12 +80,8 @@
 
     <!--button-->
     <div class="p-mt-2 p-d-flex p-flex-row p-jc-end" style="width: 100%">
-      <template v-if="changesApplied">
-        <Button
-          label="CLOSE"
-          @click="onCancel()"
-          class="p-button-sm"
-        ></Button>
+      <template v-if="changesApplied || $store.getters.role !== 'ADMIN'">
+        <Button label="CLOSE" @click="onCancel()" class="p-button-sm"></Button>
       </template>
       <template v-else>
         <Button
@@ -147,6 +143,9 @@ export default defineComponent({
         userMessage.value =
           "Trường " + msg.join(", ") + " không được để trống!";
         showMessage.value = true;
+        setTimeout(() => {
+          return (showMessage.value = false);
+        }, 2000);
       } else {
         delete rawReceiptObj.index;
         delete rawReceiptObj.strDateWarehousing;
@@ -154,6 +153,9 @@ export default defineComponent({
         if (check.data) {
           userMessage.value = "Mã phiếu nhập bị trùng. Vui lòng nhập lại!";
           showMessage.value = true;
+          setTimeout(() => {
+            return (showMessage.value = false);
+          }, 2000);
         } else {
           let resp;
           if (checkId.data) {

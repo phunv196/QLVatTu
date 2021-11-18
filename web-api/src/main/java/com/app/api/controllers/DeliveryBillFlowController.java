@@ -156,9 +156,9 @@ public class DeliveryBillFlowController extends BaseController {
             criteria.add(Restrictions.eq("suppliesId",  suppliesId ));
         }
         criteria.setProjection(null);
-        List<DeliveryBillFlowModel> deliveryBillFlowList = criteria.list();
+        DeliveryBillFlowModel deliveryBillFlow = (DeliveryBillFlowModel) criteria.uniqueResult();
 
-        return Response.ok(deliveryBillFlowList).build();
+        return Response.ok(deliveryBillFlow).build();
     }
 
 }

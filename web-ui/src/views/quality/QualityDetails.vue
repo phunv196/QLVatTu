@@ -15,19 +15,23 @@
     <div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
-          >Mã chất lượng <strong class="p-error">*</strong> </label
-        >
+          >Mã chất lượng <strong class="p-error">*</strong>
+        </label>
         <InputText
           type="text"
           v-model="recData.code"
-          class="p-inputtext-sm p-col-8 "
+          class="p-inputtext-sm p-col-8"
         />
       </div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
           >Tên chất lượng <strong class="p-error">*</strong>
         </label>
-        <InputText type="text" v-model="recData.name" class="p-inputtext-sm p-col-8" />
+        <InputText
+          type="text"
+          v-model="recData.name"
+          class="p-inputtext-sm p-col-8"
+        />
       </div>
       <div class="p-mt-3 p-d-flex p-ai-center">
         <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1">
@@ -109,6 +113,12 @@ export default defineComponent({
         if (check.data) {
           userMessage.value = "Mã chất lượng bị trùng. Vui lòng nhập lại!";
           showMessage.value = true;
+          setTimeout(() => {
+            return (showMessage.value = false);
+          }, 2000);
+          setTimeout(() => {
+            return (showMessage.value = false);
+          }, 2000);
         } else {
           let resp;
           if (rawQualityObj.qualityId) {
@@ -119,7 +129,9 @@ export default defineComponent({
           if (resp.data.msgType === "SUCCESS") {
             toast.add({
               severity: "success",
-              summary: rawQualityObj.id ? "Sửa thành công!" : "Thêm mới thành công!",
+              summary: rawQualityObj.id
+                ? "Sửa thành công!"
+                : "Thêm mới thành công!",
               detail: `${rawQualityObj.name} (${rawQualityObj.code})`,
               life: 3000,
             });

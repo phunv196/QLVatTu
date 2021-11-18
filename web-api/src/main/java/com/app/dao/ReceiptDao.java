@@ -28,6 +28,9 @@ public class ReceiptDao extends BaseHibernateDAO {
     }
 
     public int delete(Long receiptId) throws HibernateException, ConstraintViolationException {
+        Query query = createQuery("delete ReceiptFlowModel where receiptId = :receiptId");
+        query.setParameter("receiptId", receiptId);
+        query.executeUpdate();
         Query q = createQuery("delete ReceiptModel where receiptId = :receiptId");
         q.setParameter("receiptId", receiptId);
         return q.executeUpdate();
@@ -173,8 +176,7 @@ public class ReceiptDao extends BaseHibernateDAO {
         String finalSql = "select r.receipt_id receiptId" +
                 " from receipt r " +
                 " left join receipt_flow rf on rf.receipt_id = r.receipt_id" +
-                " where rf.supplies_id = :suppliesId" +
-                " and (rf.amount - if(rf.received is null, 0, rf.received)) > 0";
+                " where rf.supplies_id = :suppliesId";
         SQLQuery q = createSQLQuery(finalSql);
         q.setParameter("suppliesId", suppliesId);
         return (List<Integer>) q.list();
@@ -189,9 +191,6 @@ public class ReceiptDao extends BaseHibernateDAO {
         if (arrReceipt.size() > 0) {
             q.setParameterList("arrReceipt", arrReceipt);
         }
-
-        //q.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP);
-        //List rowList = q.list();
         q.setResultTransformer(Transformers.aliasToBean(ReceiptModel.class));
         setResultTransformer(q, ReceiptModel.class);
         return q.list();

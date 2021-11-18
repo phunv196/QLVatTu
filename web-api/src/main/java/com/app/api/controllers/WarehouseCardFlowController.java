@@ -49,7 +49,6 @@ public class WarehouseCardFlowController extends BaseController {
     public Response getWarehouseCardFlowList(
             @Parameter(description="WarehouseCard Id") @QueryParam("warehouseCardId") Long warehouseCardId,
             @Parameter(description="supplies Id") @QueryParam("suppliesId") Long suppliesId,
-            @Parameter(description="Name", example="nikon%") @QueryParam("name") String name,
             @Parameter(description="Page No, Starts from 1 ", example="1") @DefaultValue("1") @QueryParam("page") int page,
             @Parameter(description="Items in each page", example="5") @DefaultValue("5") @QueryParam("page-size") int pageSize
     ) {
@@ -98,7 +97,7 @@ public class WarehouseCardFlowController extends BaseController {
         ReceiptFlowModel model = receiptFlowDao.getModel(warehouseCardFlow.getReceiptId(), cardModel.getSuppliesId());
         model.setReceived(model.getReceived() == null ? warehouseCardFlow.getAmount() : model.getReceived() + warehouseCardFlow.getAmount());
         receiptFlowDao.beginTransaction();
-        receiptFlowDao.save(model);
+        receiptFlowDao.saveOrUpdate(model);
         receiptFlowDao.commitTransaction();
     }
 
@@ -113,9 +112,11 @@ public class WarehouseCardFlowController extends BaseController {
         try {
             WarehouseCardFlowModel foundProd  = warehouseCardFlowDao.getById(warehouseCardFlow.getWarehouseCardFlowId());
             if (foundProd != null) {
+                Long oldAmount = foundProd.getAmount();
                 warehouseCardFlowDao.beginTransaction();
                 warehouseCardFlowDao.update(warehouseCardFlow);
                 warehouseCardFlowDao.commitTransaction();
+                warehouseCardFlow.setAmount(warehouseCardFlow.getAmount() - oldAmount);
                 if (check(warehouseCardFlow.getWarehouseCardId()) && warehouseCardFlow.getReceiptId() != null) {
                     updateRecepit(warehouseCardFlow);
                 }
@@ -147,6 +148,10 @@ public class WarehouseCardFlowController extends BaseController {
                 resp.setErrorMessage(String.format("Bản ghi không tồn tại (id:%s)", warehouseCardFlowId));
                 return Response.ok(resp).build();
             } else {
+                if (check(foundProd.getWarehouseCardId()) && foundProd.getReceiptId() != null) {
+                    foundProd.setAmount(0 - foundProd.getAmount());
+                    updateRecepit(foundProd);
+                }
                 warehouseCardFlowDao.beginTransaction();
                 warehouseCardFlowDao.delete(warehouseCardFlowId);
                 warehouseCardFlowDao.commitTransaction();

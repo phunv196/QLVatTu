@@ -138,12 +138,18 @@ export default defineComponent({
         userMessage.value =
           "Trường " + msg.join(", ") + " không được để trống!";
         showMessage.value = true;
+        setTimeout(() => {
+          return (showMessage.value = false);
+        }, 2000);
       } else {
         delete rawSupplierObj.index;
         const check = await SupplierApi.getSupplierByCode(rawSupplierObj);
         if (check.data) {
           userMessage.value = "Mã nhà cung cấp bị trùng. Vui lòng nhập lại!";
           showMessage.value = true;
+          setTimeout(() => {
+            return (showMessage.value = false);
+          }, 2000);
         } else {
           let resp;
           if (rawSupplierObj.supplierId) {

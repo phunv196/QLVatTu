@@ -176,10 +176,17 @@ export default defineComponent({
         userMessage.value =
           "Trường " + msg.join(", ") + " không được để trống!";
         showMessage.value = true;
+        setTimeout(() => {
+          return (showMessage.value = false);
+        }, 2000);
       } else {
         if (rawWarehouseCardFlowObj.amount > maxAmount.value) {
-          userMessage.value = "Số lượng không được lớn hơn " + maxAmount.value +" !"
+          userMessage.value =
+            "Số lượng không được lớn hơn " + maxAmount.value + " !";
           showMessage.value = true;
+          setTimeout(() => {
+            return (showMessage.value = false);
+          }, 2000);
         } else {
           let resp;
           if (rawWarehouseCardFlowObj.warehouseCardFlowId) {
@@ -207,7 +214,6 @@ export default defineComponent({
               summary: rawWarehouseCardFlowObj.warehouseCardFlowId
                 ? "Sửa thành công!"
                 : "Thêm mới thành công!",
-              detail: `${rawWarehouseCardFlowObj.name} (${rawWarehouseCardFlowObj.code})`,
               life: 3000,
             });
             if (!rawWarehouseCardFlowObj.warehouseCardFlowId) {
@@ -239,11 +245,12 @@ export default defineComponent({
         suppliesId.value
       );
       if (
-        deliveryBillFlow.data.length > 0 &&
+        deliveryBillFlow.data &&
         suppliesId.value > 0 &&
         recData.value.deliveryBillId
       ) {
-        const data = deliveryBillFlow.data[0].amount;
+        const data = deliveryBillFlow.data.amount;
+        maxAmount.value = data;
         recData.value.amount = data || 0;
       } else {
         recData.value.amount = 0;
@@ -255,12 +262,10 @@ export default defineComponent({
         recData.value.receiptId,
         suppliesId.value
       );
-      if (
-        receiptFlow.data &&
-        suppliesId.value > 0 &&
-        recData.value.receiptId
-      ) {
-        const data = receiptFlow.data.received ? receiptFlow.data.amount - receiptFlow.data.received : receiptFlow.data.amount;
+      if (receiptFlow.data && suppliesId.value > 0 && recData.value.receiptId) {
+        const data = receiptFlow.data.received
+          ? receiptFlow.data.amount - receiptFlow.data.received
+          : receiptFlow.data.amount;
         maxAmount.value = data;
         recData.value.amount = data || 0;
       } else {
@@ -308,7 +313,7 @@ export default defineComponent({
       suppliesId,
       arrReceipt,
       arrDeliveryBill,
-      maxAmount
+      maxAmount,
     };
   },
 });

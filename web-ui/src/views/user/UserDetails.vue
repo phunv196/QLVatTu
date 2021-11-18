@@ -1,7 +1,7 @@
 <template>
   <div class="m-font-regular">
     <BlockUI :blocked="isLoading" :fullScreen="true"></BlockUI>
- 
+
     <Toast />
     <div>
       <span class="m-font-bold">USER ID: </span>
@@ -144,14 +144,21 @@ export default defineComponent({
         msg.push("tên đầy đủ");
       }
       if (msg.length > 0) {
-        userMessage.value = "Trường " + msg.join(", ") + " không được để trống!";
+        userMessage.value =
+          "Trường " + msg.join(", ") + " không được để trống!";
         showMessage.value = true;
+        setTimeout(() => {
+          return (showMessage.value = false);
+        }, 2000);
       } else {
         delete rawUsersObj.index;
         const check = await UsersApi.getUsersByLoginName(rawUsersObj);
         if (check.data) {
           userMessage.value = "Tên đăng nhập bị trùng. Vui lòng nhập lại!";
           showMessage.value = true;
+          setTimeout(() => {
+            return (showMessage.value = false);
+          }, 2000);
         } else {
           let resp;
           if (rawUsersObj.userId) {

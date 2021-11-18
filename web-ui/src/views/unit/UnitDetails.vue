@@ -107,12 +107,18 @@ export default defineComponent({
         userMessage.value =
           "Trường " + msg.join(", ") + " không được để trống!";
         showMessage.value = true;
+        setTimeout(() => {
+          return (showMessage.value = false);
+        }, 2000);
       } else {
         delete rawUnitObj.index;
         const check = await UnitApi.getUnitByCode(rawUnitObj);
         if (check.data) {
           userMessage.value = "Mã đơn vị tính bị trùng. Vui lòng nhập lại!";
           showMessage.value = true;
+          setTimeout(() => {
+            return (showMessage.value = false);
+          }, 2000);
         } else {
           let resp;
           if (rawUnitObj.unitId) {

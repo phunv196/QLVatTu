@@ -28,6 +28,9 @@ public class DeliveryBillDao extends BaseHibernateDAO {
     }
 
     public int delete(Long deliveryBillId) throws HibernateException, ConstraintViolationException {
+        Query query = createQuery("delete DeliveryBillFlowModel where deliveryBillId = :deliveryBillId");
+        query.setParameter("deliveryBillId", deliveryBillId);
+        query.executeUpdate();
         Query q = createQuery("delete DeliveryBillModel where deliveryBillId = :deliveryBillId");
         q.setParameter("deliveryBillId", deliveryBillId);
         return q.executeUpdate();

@@ -20,7 +20,7 @@
         <InputText
           type="text"
           v-model="recData.code"
-          class="p-inputtext-sm p-mr-5 "
+          class="p-inputtext-sm p-mr-5"
           style="width: 30%"
         />
         <label class="p-d-inline-block m-label-size-2 p-text-left p-mr-1 p-ml-5"
@@ -192,12 +192,18 @@ export default defineComponent({
       if (msg.length > 0) {
         userMessage.value = "Trường " + msg.join(", ") + "không được để trống!";
         showMessage.value = true;
+        setTimeout(() => {
+          return (showMessage.value = false);
+        }, 2000);
       } else {
         delete rawSuppliesObj.index;
         const check = await SuppliesApi.getSuppliesByCode(rawSuppliesObj);
         if (check.data) {
           userMessage.value = "Mã vật tư bị trùng. Vui lòng nhập lại!";
           showMessage.value = true;
+          setTimeout(() => {
+            return (showMessage.value = false);
+          }, 2000);
         } else {
           let resp;
           if (rawSuppliesObj.suppliesId) {
@@ -290,7 +296,7 @@ export default defineComponent({
       onApplyChanges,
       onCancel,
       userMessage,
-      arrUnit
+      arrUnit,
     };
   },
 });

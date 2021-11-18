@@ -43,4 +43,11 @@ public class WarehouseDao extends BaseHibernateDAO {
         }
         return criteria.list();
     }
+
+    public List<WarehouseModel> getByRecepit() {
+        String hql = " select w from WarehouseModel w, ReceiptModel r " +
+                     " where w.warehouseId = r.warehouseId";
+        Query q = createQuery(hql);
+        return q.list();
+    }
 }

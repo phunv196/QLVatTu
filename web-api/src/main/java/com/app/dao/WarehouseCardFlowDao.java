@@ -88,7 +88,7 @@ public class WarehouseCardFlowDao extends BaseHibernateDAO {
                 " left join employees e on e.employee_id = db.employee_id" +
                 " left join employees emp on emp.employee_id = r.employee_id" +
                 " where wcf.warehouse_card_id = :warehouseCardId" +
-                " and dbf.supplies_id = :suppliesId || rf.supplies_id = :suppliesId";
+                " and (dbf.supplies_id = :suppliesId || rf.supplies_id = :suppliesId)";
         finalSql = finalSql + " order by wcf.warehouse_card_flow_id " + sqlLimit;
         SQLQuery q = createSQLQuery(finalSql);
         q.setParameter("warehouseCardId", warehouseCardId);

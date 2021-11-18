@@ -6,8 +6,10 @@ import com.app.dao.base.CommonUtils;
 import com.app.dao.base.converter.DynamicExport;
 import com.app.model.BaseResponse;
 import com.app.model.ExportModel;
+import com.app.model.receipt.ReceiptFlowModel;
 import com.app.model.supplies.SuppliesModel;
 import com.app.model.unit.UnitModel;
+import com.app.model.warehouse.WarehouseModel;
 import com.app.model.warehouseCard.WarehouseCardFlowModel;
 import com.app.model.warehouseCard.WarehouseCardModel;
 import com.app.model.warehouseCard.WarehouseCardModel.WarehouseCardResponse;
@@ -50,6 +52,7 @@ public class WarehouseCardController extends BaseController {
     WarehouseCardFlowController warehouseCardFlowController = new WarehouseCardFlowController();
     WarehouseCardDao warehouseCardDao = new WarehouseCardDao();
     WarehouseCardFlowDao warehouseCardFlowDao = new WarehouseCardFlowDao();
+    ReceiptFlowDao receiptFlowDao = new ReceiptFlowDao();
     SuppliesDao suppliesDao = new SuppliesDao();
     DepartmentDao departmentDao = new DepartmentDao();
     EmployeeDao employeeDao = new EmployeeDao();
@@ -120,8 +123,8 @@ public class WarehouseCardController extends BaseController {
             warehouseCard.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
             warehouseCardDao.beginTransaction();
             warehouseCardDao.save(warehouseCard);
-            warehouseCardDao.commitTransaction();
             updateReceipt(warehouseCard);
+            warehouseCardDao.commitTransaction();
             resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công code: %s ", warehouseCard.getCode()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
@@ -136,7 +139,6 @@ public class WarehouseCardController extends BaseController {
         list.forEach(e -> {
             warehouseCardFlowController.updateRecepit(e);
         });
-
     }
 
     @PUT
@@ -182,6 +184,7 @@ public class WarehouseCardController extends BaseController {
                 resp.setErrorMessage(String.format("Bản ghi không tồn tại (id:%s)", warehouseCardId));
                 return Response.ok(resp).build();
             } else {
+                updateRecepitFlow(foundProd.getSuppliesId());
                 warehouseCardDao.beginTransaction();
                 warehouseCardDao.delete(warehouseCardId);
                 warehouseCardDao.commitTransaction();
@@ -191,6 +194,22 @@ public class WarehouseCardController extends BaseController {
         } catch (HibernateException | ConstraintViolationException e) {
             resp.setErrorMessage("Không thể xóa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
+        }
+    }
+
+    private void updateRecepitFlow(Long suppliesId) {
+        Criteria criteria = receiptFlowDao.createCriteria(ReceiptFlowModel.class);
+        if (suppliesId > 0){
+            criteria.add(Restrictions.eq("suppliesId",  suppliesId ));
+        }
+        List<ReceiptFlowModel> models = criteria.list();
+        if (models != null) {
+            models.forEach(el -> {
+                el.setReceived(0L);
+            });
+            receiptFlowDao.beginTransaction();
+            receiptFlowDao.saveOrUpdateAll(models);
+            receiptFlowDao.commitTransaction();
         }
     }
 
@@ -238,6 +257,17 @@ public class WarehouseCardController extends BaseController {
         warehouseCardFlowDao.commitTransaction();
     }
 
+    @GET
+    @Path("inventory/{suppliesId}")
+    @RolesAllowed({"ADMIN", "SUPPORT"})
+    public Response getAmountInventory(@Parameter(description="suppliesId Id", example="601") @PathParam("suppliesId") Long suppliesId) {
+        WarehouseCardModel model = warehouseCardDao.getAmountInventory(suppliesId);
+        if (model != null) {
+            return Response.ok(  model.getAmountInventory()).build();
+        }
+        return Response.ok(  0).build();
+    }
+
     @POST
     @Path("byCode")
     @RolesAllowed({"ADMIN", "SUPPORT"})
@@ -251,12 +281,12 @@ public class WarehouseCardController extends BaseController {
         if (model.getWarehouseCardId() != null){
             criteria.add(Restrictions.ne("warehouseCardId", model.getWarehouseCardId()));
         }
-        if (CommonUtils.isNullOrEmpty(model.getCode()) || model.getSuppliesId() == null){
+        if (CommonUtils.isNullOrEmpty(model.getCode()) && model.getSuppliesId() == null){
             return Response.ok(true).build();
         }
         criteria.add(Restrictions.disjunction()
-                .add(Restrictions.eq("suppliesId", model.getSuppliesId()))
-                .add(Restrictions.eq("code", model.getCode()).ignoreCase()));
+                .add(Restrictions.eq("suppliesId", model.getSuppliesId() == null ? 0 : model.getSuppliesId()))
+                .add(Restrictions.eq("code", model.getCode() == null ? "" : model.getCode()).ignoreCase()));
 
         criteria.setProjection(Projections.rowCount());
         Long rowCount = (Long)criteria.uniqueResult();

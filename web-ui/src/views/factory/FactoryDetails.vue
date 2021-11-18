@@ -186,6 +186,9 @@ export default defineComponent({
         userMessage.value =
           "Trường " + msg.join(", ") + " không được để trống!";
         showMessage.value = true;
+        setTimeout(() => {
+          return (showMessage.value = false);
+        }, 2000);
       } else {
         let message = [];
         const check = await FactoryApi.getFactorByCode(rawFactoryObj);
@@ -199,6 +202,9 @@ export default defineComponent({
           userMessage.value =
             "Trường " + message.join(", ") + ". Vui lòng nhập lại!";
           showMessage.value = true;
+          setTimeout(() => {
+            return (showMessage.value = false);
+          }, 2000);
         } else {
           let resp;
           if (rawFactoryObj.factoryId) {

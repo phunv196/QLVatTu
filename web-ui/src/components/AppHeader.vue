@@ -13,7 +13,7 @@
           <ul v-if="item.items?.length > 1">
               <li v-for="(el, j) of item.items" :key="j">
                 <router-link tag="span" :to="el.to" class="m-app-header-el">
-                    <span :class="item.icon"></span> {{el.label}}
+                    <span :class="el.icon"></span> {{el.label}}
                 </router-link>
             </li>
           </ul>
@@ -128,6 +128,9 @@ export default defineComponent({
       if (msg.length > 0) {
         userMessage.value = "Trường " + msg.join(", ") + ". Vui lòng nhập lại!";
         showMessage.value = true;
+        setTimeout(() => {
+          return (showMessage.value = false);
+        }, 2000);
       } else {
         UsersApi.changePassword({password: password.value, newPassword: newPassword.value }).then(res => {
           if (res.data) {
@@ -212,7 +215,7 @@ export default defineComponent({
             display: none;
             position: absolute;
             flex-direction: column;
-            width: 200px;
+            width: 210px;
             padding: 0;
             margin: 0;
             background: #333;

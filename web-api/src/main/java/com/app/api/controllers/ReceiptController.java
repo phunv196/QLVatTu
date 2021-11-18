@@ -248,10 +248,12 @@ public class ReceiptController extends BaseController {
         suppliesId = suppliesId == null ? 0 : suppliesId;
         List<Integer> arrReceiptId = new ArrayList<>();
         arrReceiptId = receiptDao.getListBySuppliersId(suppliesId);
-        Set<Integer> set = new HashSet<>(arrReceiptId);
-        List<Integer> arrReceipt = new ArrayList<Integer>(set);
-        List<ReceiptModel> modelList = receiptDao.getListBySupplies(arrReceipt);
-        resp.setList(modelList);
+        if (arrReceiptId.size() > 0) {
+            Set<Integer> set = new HashSet<>(arrReceiptId);
+            List<Integer> arrReceipt = new ArrayList<Integer>(set);
+            List<ReceiptModel> modelList = receiptDao.getListBySupplies(arrReceipt);
+            resp.setList(modelList);
+        }
         return Response.ok(resp).build();
     }
 

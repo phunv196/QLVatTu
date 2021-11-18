@@ -133,12 +133,11 @@
 </template>
 
 <script lang='ts'>
-import { defineComponent, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import WarehouseCardApi from "@/api/warehouse-card-api";
 import { useToast } from "primevue/usetoast";
 import WarehouseCardFlow from "@/views/warehouse-card-flow/WarehouseCardFlow.vue";
 import suppliesApi from "@/api/supplies-api";
-import { async } from "rxjs";
 export default defineComponent({
   props: {
     rec: {
@@ -163,6 +162,17 @@ export default defineComponent({
       setTimeout(() => {
         return (checkSupplies.value = true);
       }, 1);
+      const check = await WarehouseCardApi.getWarehouseCardByCode(
+        recData.value
+      );
+      if (check.data) {
+        checkSupplies.value = false;
+        userMessage.value = "Mã thẻ kho hoặc vật tư bị trùng. Vui lòng nhập lại!";
+        showMessage.value = true;
+        setTimeout(() => {
+          return (showMessage.value = false);
+        }, 2000);
+      }
     };
     const onApplyChanges = async () => {
       const rawWarehouseCardObj = JSON.parse(JSON.stringify(recData.value));
@@ -188,15 +198,11 @@ export default defineComponent({
       if (msg.length > 0) {
         userMessage.value = "Trường " + msg.join(", ") + " không được để trống!";
         showMessage.value = true;
+        setTimeout(() => {
+          return (showMessage.value = false);
+        }, 2000);
       } else {
-        const check = await WarehouseCardApi.getWarehouseCardByCode(
-          rawWarehouseCardObj
-        );
-        if (check.data) {
-          userMessage.value = "Mã thẻ kho hoặc vật tư bị trùng. Vui lòng nhập lại!";
-          showMessage.value = true;
-        } else {
-          let resp;
+        let resp;
           const checkId = await WarehouseCardApi.checkId(
             rawWarehouseCardObj.warehouseCardId
           );
@@ -231,13 +237,17 @@ export default defineComponent({
               detail: resp.data.msg,
             });
           }
-        }
       }
     };
 
     const onCancel = () => {
       emit("cancel");
     };
+
+    onMounted(() => {
+      if (recData.value.warehouseId)
+        changeArrSupplies(recData.value.warehouseId);
+    });
 
     const changeArrSupplies = async (id: any) => {
       const supp = await suppliesApi.getByWarehouseId(id);

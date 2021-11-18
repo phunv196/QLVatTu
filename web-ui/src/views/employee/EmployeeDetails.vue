@@ -208,11 +208,17 @@ export default defineComponent({
         userMessage.value =
           "Trường " + msg.join(", ") + " không được để trống!";
         showMessage.value = true;
+        setTimeout(() => {
+          return (showMessage.value = false);
+        }, 2000);
       } else {
         const check = await EmployeeApi.getEmployeeByCode(rawEmpObj);
         if (check.data) {
           userMessage.value = "Mã nhân viên bị trùng. Vui lòng nhập lại!";
           showMessage.value = true;
+          setTimeout(() => {
+            return (showMessage.value = false);
+          }, 2000);
         } else {
           let resp;
           rawEmpObj.fullName = rawEmpObj.firstName + " " + rawEmpObj.lastName;

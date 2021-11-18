@@ -237,6 +237,7 @@
             class="p-button-sm p-button-rounded p-button-secondary p-button-text"
           />
           <Button
+            v-if="$store.getters.role === 'ADMIN'"
             icon="pi pi-trash"
             @click="onDeleteClick(slotProps.data)"
             class="p-button-sm p-button-rounded p-button-danger p-button-text"
@@ -409,7 +410,7 @@ export default defineComponent({
 
     const onAddClick = async () => {
       const today = new Date().getTime();
-      const resp = await WarehouseApi.getAll();
+      const resp = await WarehouseApi.getByReceipt();
       let warehouseItem: any;
       if (resp.data.list) {
         warehouseItem = resp.data.list;
@@ -432,7 +433,7 @@ export default defineComponent({
     };
 
     const onEditClick = async (rec: Record<string, unknown>) => {
-      const resp = await WarehouseApi.getAll();
+      const resp = await WarehouseApi.getByReceipt();
       let warehouseItem: any;
       if (resp.data.list) {
         warehouseItem = resp.data.list;
