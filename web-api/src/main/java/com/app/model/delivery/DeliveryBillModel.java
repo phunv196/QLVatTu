@@ -10,7 +10,7 @@ import java.util.List;
 @Entity
 @Table(name = "delivery_bill")
 public class DeliveryBillModel {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     @Column(name = "delivery_bill_id", unique = true, nullable = false) private Long deliveryBillId;
 
     @Schema(example="601")

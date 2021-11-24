@@ -10,7 +10,7 @@ import java.util.List;
 @Entity
 @Table(name = "receipt")
 public class ReceiptModel {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     @Column(name = "receipt_id", unique = true, nullable = false) private Long receiptId;
 
     @Schema(example="601")

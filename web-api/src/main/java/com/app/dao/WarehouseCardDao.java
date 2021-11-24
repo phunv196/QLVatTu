@@ -260,4 +260,21 @@ public class WarehouseCardDao extends BaseHibernateDAO {
         setResultTransformer(q, WarehouseCardModel.class);
         return (WarehouseCardModel) q.uniqueResult();
     }
+
+//    public WarehouseCardModel save(WarehouseCardModel warehouseCardModel) {
+//        String insert = " insert into warehouse_card(warehouse_card_id, code, name, supplies_id, "
+//                + "warehouse_id, date_created, description, employee_id) values(?, ?, ?, ?, ?, ?, ?, ?)";
+//        SQLQuery query = createSQLQuery(insert);
+//        query.setParameter(0, warehouseCardModel.getWarehouseCardId());
+//        query.setParameter(1, warehouseCardModel.getCode());
+//        query.setParameter(2, warehouseCardModel.getName());
+//        query.setParameter(3, warehouseCardModel.getSuppliesId());
+//        query.setParameter(4, warehouseCardModel.getWarehouseId());
+//        query.setParameter(5, warehouseCardModel.getDateCreated());
+//        query.setParameter(6, warehouseCardModel.getDescription());
+//        query.setParameter(7, warehouseCardModel.getEmployeeId());
+//
+//        query.executeUpdate();
+//        return warehouseCardModel;
+//    }
 }

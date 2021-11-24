@@ -122,9 +122,9 @@ public class WarehouseCardController extends BaseController {
             UserModel userFromToken = (UserModel)securityContext.getUserPrincipal();
             warehouseCard.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
             warehouseCardDao.beginTransaction();
-            warehouseCardDao.save(warehouseCard);
-            updateReceipt(warehouseCard);
+            warehouseCardDao.saveOrUpdate(warehouseCard);
             warehouseCardDao.commitTransaction();
+            updateReceipt(warehouseCard);
             resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công code: %s ", warehouseCard.getCode()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
@@ -222,7 +222,7 @@ public class WarehouseCardController extends BaseController {
     )
     public Response getSequence() throws Exception {
         Long id = warehouseCardDao.getSequence();
-        return Response.ok(id == null ? 1 : id -1).build();
+        return Response.ok(id == null ? 1 : id -1 ).build();
     }
 
     @GET
@@ -280,6 +280,9 @@ public class WarehouseCardController extends BaseController {
         Criteria criteria = warehouseCardDao.createCriteria(WarehouseCardModel.class);
         if (model.getWarehouseCardId() != null){
             criteria.add(Restrictions.ne("warehouseCardId", model.getWarehouseCardId()));
+        }
+        if (model.getWarehouseCardId() != null){
+            criteria.add(Restrictions.eq("warehouseId", model.getWarehouseId()));
         }
         if (CommonUtils.isNullOrEmpty(model.getCode()) && model.getSuppliesId() == null){
             return Response.ok(true).build();

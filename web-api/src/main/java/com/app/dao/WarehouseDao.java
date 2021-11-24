@@ -2,12 +2,15 @@ package com.app.dao;
 
 import com.app.dao.base.BaseHibernateDAO;
 import com.app.model.warehouse.WarehouseModel;
+import com.app.model.warehouseCard.WarehouseCardFlowModel;
 import jakarta.validation.ConstraintViolationException;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 
 import java.util.List;
 
@@ -45,9 +48,11 @@ public class WarehouseDao extends BaseHibernateDAO {
     }
 
     public List<WarehouseModel> getByRecepit() {
-        String hql = " select w from WarehouseModel w, ReceiptModel r " +
-                     " where w.warehouseId = r.warehouseId";
-        Query q = createQuery(hql);
+        String hql = " select DISTINCT w.warehouse_id as warehouseId, w.name as name from warehouse w" +
+                     " inner join receipt r on w.warehouse_id = r.warehouse_id";
+        SQLQuery q = createSQLQuery(hql);
+        q.setResultTransformer(Transformers.aliasToBean(WarehouseModel.class));
+        setResultTransformer(q, WarehouseModel.class);
         return q.list();
     }
 }

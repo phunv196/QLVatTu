@@ -163,7 +163,7 @@ public class SuppliesDao extends BaseHibernateDAO {
     }
 
     public List<SuppliesModel> getByWarehouseId(Long warehouseId) {
-        StringBuilder querySelect = new StringBuilder("select s.supplies_id suppliesId," +
+        StringBuilder querySelect = new StringBuilder("select DISTINCT s.supplies_id suppliesId," +
                 " s.code code," +
                 " s.name name" +
                 " from supplies s " +

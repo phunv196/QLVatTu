@@ -213,7 +213,7 @@ public class DeliveryBillController extends BaseController {
     )
     public Response getSequence() throws Exception {
         Long id = deliveryBillDao.getSequence();
-        return Response.ok(id == null ? 1 : id -1).build();
+        return Response.ok(id == null ? 1 : id -1 ).build();
     }
 
     @GET
