@@ -2,7 +2,7 @@
   <div class="m-font-regular">
     <Toast />
     <h4>
-      Phân xưởng #
+      Khách hàng #
       <span style="color: var(--primary-color)">
         {{ recData.factoryId ? recData.factoryId : "NEW" }}
       </span>
@@ -15,7 +15,7 @@
     <div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-4 p-text-right p-mr-1"
-          >Mã phân xưởng <strong class="p-error">*</strong>
+          >Mã khách hàng <strong class="p-error">*</strong>
         </label>
         <InputText
           type="text"
@@ -23,7 +23,7 @@
           class="p-inputtext-sm p-col-3 p-mr-2"
         />
         <label class="p-d-inline-block m-label-size-4 p-text-right p-mr-1"
-          >Tên phân xưởng <strong class="p-error">*</strong>
+          >Tên khách hàng <strong class="p-error">*</strong>
         </label>
         <InputText
           type="text"
@@ -165,10 +165,10 @@ export default defineComponent({
       let msg: any[];
       msg = [];
       if (!rawFactoryObj.code) {
-        msg.push("mã phân xưởng");
+        msg.push("mã khách hàng");
       }
       if (!rawFactoryObj.name) {
-        msg.push("tên phân xưởng");
+        msg.push("tên khách hàng");
       }
       if (!rawFactoryObj.email) {
         msg.push("email");
@@ -193,7 +193,7 @@ export default defineComponent({
         let message = [];
         const check = await FactoryApi.getFactorByCode(rawFactoryObj);
         if (check.data) {
-          message.push("mã phân xưởng bị trùng");
+          message.push("mã khách hàng bị trùng");
         }
         if (rawFactoryObj.dateConstruction > rawFactoryObj.dateFinish) {
           message.push("ngày thi công không thể lớn hơn ngày hoàn thành");

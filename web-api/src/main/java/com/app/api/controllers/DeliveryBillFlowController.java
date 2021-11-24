@@ -6,6 +6,7 @@ import com.app.dao.DeliveryBillFlowDao;
 import com.app.model.BaseResponse;
 import com.app.model.delivery.DeliveryBillFlowModel;
 import com.app.model.delivery.DeliveryBillFlowModel.DeliveryBillFlowResponse;
+import com.app.model.receipt.ReceiptFlowModel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -19,6 +20,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import java.math.BigInteger;
@@ -161,4 +163,29 @@ public class DeliveryBillFlowController extends BaseController {
         return Response.ok(deliveryBillFlow).build();
     }
 
+    @GET
+    @Path("check_delivery_bill_flow")
+    @RolesAllowed({"ADMIN", "SUPPORT"})
+    @Operation(
+            summary = "Get list of receipt_flows",
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = ReceiptFlowModel.ReceiptFlowResponse.class)))}
+    )
+    public Response checkReceiptFlow(@Parameter(description="deliveryBill Id") @QueryParam("deliveryBillId") Long deliveryBillId,
+                                     @Parameter(description="receipt flow Id") @QueryParam("deliveryBillFlowId") Long deliveryBillFlowId,
+                                     @Parameter(description="supplies Id") @QueryParam("suppliesId") Long suppliesId
+    ) {
+        Criteria criteria = deliveryBillFlowDao.createCriteria(DeliveryBillFlowModel.class);
+        if (deliveryBillId != null){
+            criteria.add(Restrictions.eq("deliveryBillId",  deliveryBillId ));
+        }
+        if (deliveryBillFlowId != null){
+            criteria.add(Restrictions.ne("deliveryBillFlowId",  deliveryBillFlowId ));
+        }
+        if (suppliesId != null){
+            criteria.add(Restrictions.eq("suppliesId",  suppliesId ));
+        }
+        criteria.setProjection(Projections.rowCount());
+        Long rowCount = (Long)criteria.uniqueResult();
+        return Response.ok(rowCount > 0).build();
+    }
 }

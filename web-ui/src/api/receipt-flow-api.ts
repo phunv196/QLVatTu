@@ -33,10 +33,13 @@ export default {
     return api.get('/receipt_flows/receipt_flow', { params: qsParams });
   },
 
-  async checkReceiptFlow(receiptId:number, suppliesId:number): Promise<AxiosResponse> {
+  async checkReceiptFlow(receiptId:number, suppliesId:number, receiptFlowId:number): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
     if (receiptId) {
       qsParams.receiptId = receiptId;
+    }
+    if (receiptFlowId) {
+      qsParams.receiptFlowId = receiptFlowId;
     }
     if (suppliesId) {
       qsParams.suppliesId = suppliesId;

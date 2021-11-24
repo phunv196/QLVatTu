@@ -17,7 +17,7 @@ public class DeliveryBillDao extends BaseHibernateDAO {
 
     public Long getSequence() throws Exception {
         Long id = getAutoIncrement("delivery_bill");
-        return id == null ? 1 : id;
+        return id == null ? 0 : id;
     }
 
     public DeliveryBillModel getById(Long deliveryBillId) {

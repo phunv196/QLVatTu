@@ -52,7 +52,7 @@
       </div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-4 p-text-right p-mr-1"
-          >Phân xưởng <strong class="p-error">*</strong>
+          >Khách hàng <strong class="p-error">*</strong>
         </label>
         <Dropdown
           style="width: 30%"
@@ -167,7 +167,7 @@ export default defineComponent({
         msg.push("ngày lập phiếu");
       }
       if (!rawDeliveryBillObj.factoryId) {
-        msg.push("phân xưởng");
+        msg.push("khách hàng");
       }
       if (!rawDeliveryBillObj.warehouseId) {
         msg.push("kho");

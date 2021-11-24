@@ -115,7 +115,7 @@
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
-          >Phân xưởng
+          >Khách hàng
         </label>
         <Dropdown
           class="p-inputtext-sm"
@@ -212,7 +212,7 @@
       ></Column>
       <Column
         field="factoryCode"
-        header="Mã phân xưởng"
+        header="Mã khách hàng"
         headerStyle="width:160px"
       ></Column>
       <Column

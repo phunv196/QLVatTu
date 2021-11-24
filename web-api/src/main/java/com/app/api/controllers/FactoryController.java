@@ -86,7 +86,7 @@ public class FactoryController extends BaseController {
             resp.setList(modelList);
             resp.setTotal(total.intValue());
             resp.setPageStats(total.intValue(),pageSize, page,"");
-            resp.setSuccessMessage("Danh sách phân xưởng " + (factoryId>0 ? "- factory:"+factoryId:""));
+            resp.setSuccessMessage("Danh sách khách hàng " + (factoryId>0 ? "- factory:"+factoryId:""));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
             resp.setErrorMessage("Lỗi sảy ra - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
@@ -237,7 +237,7 @@ public class FactoryController extends BaseController {
             FactoryModel factory
     ) throws Exception {
         ExportModel.ExportResponse resp = new ExportModel.ExportResponse();
-        String fileName = "danh_sach_phan_xuong.xls";
+        String fileName = "danh_sach_khach_hang.xls";
         Integer startDataRow = 6;
         DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_EXPORT_EXCELL + fileName), startDataRow, false);
         List<FactoryModel> models = factoryDao.getListExport(factory.getCode(), factory.getName(), factory.getEmail(),
@@ -261,7 +261,7 @@ public class FactoryController extends BaseController {
         dynamicExport.setCellFormat(startDataRow, 0, dynamicExport.getLastRow(), 7, DynamicExport.BORDER_FORMAT);
         // Set ten file xuat ra excel
         String prefixOutPutFile = new SimpleDateFormat("yyyyMMddHHmmss_").format(new Date()) + "_";
-        String fileExport = FOLDER_EXPORT + prefixOutPutFile +  "danh_sach_phan_xuong";
+        String fileExport = FOLDER_EXPORT + prefixOutPutFile +  "danh_sach_khach_hang";
         String filePath = dynamicExport.exportFile(fileExport, req);
         File file = new File(filePath);
         byte[] fileContent = FileUtils.readFileToByteArray(file);
@@ -282,7 +282,7 @@ public class FactoryController extends BaseController {
     )
     public Response dowloadTemplate() throws Exception {
         ExportModel.ExportResponse resp = new ExportModel.ExportResponse();
-        String fileName = "BM_Nhap_Moi_Phan_Xuong.xls";
+        String fileName = "BM_Nhap_Moi_Khach_Hang.xls";
         DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_IMPORT_EXCELL + fileName), 6, false);
         dynamicExport.setActiveSheet(1);
         List<EmployeeModel> listEmployeeModel = employeeDao.getAll(EmployeeModel.class, "employeeId");
@@ -294,7 +294,7 @@ public class FactoryController extends BaseController {
             rows++;
         }
         dynamicExport.setCellFormat(0, 0, rows-1, 2, DynamicExport.BORDER_FORMAT);
-        String fileExport = FOLDER_EXPORT_TEMPLATE + "BM_Nhap_Moi_Phan_Xuong";
+        String fileExport = FOLDER_EXPORT_TEMPLATE + "BM_Nhap_Moi_Khach_Hang";
         String filePath = dynamicExport.exportFile(fileExport, req);
         File file = new File(filePath);
         byte[] fileContent = FileUtils.readFileToByteArray(file);

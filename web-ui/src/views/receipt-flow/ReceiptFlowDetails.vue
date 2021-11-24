@@ -123,7 +123,8 @@ export default defineComponent({
       } else {
         const check = await ReceiptFlowApi.checkReceiptFlow(
           rawReceiptFlowObj.receiptId,
-          rawReceiptFlowObj.suppliesId
+          rawReceiptFlowObj.suppliesId,
+          rawReceiptFlowObj.receiptFlowId
         );
         if (check.data) {
           userMessage.value = "Danh sách vật tư nhập không được trùng!";

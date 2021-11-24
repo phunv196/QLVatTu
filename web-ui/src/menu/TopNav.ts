@@ -77,7 +77,7 @@ export default {
       icon:'pi pi-inbox',
       items:[
         {
-          label:'Quản lý phân xưởng',
+          label:'Quản lý khách hàng',
           to: '/home/factory',
           icon:'pi pi-ticket',
         },{

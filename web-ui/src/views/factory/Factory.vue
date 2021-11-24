@@ -18,11 +18,11 @@
     </Sidebar>
     <Dialog v-model:visible="showDialog" style="width: 1000px; height: 650px">
       <template #header>
-        <h3>Import phân xưởng</h3>
+        <h3>Import khách hàng</h3>
       </template>
       <Import @cancel="showDialog = false" @changed="getData()"> </Import>
     </Dialog>
-    <h3>Quản lý phân xưởng</h3>
+    <h3>Quản lý khách hàng</h3>
     <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1350px">
       <div>
         <label
@@ -190,12 +190,12 @@
       ></Column>
       <Column
         field="code"
-        header="Mã phân xưởng"
+        header="Mã khách hàng"
         headerStyle="width:90px"
       ></Column>
       <Column
         field="name"
-        header="Tên phân xưởng"
+        header="Tên khách hàng"
         headerStyle="width:160px"
       ></Column>
       <Column field="email" header="Email" headerStyle="width:160px"></Column>

@@ -163,11 +163,15 @@ public class ReceiptFlowController extends BaseController {
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = ReceiptFlowResponse.class)))}
     )
     public Response checkReceiptFlow(@Parameter(description="receipt Id") @QueryParam("receiptId") Long receiptId,
+                                     @Parameter(description="receipt flow Id") @QueryParam("receiptId") Long receiptFlowId,
                   @Parameter(description="supplies Id") @QueryParam("suppliesId") Long suppliesId
     ) {
         Criteria criteria = receiptFlowDao.createCriteria(ReceiptFlowModel.class);
         if (receiptId != null){
             criteria.add(Restrictions.eq("receiptId",  receiptId ));
+        }
+        if (receiptFlowId != null){
+            criteria.add(Restrictions.ne("receiptFlowId",  receiptFlowId ));
         }
         if (suppliesId != null){
             criteria.add(Restrictions.eq("suppliesId",  suppliesId ));

@@ -34,5 +34,19 @@ export default {
     return api.get('/delivery_bill_flows/delivery_bill_flow', { params: qsParams });
   },
 
+  async getCheckDeliveryBillFlow(deliveryBillId:number, deliveryBillFlowId:number, suppliesId:number): Promise<AxiosResponse> {
+    const qsParams: Record<string, number | string> = {};
+    if (deliveryBillId) {
+      qsParams.deliveryBillId = deliveryBillId;
+    }
+    if (deliveryBillFlowId) {
+      qsParams.deliveryBillFlowId = deliveryBillFlowId;
+    }
+    if (suppliesId) {
+      qsParams.suppliesId = suppliesId;
+    }
+    return api.get('/delivery_bill_flows/check_delivery_bill_flow', { params: qsParams });
+  },
+
 
 };

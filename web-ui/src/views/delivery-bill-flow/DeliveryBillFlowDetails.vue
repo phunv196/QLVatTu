@@ -86,7 +86,6 @@
 import { defineComponent, ref } from "vue";
 import DeliveryBillFlowApi from "@/api/delivery-bill-flow-api";
 import { useToast } from "primevue/usetoast";
-import { async } from "rxjs";
 import warehouseCardApi from "@/api/warehouse-card-api";
 
 export default defineComponent({
@@ -124,56 +123,71 @@ export default defineComponent({
           return (showMessage.value = false);
         }, 2000);
       } else {
-        if (recData.value.amount > maxAmount.value) {
-          userMessage.value = "Số lượng vật tư xuất không thể lớn hơn " + maxAmount.value;
+        const check = await DeliveryBillFlowApi.getCheckDeliveryBillFlow(
+          rawDeliveryBillFlowObj.deliveryBillId,
+          rawDeliveryBillFlowObj.suppliesId,
+          rawDeliveryBillFlowObj.deliveryBillFlowId
+        );
+        if (check.data) {
+          userMessage.value = "Danh sách vật tư nhập không được trùng!";
           showMessage.value = true;
           setTimeout(() => {
             return (showMessage.value = false);
           }, 2000);
         } else {
-          let resp;
-          if (rawDeliveryBillFlowObj.deliveryBillFlowId) {
-            resp = await DeliveryBillFlowApi.updateDeliveryBillFlow(
-              rawDeliveryBillFlowObj
-            );
-          } else {
-            resp = await DeliveryBillFlowApi.addDeliveryBillFlow(
-              rawDeliveryBillFlowObj
-            );
-          }
-          if (resp.data.msgType === "SUCCESS") {
-            toast.add({
-              severity: "success",
-              summary: rawDeliveryBillFlowObj.deliveryBillFlowId
-                ? "Sửa thành công!"
-                : "Thêm mới thành công",
-              detail: `${rawDeliveryBillFlowObj.name} (${rawDeliveryBillFlowObj.code})`,
-              life: 3000,
-            });
-            if (!rawDeliveryBillFlowObj.deliveryBillFlowId) {
-              recData.value.id = "CREATED";
-            }
-            changesApplied.value = true;
-            emit("changed");
+          if (recData.value.amount > maxAmount.value) {
+            userMessage.value =
+              "Số lượng vật tư xuất không thể lớn hơn " + maxAmount.value;
+            showMessage.value = true;
             setTimeout(() => {
-              onCancel();
-            }, 500);
+              return (showMessage.value = false);
+            }, 2000);
           } else {
-            toast.add({
-              severity: "error",
-              summary: "Lỗi xảy ra!",
-              detail: resp.data.msg,
-            });
+            let resp;
+            if (rawDeliveryBillFlowObj.deliveryBillFlowId) {
+              resp = await DeliveryBillFlowApi.updateDeliveryBillFlow(
+                rawDeliveryBillFlowObj
+              );
+            } else {
+              resp = await DeliveryBillFlowApi.addDeliveryBillFlow(
+                rawDeliveryBillFlowObj
+              );
+            }
+            if (resp.data.msgType === "SUCCESS") {
+              toast.add({
+                severity: "success",
+                summary: rawDeliveryBillFlowObj.deliveryBillFlowId
+                  ? "Sửa thành công!"
+                  : "Thêm mới thành công",
+                life: 3000,
+              });
+              if (!rawDeliveryBillFlowObj.deliveryBillFlowId) {
+                recData.value.id = "CREATED";
+              }
+              changesApplied.value = true;
+              emit("changed");
+              setTimeout(() => {
+                onCancel();
+              }, 500);
+            } else {
+              toast.add({
+                severity: "error",
+                summary: "Lỗi xảy ra!",
+                detail: resp.data.msg,
+              });
+            }
           }
         }
       }
     };
 
     const changeSupplies = async () => {
-      const res = await warehouseCardApi.getAmountInventory(recData.value.suppliesId);
+      const res = await warehouseCardApi.getAmountInventory(
+        recData.value.suppliesId
+      );
       recData.value.amount = res.data;
       maxAmount.value = res.data;
-    }
+    };
 
     const onCancel = () => {
       emit("cancel");
@@ -187,7 +201,7 @@ export default defineComponent({
       onApplyChanges,
       onCancel,
       changeSupplies,
-      maxAmount
+      maxAmount,
     };
   },
 });
