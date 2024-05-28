@@ -4,13 +4,13 @@ import axios from 'axios';
 
 const localStoragePersist = createPersistedState({
   key: 'app-local',
-  paths: ['user', 'userName', 'baseUrl', 'lang'],
+  paths: ['user', 'userName', 'baseUrl', 'lang', 'jwt'],
   storage: window.localStorage,
 });
 
 const sessionStoragePersist = createPersistedState({
   key: 'app-session',
-  paths: ['role', 'jwt', 'jwtTime'],
+  paths: ['role', 'jwtTime'],
   storage: window.sessionStorage,
 });
 

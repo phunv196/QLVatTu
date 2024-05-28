@@ -4,7 +4,7 @@
     <div class="p-d-flex p-flex-row p-jc-start">
       <div class="p-d-flex p-flex-column m-mini-chart-container">
         <div class="m-chart-title">Biểu đồ nhập vật tư theo quý {{year}}</div>
-        <div class="p-d-flex p-flex-row p-ai-end">
+        <div class="p-d-flex p-flex-row p-ai-end p-jc-between">
           <Chart
             :height="30"
             :width="30"
@@ -23,7 +23,7 @@
 
       <div class="p-d-flex p-flex-column m-mini-chart-container p-ml-4">
         <div class="m-chart-title">Biểu đồ xuất vật tư theo quý {{year}}</div>
-        <div class="p-d-flex p-flex-row p-ai-end">
+        <div class="p-d-flex p-flex-row p-ai-end p-jc-between">
           <Chart
             :height="100"
             :width="100"
@@ -279,11 +279,11 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 .m-chart-container {
-  max-width: 70rem;
+  max-width: 100%;
 }
 
 .m-mini-chart-container {
-  min-width: 26rem;
+  min-width: 50%;
 }
 
 .m-chart-container,

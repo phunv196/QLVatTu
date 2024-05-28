@@ -3,6 +3,9 @@ const path = require('path');
 
 module.exports = {
   assetsDir: './ui',
+  configureWebpack: {
+    devtool: 'source-map'
+  },
   devServer: {
     port: 8081,
   },

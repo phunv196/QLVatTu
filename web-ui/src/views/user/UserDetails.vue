@@ -111,7 +111,6 @@ import { defineComponent, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import UsersApi from "@/api/users-api";
 import EmployeeApi from "@/api/employee-api";
-import RoleApi from "@/api/role-api";
 import { useToast } from "primevue/usetoast";
 
 export default defineComponent({
@@ -128,7 +127,6 @@ export default defineComponent({
       recData.value = res.data;
     });
     const emp = ref([]);
-    const role = ref([]);
     const router = useRouter();
     const changesApplied = ref(false);
     const toast = useToast();
@@ -213,13 +211,6 @@ export default defineComponent({
         lstEmps = resp.data.list;
       }
       emp.value = lstEmps;
-
-      const resps = await RoleApi.getAll();
-      let lstRole = [];
-      if (resps.data) {
-        lstRole = resps.data.list;
-      }
-      role.value = lstRole;
     };
 
     const onCancel = () => {
@@ -235,7 +226,6 @@ export default defineComponent({
       onApplyChanges,
       changesApplied,
       emp,
-      role,
       getEmployeeById,
     };
   },

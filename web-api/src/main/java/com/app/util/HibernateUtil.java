@@ -2,6 +2,7 @@ package com.app.util;
 
 
 import com.app.dao.base.CommonUtils;
+import com.app.model.category.CategoryModel;
 import com.app.model.delivery.DeliveryBillFlowModel;
 import com.app.model.delivery.DeliveryBillModel;
 import com.app.model.department.DepartmentModel;
@@ -11,7 +12,6 @@ import com.app.model.position.PositionModel;
 import com.app.model.quality.QualityModel;
 import com.app.model.receipt.ReceiptFlowModel;
 import com.app.model.receipt.ReceiptModel;
-import com.app.model.role.RoleModel;
 import com.app.model.species.SpeciesModel;
 import com.app.model.supplier.SupplierModel;
 import com.app.model.supplies.SuppliesModel;
@@ -58,10 +58,10 @@ public class HibernateUtil {
             configuration.addAnnotatedClass(DeliveryBillModel.class);
             configuration.addAnnotatedClass(FactoryModel.class);
             configuration.addAnnotatedClass(PositionModel.class);
+            configuration.addAnnotatedClass(CategoryModel.class);
             configuration.addAnnotatedClass(QualityModel.class);
             configuration.addAnnotatedClass(ReceiptFlowModel.class);
             configuration.addAnnotatedClass(ReceiptModel.class);
-            configuration.addAnnotatedClass(RoleModel.class);
             configuration.addAnnotatedClass(SpeciesModel.class);
             configuration.addAnnotatedClass(SupplierModel.class);
             configuration.addAnnotatedClass(SuppliesModel.class);

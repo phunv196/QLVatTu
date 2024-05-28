@@ -181,13 +181,21 @@ export default defineComponent({
       }
     };
 
-    const changeSupplies = async () => {
+    const changeSupplies = async (isSetup?: boolean) => {
       const res = await warehouseCardApi.getAmountInventory(
         recData.value.suppliesId
       );
-      recData.value.amount = res.data;
-      maxAmount.value = res.data;
+      if(!isSetup) {
+        recData.value.amount = res.data;
+        maxAmount.value = res.data;
+      } else {
+        maxAmount.value = res.data + recData.value.amount;
+      }
     };
+
+    if (JSON.parse(JSON.stringify(recData.value)).deliveryBillFlowId) {
+      changeSupplies(true);
+    }
 
     const onCancel = () => {
       emit("cancel");

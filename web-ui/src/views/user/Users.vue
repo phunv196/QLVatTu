@@ -81,7 +81,7 @@
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
-          >Quyền
+          >Role
         </label>
         <Dropdown
           class="p-inputtext-sm"
@@ -174,7 +174,7 @@
         bodyStyle="min-width:110px;"
       ></Column>
       <Column
-        field="roleName"
+        field="role"
         header="Quyền"
         headerStyle="min-width:110px"
         bodyStyle="min-width:110px;"
@@ -204,7 +204,7 @@
       >
         <template #body="slotProps">
           <template
-            v-if="$store.getters.role === 'ADMIN'"> 
+            v-if="$store.getters.role === 'ADMIN'">
             <Button
               icon="pi pi-pencil"
               @click="onEditClick(slotProps.data)"
@@ -242,8 +242,6 @@ import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import { debounce, exportFile } from "@/shared/utils";
 import EmployeeApi from "@/api/employee-api"; // eslint-disable-line import/no-cycle
-import RoleApi from "@/api/role-api"; // eslint-disable-line import/no-cycle
-import { async } from "rxjs";
 
 export default defineComponent({
   setup(): unknown {
@@ -480,12 +478,16 @@ export default defineComponent({
     };
 
     const lstRole = async () => {
-      const resp = await RoleApi.getAll();
-      let lstRoles = [];
-      if (resp.data) {
-        lstRoles = resp.data.list;
-      }
-      role.value = lstRoles;
+      role.value = [
+        {
+          'code': 'ADMIN',
+          'name': 'ADMIN'
+        },
+        {
+          'code': 'SUPPORT',
+          'name': 'SUPPORT'
+        }
+      ] as any;
     };
 
     const showImport = () => {

@@ -21,6 +21,7 @@ import Supplies from '@/views/supplies/Supplies.vue';
 import Warehouse from '@/views/warehouse/Warehouse.vue';
 import WarehouseCard from '@/views/warehouse-card/WarehouseCard.vue';
 import Department from '@/views/department/Department.vue';
+import Category from "@/views/category/Category.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -44,6 +45,7 @@ const routes: Array<RouteRecordRaw> = [
       { path: 'delivery-bill', component: DeliveryBill },
       { path: 'factory', component: Factory },
       { path: 'position', component: Position },
+      { path: 'category', component: Category },
       { path: 'quality', component: Quality },
       { path: 'receipt', component: Receipt },
       { path: 'unit', component: Unit },

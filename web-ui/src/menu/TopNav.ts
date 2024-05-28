@@ -27,6 +27,12 @@ export default {
         },
         {
           id: '2',
+          label:'Quản lý danh mục',
+          to: '/home/category',
+          icon:'pi pi-check-square',
+        },
+        {
+          id: '2',
           label:'Chủng loại',
           to: '/home/species',
           icon:'pi pi-tags',
