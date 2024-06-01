@@ -143,7 +143,7 @@ public class WarehouseController extends BaseController {
         BaseResponse resp = new BaseResponse();
         try {
             warehouseDao.beginTransaction();
-            warehouseDao.save(warehouse);
+            warehouseDao.saveOrUpdate(warehouse);
             warehouseDao.commitTransaction();
             resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công code: %s ", warehouse.getCode()));
             return Response.ok(resp).build();

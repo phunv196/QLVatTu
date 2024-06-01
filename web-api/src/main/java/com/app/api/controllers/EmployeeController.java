@@ -91,7 +91,7 @@ public class EmployeeController extends BaseController {
         BaseResponse resp = new BaseResponse();
         try {
             employeeDao.beginTransaction();
-            employeeDao.save(emp);
+            employeeDao.saveOrUpdate(emp);
             employeeDao.commitTransaction();
             resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công code: %s ", emp.getCode()));
         } catch (HibernateException | ConstraintViolationException e) {

@@ -149,7 +149,7 @@ public class DeliveryBillController extends BaseController {
             deliveryBill.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
             deliveryBill.setCode(String.format("PX-%s-%s", CommonUtils.convertDateToString(deliveryBill.getDateDeliveryBill()), deliveryBillDao.getSequence().toString()));
             deliveryBillDao.beginTransaction();
-            deliveryBillDao.save(deliveryBill);
+            deliveryBillDao.saveOrUpdate(deliveryBill);
 
             Criteria criteriaS = suppliesDao.createCriteria(SuppliesModel.class);
             criteriaS.setProjection(null);

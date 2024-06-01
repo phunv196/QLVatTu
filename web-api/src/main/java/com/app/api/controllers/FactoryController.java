@@ -142,7 +142,7 @@ public class FactoryController extends BaseController {
         BaseResponse resp = new BaseResponse();
         try {
             factoryDao.beginTransaction();
-            factoryDao.save(factory);
+            factoryDao.saveOrUpdate(factory);
             factoryDao.commitTransaction();
             resp.setSuccessMessage(String.format("Thê mới bản ghi thành công code: %s ", factory.getCode()));
             return Response.ok(resp).build();

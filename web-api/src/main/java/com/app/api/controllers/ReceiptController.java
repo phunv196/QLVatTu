@@ -132,7 +132,7 @@ public class ReceiptController extends BaseController {
             receipt.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
             receipt.setCode(String.format("PN-%s-%s", CommonUtils.convertDateToString(receipt.getDateWarehousing()), receiptDao.getSequence().toString()));
             receiptDao.beginTransaction();
-            receiptDao.save(receipt);
+            receiptDao.saveOrUpdate(receipt);
 
             Criteria criteriaS = suppliesDao.createCriteria(SuppliesModel.class);
             criteriaS.setProjection(null);
@@ -172,7 +172,7 @@ public class ReceiptController extends BaseController {
                         cardModelAdd.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
                         cardModelAdd.setWarehouseCardId(warehouseCardId + i++);
                         cardModelAdd.setWarehouseId(receipt.getWarehouseId());
-                        cardModelAdd.setInventory(suppliesTop1.getInventory() - receiptFlowModel.getAmount());
+                        cardModelAdd.setInventory((suppliesTop1 != null ? suppliesTop1.getInventory() : 0) + receiptFlowModel.getAmount());
                         cardModelList.add(cardModelAdd);
                         WarehouseCardFlowModel warehouseCardFlowModel = new WarehouseCardFlowModel();
                         warehouseCardFlowModel.setWarehouseCardId(cardModelAdd.getWarehouseCardId());
@@ -182,11 +182,11 @@ public class ReceiptController extends BaseController {
                         warehouseCardFlowModel.setAmount(receiptFlowModel.getAmount());
                         cardFlowModelList.add(warehouseCardFlowModel);
                         SuppliesModel suppliesModel = mapS.get(receiptFlowModel.getSuppliesId());
-                        suppliesModel.setInventory(suppliesModel.getInventory() != null ? suppliesModel.getInventory() + receiptFlowModel.getAmount() : receiptFlowModel.getAmount());
+                        suppliesModel.setInventory((suppliesModel != null ? suppliesModel.getInventory() : 0) + receiptFlowModel.getAmount());
                         suppliesListSave.add(suppliesModel);
                     } else {
                         SuppliesModel suppliesModel = mapS.get(receiptFlowModel.getSuppliesId());
-                        suppliesModel.setInventory(suppliesModel.getInventory() != null ? suppliesModel.getInventory() + receiptFlowModel.getAmount() : receiptFlowModel.getAmount());
+                        suppliesModel.setInventory((suppliesModel != null ? suppliesModel.getInventory() : 0) + receiptFlowModel.getAmount());
                         suppliesListSave.add(suppliesModel);
                         warehouseCardModel.setInventory(warehouseCardModel.getInventory() + receiptFlowModel.getAmount());
                         cardModelList.add(warehouseCardModel);
@@ -206,17 +206,17 @@ public class ReceiptController extends BaseController {
             receiptDao.commitTransaction();
             suppliesListSave.forEach(suppliesModel -> {
                 suppliesDao.beginTransaction();
-                suppliesDao.save(suppliesModel);
+                suppliesDao.saveOrUpdate(suppliesModel);
                 suppliesDao.commitTransaction();
             });
             cardModelList.forEach(warehouseCardModel -> {
                 warehouseCardDao.beginTransaction();
-                warehouseCardDao.save(warehouseCardModel);
+                warehouseCardDao.saveOrUpdate(warehouseCardModel);
                 warehouseCardDao.commitTransaction();
             });
             cardFlowModelList.forEach(warehouseCardFlowModel -> {
                 warehouseCardFlowDao.beginTransaction();
-                warehouseCardFlowDao.save(warehouseCardFlowModel);
+                warehouseCardFlowDao.saveOrUpdate(warehouseCardFlowModel);
                 warehouseCardFlowDao.commitTransaction();
             });
             cardFlowModelList.forEach(warehouseCardFlowModel -> {

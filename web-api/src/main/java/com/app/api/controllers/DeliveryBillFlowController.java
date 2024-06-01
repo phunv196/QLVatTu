@@ -76,7 +76,7 @@ public class DeliveryBillFlowController extends BaseController {
         BaseResponse resp = new BaseResponse();
         try {
             deliveryBillFlowDao.beginTransaction();
-            deliveryBillFlowDao.save(deliveryBillFlow);
+            deliveryBillFlowDao.saveOrUpdate(deliveryBillFlow);
             deliveryBillFlowDao.commitTransaction();
             if(deliveryBillDao.getById(deliveryBillFlow.getDeliveryBillId()) != null) {
                 warehouseCardController.createWarehouseCardByDeliveryBillId(deliveryBillFlow);

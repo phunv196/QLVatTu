@@ -284,7 +284,7 @@ public class BaseHibernateDAO {
 
     //<editor-fold defaultstate="collapsed" desc="Luu vao DB">
     public void save(Object objectToSave) {
-        getSession().save(objectToSave);
+        getSession().saveOrUpdate(objectToSave);
     }
 
     public void update(Object entity) {

@@ -396,13 +396,13 @@ public class WarehouseCardController extends BaseController {
                 SuppliesModel suppliesModel = mapS.get(receiptFlowModel.getSuppliesId());
                 suppliesModel.setInventory(suppliesModel.getInventory() + receiptFlowModel.getAmount());
                 suppliesDao.beginTransaction();
-                suppliesDao.save(suppliesModel);
+                suppliesDao.saveOrUpdate(suppliesModel);
                 suppliesDao.commitTransaction();
             } else {
                 SuppliesModel suppliesModel = mapS.get(receiptFlowModel.getSuppliesId());
                 suppliesModel.setInventory(suppliesModel.getInventory() + receiptFlowModel.getAmount());
                 suppliesDao.beginTransaction();
-                suppliesDao.save(suppliesModel);
+                suppliesDao.saveOrUpdate(suppliesModel);
                 suppliesDao.commitTransaction();
                 warehouseCardModel.setInventory(warehouseCardModel.getInventory() + receiptFlowModel.getAmount());
                 WarehouseCardFlowModel warehouseCardFlowModel = new WarehouseCardFlowModel();
@@ -470,13 +470,13 @@ public class WarehouseCardController extends BaseController {
                 SuppliesModel suppliesModel = mapS.get(deliveryBillFlow.getSuppliesId());
                 suppliesModel.setInventory(suppliesModel.getInventory() - deliveryBillFlow.getAmount());
                 suppliesDao.beginTransaction();
-                suppliesDao.save(suppliesModel);
+                suppliesDao.saveOrUpdate(suppliesModel);
                 suppliesDao.commitTransaction();
             } else {
                 SuppliesModel suppliesModel = mapS.get(deliveryBillFlow.getSuppliesId());
                 suppliesModel.setInventory(suppliesModel.getInventory() - deliveryBillFlow.getAmount());
                 suppliesDao.beginTransaction();
-                suppliesDao.save(suppliesModel);
+                suppliesDao.saveOrUpdate(suppliesModel);
                 suppliesDao.commitTransaction();
                 warehouseCardModel.setInventory(warehouseCardModel.getInventory() - deliveryBillFlow.getAmount());
                 WarehouseCardFlowModel warehouseCardFlowModel = new WarehouseCardFlowModel();
@@ -515,7 +515,7 @@ public class WarehouseCardController extends BaseController {
         SuppliesModel suppliesModel = suppliesDao.getById(receiptFlowModel.getSuppliesId());
         suppliesModel.setInventory(suppliesModel.getInventory() + receiptFlowModel.getAmount() - amountOld);
         suppliesDao.beginTransaction();
-        suppliesDao.save(suppliesModel);
+        suppliesDao.saveOrUpdate(suppliesModel);
         suppliesDao.commitTransaction();
     }
 
@@ -538,7 +538,7 @@ public class WarehouseCardController extends BaseController {
         SuppliesModel suppliesModel = suppliesDao.getById(deliveryBillFlowModel.getSuppliesId());
         suppliesModel.setInventory(suppliesModel.getInventory() - deliveryBillFlowModel.getAmount() + amountOld);
         suppliesDao.beginTransaction();
-        suppliesDao.save(suppliesModel);
+        suppliesDao.saveOrUpdate(suppliesModel);
         suppliesDao.commitTransaction();
     }
 

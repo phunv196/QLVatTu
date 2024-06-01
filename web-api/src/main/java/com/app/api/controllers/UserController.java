@@ -204,7 +204,7 @@ public class UserController extends BaseController {
             }
             model.setPassword(PlainTextPasswordEncoder.encode(PASSWORD, id.toString()));
             userDao.beginTransaction();
-            userDao.save(model);
+            userDao.saveOrUpdate(model);
             userDao.commitTransaction();
             resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công loginName: %s ", model.getLoginName()));
         } catch (HibernateException | ConstraintViolationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
@@ -526,7 +526,7 @@ public class UserController extends BaseController {
                 user.setPassword(PlainTextPasswordEncoder.encode(PASSWORD, id.toString()));
                 user.setRole(Constants.UserRoleConstants.ROLE_SUPPORT);
                 userDao.beginTransaction();
-                userDao.save(user);
+                userDao.saveOrUpdate(user);
                 userDao.commitTransaction();
             });
             resp.setSuccessMessage("Import thành công!");

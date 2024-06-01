@@ -79,7 +79,7 @@ public class WarehouseCardFlowController extends BaseController {
         try {
             warehouseCardFlowDao.beginTransaction();
             warehouseCardFlow.setCreateAt(new Date());
-            warehouseCardFlowDao.save(warehouseCardFlow);
+            warehouseCardFlowDao.saveOrUpdate(warehouseCardFlow);
             warehouseCardFlowDao.commitTransaction();
             if( check(warehouseCardFlow.getWarehouseCardId()) && warehouseCardFlow.getReceiptId() != null) {
                 updateRecepit(warehouseCardFlow);

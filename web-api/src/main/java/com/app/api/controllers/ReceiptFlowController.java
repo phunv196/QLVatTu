@@ -69,7 +69,7 @@ public class ReceiptFlowController extends BaseController {
         BaseResponse resp = new BaseResponse();
         try {
             receiptFlowDao.beginTransaction();
-            receiptFlowDao.save(receiptFlow);
+            receiptFlowDao.saveOrUpdate(receiptFlow);
             receiptFlowDao.commitTransaction();
             if(receiptDao.getById(receiptFlow.getReceiptId()) != null) {
                 warehouseCardController.createWarehouseCardByReceiptId(receiptFlow);

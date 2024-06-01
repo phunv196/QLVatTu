@@ -155,7 +155,7 @@ public class SuppliesController extends BaseController {
         BaseResponse resp = new BaseResponse();
         try {
             suppliesDao.beginTransaction();
-            suppliesDao.save(supplies);
+            suppliesDao.saveOrUpdate(supplies);
             suppliesDao.commitTransaction();
             resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công code: %s ", supplies.getCode()));
             return Response.ok(resp).build();

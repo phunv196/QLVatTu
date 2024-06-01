@@ -129,7 +129,7 @@ public class SupplierController extends BaseController {
         BaseResponse resp = new BaseResponse();
         try {
             supplierDao.beginTransaction();
-            supplierDao.save(supplier);
+            supplierDao.saveOrUpdate(supplier);
             supplierDao.commitTransaction();
             resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công code: %s ", supplier.getCode()));
             return Response.ok(resp).build();

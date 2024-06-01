@@ -168,7 +168,7 @@ public class CategoryController extends BaseController {
         BaseResponse resp = new BaseResponse();
         try {
             categoryDao.beginTransaction();
-            categoryDao.save(qual);
+            categoryDao.saveOrUpdate(qual);
             categoryDao.commitTransaction();
             resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công code: %s ", qual.getCode()));
             return Response.ok(resp).build();
