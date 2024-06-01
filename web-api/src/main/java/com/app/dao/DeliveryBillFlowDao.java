@@ -35,8 +35,8 @@ public class DeliveryBillFlowDao extends BaseHibernateDAO {
                 " sp.name speciesName" +
                 " from delivery_bill_flow dbf " +
                 " left join supplies s on s.supplies_id = dbf.supplies_id" +
-                " left join species sp on sp.species_id = s.species_id" +
-                " left join unit u on s.unit_id = u.unit_id" +
+                " left join category sp on sp.code = s.species_id" +
+                " left join category u on u.code = s.unit_id" +
                 " where dbf.delivery_bill_id = :deliveryBillId";
         SQLQuery q = createSQLQuery(sql);
         q.setParameter("deliveryBillId", deliveryBillId);
@@ -99,8 +99,8 @@ public class DeliveryBillFlowDao extends BaseHibernateDAO {
                 " sp.name speciesName" +
                 " from delivery_bill_flow dbf " +
                 " left join supplies s on s.supplies_id = dbf.supplies_id" +
-                " left join species sp on sp.species_id = s.species_id" +
-                " left join unit u on s.unit_id = u.unit_id" +
+                " left join category sp on sp.code = s.species_id" +
+                " left join category u on u.code = s.unit_id" +
                 " where dbf.delivery_bill_id = :deliveryBillId";
         finalSql = finalSql + " order by dbf.delivery_bill_flow_id " + sqlLimit;
         SQLQuery q = createSQLQuery(finalSql);

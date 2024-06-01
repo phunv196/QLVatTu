@@ -58,6 +58,10 @@ export default {
     return api.post('/factorys/byCode', factoryObj);
   },
 
+  async getByDate(factoryObj: Record<string, string | Date>): Promise<AxiosResponse> {
+    return api.post('/factorys/getByDate', factoryObj);
+  },
+
   async downloadTemplate(): Promise<AxiosResponse> {
     return api.get('/factorys/downloadTemplate',);
   },

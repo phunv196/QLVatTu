@@ -265,8 +265,8 @@ export default defineComponent({
     const searchFullName = ref("");
     const searchEmail = ref("");
     const searchPhone = ref("");
-    const searchRole = ref("");
-    const searchEmployeeId = ref("");
+    const searchRole = ref(null);
+    const searchEmployeeId = ref(null);
 
     const getData = async (
       page: number,
@@ -280,7 +280,7 @@ export default defineComponent({
       searchEmployeeId = ""
     ) => {
       // isLoading.value = true;
-      searchEmployeeId = searchEmployeeId === "null" ? "0" : searchEmployeeId;
+      searchEmployeeId = searchEmployeeId === "null" ? "" : searchEmployeeId;
       searchRole = searchRole === "null" ? "" : searchRole;
       try {
         const resp = await UsersApi.getUsers(

@@ -1,6 +1,7 @@
 package com.app.api.controllers;
 
 import com.app.api.BaseController;
+import com.app.dao.ReceiptDao;
 import com.app.dao.ReceiptFlowDao;
 import com.app.model.BaseResponse;
 import com.app.model.receipt.ReceiptFlowModel;
@@ -31,7 +32,8 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 public class ReceiptFlowController extends BaseController {
     ReceiptFlowDao receiptFlowDao = new ReceiptFlowDao();
-
+    ReceiptDao receiptDao = new ReceiptDao();
+    WarehouseCardController warehouseCardController = new WarehouseCardController();
     @GET
     @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(
@@ -69,6 +71,9 @@ public class ReceiptFlowController extends BaseController {
             receiptFlowDao.beginTransaction();
             receiptFlowDao.save(receiptFlow);
             receiptFlowDao.commitTransaction();
+            if(receiptDao.getById(receiptFlow.getReceiptId()) != null) {
+                warehouseCardController.createWarehouseCardByReceiptId(receiptFlow);
+            }
             resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công id: %s ", receiptFlow.getReceiptFlowId()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
@@ -83,14 +88,19 @@ public class ReceiptFlowController extends BaseController {
             summary = "Update a ReceiptFlow",
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
     )
-    public Response updateReceiptFlow(ReceiptFlowModel receiptFlow) {
+    public Response updateReceiptFlow(ReceiptFlowModel receiptFlow) throws Exception {
         BaseResponse resp = new BaseResponse();
         try {
             ReceiptFlowModel foundProd  = receiptFlowDao.getById(receiptFlow.getReceiptFlowId());
+            ReceiptFlowModel model = new ReceiptFlowModel();
+            model.setAmount(foundProd.getAmount());
             if (foundProd != null) {
                 receiptFlowDao.beginTransaction();
                 receiptFlowDao.update(receiptFlow);
                 receiptFlowDao.commitTransaction();
+                if(receiptDao.getById(receiptFlow.getReceiptId()) != null) {
+                    warehouseCardController.updateWarehouseCardByReceiptId(receiptFlow, model.getAmount());
+                }
                 resp.setSuccessMessage(String.format("Sửa bản ghi thành công (id:%s)", receiptFlow.getReceiptFlowId()));
                 return Response.ok(resp).build();
             } else {
@@ -163,7 +173,7 @@ public class ReceiptFlowController extends BaseController {
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = ReceiptFlowResponse.class)))}
     )
     public Response checkReceiptFlow(@Parameter(description="receipt Id") @QueryParam("receiptId") Long receiptId,
-                                     @Parameter(description="receipt flow Id") @QueryParam("receiptId") Long receiptFlowId,
+                                     @Parameter(description="receipt flow Id") @QueryParam("receiptFlowId") Long receiptFlowId,
                   @Parameter(description="supplies Id") @QueryParam("suppliesId") Long suppliesId
     ) {
         Criteria criteria = receiptFlowDao.createCriteria(ReceiptFlowModel.class);

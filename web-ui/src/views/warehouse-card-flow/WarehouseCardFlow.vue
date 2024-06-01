@@ -6,11 +6,11 @@
                                 :suppliesId="suppliesId" :arrReceipt="arrReceipt" :arrDeliveryBill="arrDeliveryBill" :isNew="isNewRec"></WarehouseCardFlowDetails>
     </Sidebar>
     <h3> Danh sách dòng thẻ kho </h3>
-    <div class="p-d-flex p-flex-row p-mb-3" style="width:1000px">
-      <div style="display:inline-block; flex:1"></div>
-      <Button icon="pi pi-user" iconPos="right" label="ADD" @click="onAddClick()"
-              class="p-ml-1 p-button-sm"></Button>
-    </div>
+<!--    <div class="p-d-flex p-flex-row p-mb-3" style="width:1000px">-->
+<!--      <div style="display:inline-block; flex:1"></div>-->
+<!--      <Button icon="pi pi-user" iconPos="right" label="ADD" @click="onAddClick()"-->
+<!--              class="p-ml-1 p-button-sm"></Button>-->
+<!--    </div>-->
     <DataTable
       :value="list"
       :paginator="true"
@@ -27,14 +27,14 @@
       <Column field="type" header="Mã nhân viên" headerStyle="width:90px"></Column>
       <Column field="employeeName" header="Tên nhân viên" headerStyle="width:190px"></Column>
       <Column field="amount" header="Số lượng" headerStyle="width:120px"></Column>
-      <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px; text-align: center;">
-        <template #body="slotProps">
-          <Button icon="pi pi-pencil" @click="onEditClick(slotProps.data)"
-                  class="p-button-sm p-button-rounded p-button-secondary p-button-text"/>
-          <Button icon="pi pi-trash" @click="onDeleteClick(slotProps.data)"
-                  class="p-button-sm p-button-rounded p-button-danger p-button-text"/>
-        </template>
-      </Column>
+<!--      <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px; text-align: center;">-->
+<!--        <template #body="slotProps">-->
+<!--          <Button icon="pi pi-pencil" @click="onEditClick(slotProps.data)"-->
+<!--                  class="p-button-sm p-button-rounded p-button-secondary p-button-text"/>-->
+<!--          <Button icon="pi pi-trash" @click="onDeleteClick(slotProps.data)"-->
+<!--                  class="p-button-sm p-button-rounded p-button-danger p-button-text"/>-->
+<!--        </template>-->
+<!--      </Column>-->
     </DataTable>
   </div>
 </template>

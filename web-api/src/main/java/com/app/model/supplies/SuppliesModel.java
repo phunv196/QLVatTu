@@ -17,11 +17,19 @@ public class SuppliesModel {
     @Column(name = "name")      private String  name;
     @Column(name = "description")       private String  description;
     @Column(name = "price")      private Long  price;
-    @Column(name = "species_id")      private Long  speciesId;
-    @Column(name = "quality_id")      private Long  qualityId;
+    @Column(name = "species_id")      private String  speciesId;
+    @Column(name = "quality_id")      private String  qualityId;
     @Column(name = "supplier_id")      private Long  supplierId;
-    @Column(name = "unit_id")      private Long  unitId;
+    @Column(name = "unit_id")      private String  unitId;
+    @Column(name = "inventory")       private Long  inventory;
 
+    public Long getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(Long inventory) {
+        this.inventory = inventory;
+    }
     @Transient
     private String speciesName;
 
@@ -75,19 +83,19 @@ public class SuppliesModel {
         this.price = price;
     }
 
-    public Long getSpeciesId() {
+    public String getSpeciesId() {
         return speciesId;
     }
 
-    public void setSpeciesId(Long speciesId) {
+    public void setSpeciesId(String speciesId) {
         this.speciesId = speciesId;
     }
 
-    public Long getQualityId() {
+    public String getQualityId() {
         return qualityId;
     }
 
-    public void setQualityId(Long qualityId) {
+    public void setQualityId(String qualityId) {
         this.qualityId = qualityId;
     }
 
@@ -99,11 +107,11 @@ public class SuppliesModel {
         this.supplierId = supplierId;
     }
 
-    public Long getUnitId() {
+    public String getUnitId() {
         return unitId;
     }
 
-    public void setUnitId(Long unitId) {
+    public void setUnitId(String unitId) {
         this.unitId = unitId;
     }
 

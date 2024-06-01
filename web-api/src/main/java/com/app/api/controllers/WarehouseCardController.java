@@ -6,14 +6,15 @@ import com.app.dao.base.CommonUtils;
 import com.app.dao.base.converter.DynamicExport;
 import com.app.model.BaseResponse;
 import com.app.model.ExportModel;
+import com.app.model.category.CategoryModel;
+import com.app.model.delivery.DeliveryBillFlowModel;
+import com.app.model.delivery.DeliveryBillModel;
 import com.app.model.receipt.ReceiptFlowModel;
 import com.app.model.supplies.SuppliesModel;
-import com.app.model.unit.UnitModel;
 import com.app.model.warehouse.WarehouseModel;
 import com.app.model.warehouseCard.WarehouseCardFlowModel;
 import com.app.model.warehouseCard.WarehouseCardModel;
 import com.app.model.warehouseCard.WarehouseCardModel.WarehouseCardResponse;
-import com.app.model.department.DepartmentModel;
 import com.app.model.employee.EmployeeModel;
 import com.app.model.receipt.ReceiptModel;
 import com.app.model.user.UserModel;
@@ -33,6 +34,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.poi.xwpf.usermodel.*;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -40,6 +42,8 @@ import java.io.*;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.app.util.Constants.COMMON.*;
 import static com.app.util.Constants.COMMON.FOLDER_EXPORT_DOCX;
@@ -50,13 +54,16 @@ import static com.app.util.Constants.COMMON.FOLDER_EXPORT_DOCX;
 @Consumes(MediaType.APPLICATION_JSON)
 public class WarehouseCardController extends BaseController {
     WarehouseCardFlowController warehouseCardFlowController = new WarehouseCardFlowController();
-    WarehouseCardDao warehouseCardDao = new WarehouseCardDao();
     WarehouseCardFlowDao warehouseCardFlowDao = new WarehouseCardFlowDao();
+    WarehouseCardDao warehouseCardDao = new WarehouseCardDao();
     ReceiptFlowDao receiptFlowDao = new ReceiptFlowDao();
     SuppliesDao suppliesDao = new SuppliesDao();
-    DepartmentDao departmentDao = new DepartmentDao();
+
+    WarehouseDao warehouseDao = new WarehouseDao();
     EmployeeDao employeeDao = new EmployeeDao();
-    UnitDao unitDao = new UnitDao();
+    CategoryDao categoryDao = new CategoryDao();
+    ReceiptDao receiptDao = new ReceiptDao();
+    DeliveryBillDao deliveryBillDao = new DeliveryBillDao();
 
     @GET
     @RolesAllowed({"ADMIN", "SUPPORT"})
@@ -121,6 +128,7 @@ public class WarehouseCardController extends BaseController {
         try {
             UserModel userFromToken = (UserModel)securityContext.getUserPrincipal();
             warehouseCard.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
+            warehouseCard.setCode(String.format("TK-%s-%s", CommonUtils.convertDateToString(new Date()), warehouseCardDao.getSequence().toString()));
             warehouseCardDao.beginTransaction();
             warehouseCardDao.saveOrUpdate(warehouseCard);
             warehouseCardDao.commitTransaction();
@@ -130,6 +138,8 @@ public class WarehouseCardController extends BaseController {
         } catch (HibernateException | ConstraintViolationException e) {
             resp.setErrorMessage("Không thể thêm mới bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -261,9 +271,9 @@ public class WarehouseCardController extends BaseController {
     @Path("inventory/{suppliesId}")
     @RolesAllowed({"ADMIN", "SUPPORT"})
     public Response getAmountInventory(@Parameter(description="suppliesId Id", example="601") @PathParam("suppliesId") Long suppliesId) {
-        WarehouseCardModel model = warehouseCardDao.getAmountInventory(suppliesId);
+        SuppliesModel model = suppliesDao.getById(suppliesId);
         if (model != null) {
-            return Response.ok(  model.getAmountInventory()).build();
+            return Response.ok(model.getInventory()).build();
         }
         return Response.ok(  0).build();
     }
@@ -276,7 +286,7 @@ public class WarehouseCardController extends BaseController {
     )
     public Response getByCode(
             WarehouseCardModel model
-    ) {
+    ) throws Exception {
         Criteria criteria = warehouseCardDao.createCriteria(WarehouseCardModel.class);
         if (model.getWarehouseCardId() != null){
             criteria.add(Restrictions.ne("warehouseCardId", model.getWarehouseCardId()));
@@ -284,16 +294,252 @@ public class WarehouseCardController extends BaseController {
         if (model.getWarehouseCardId() != null){
             criteria.add(Restrictions.eq("warehouseId", model.getWarehouseId()));
         }
-        if (CommonUtils.isNullOrEmpty(model.getCode()) && model.getSuppliesId() == null){
-            return Response.ok(true).build();
-        }
         criteria.add(Restrictions.disjunction()
                 .add(Restrictions.eq("suppliesId", model.getSuppliesId() == null ? 0 : model.getSuppliesId()))
-                .add(Restrictions.eq("code", model.getCode() == null ? "" : model.getCode()).ignoreCase()));
-
+                .add(Restrictions.eq("dateCreated", CommonUtils.convertStringToDateBasic(CommonUtils.convertDateToString(model.getDateCreated())))));
         criteria.setProjection(Projections.rowCount());
         Long rowCount = (Long)criteria.uniqueResult();
         return Response.ok(rowCount > 0).build();
+    }
+
+    public WarehouseCardModel getSuppliesIdTop1(
+            Long warehouseId, Long suppliesId
+    ) throws Exception {
+        Criteria criteria = warehouseCardDao.createCriteria(WarehouseCardModel.class);
+        criteria.add(Restrictions.eq("warehouseId", warehouseId));
+        criteria.add(Restrictions.eq("suppliesId", suppliesId));
+        criteria.addOrder(Order.desc("warehouseCardId"));
+        criteria.setProjection(null);
+        criteria.setMaxResults(1);
+        return (WarehouseCardModel) criteria.uniqueResult();
+    }
+
+    public WarehouseCardModel getByCodeInsert(
+            WarehouseCardModel model
+    ) throws Exception {
+        Criteria criteria = warehouseCardDao.createCriteria(WarehouseCardModel.class);
+        if (model.getWarehouseCardId() != null){
+            criteria.add(Restrictions.ne("warehouseCardId", model.getWarehouseCardId()));
+        }
+        if (model.getWarehouseId() != null){
+            criteria.add(Restrictions.eq("warehouseId", model.getWarehouseId()));
+        }
+        criteria.add(Restrictions.eq("suppliesId", model.getSuppliesId() == null ? 0 : model.getSuppliesId()))
+                .add(Restrictions.eq("dateCreated", CommonUtils.convertStringToDateBasic(CommonUtils.convertDateToString(model.getDateCreated()))));
+        criteria.setProjection(null);
+        return (WarehouseCardModel) criteria.uniqueResult();
+    }
+
+    public WarehouseCardModel getByCodeInsertDelivery(
+            WarehouseCardModel model
+    ) throws Exception {
+        Criteria criteria = warehouseCardDao.createCriteria(WarehouseCardModel.class);
+        if (model.getWarehouseCardId() != null){
+            criteria.add(Restrictions.ne("warehouseCardId", model.getWarehouseCardId()));
+        }
+        if (model.getWarehouseId() != null){
+            criteria.add(Restrictions.eq("warehouseId", model.getWarehouseId()));
+        }
+        criteria.add(Restrictions.eq("suppliesId", model.getSuppliesId() == null ? 0 : model.getSuppliesId()))
+                .add(Restrictions.eq("dateCreated", CommonUtils.convertStringToDateBasic(CommonUtils.convertDateToString(model.getDateCreated()))));
+        criteria.setProjection(null);
+        return (WarehouseCardModel) criteria.uniqueResult();
+    }
+
+    public void createWarehouseCardByReceiptId(ReceiptFlowModel receiptFlowModel) {
+        Criteria criteriaS = suppliesDao.createCriteria(SuppliesModel.class);
+        criteriaS.setProjection(null);
+        List<SuppliesModel> suppliesList = criteriaS.list();
+        Map<Long, SuppliesModel> mapS = suppliesList.stream().collect(Collectors.toMap(SuppliesModel::getSuppliesId, Function.identity()));
+
+        Criteria criteriaW = warehouseDao.createCriteria(WarehouseModel.class);
+        criteriaW.setProjection(null);
+        List<WarehouseModel> warehouseModels = criteriaW.list();
+        Map<Long, WarehouseModel> mapW = warehouseModels.stream().collect(Collectors.toMap(WarehouseModel::getWarehouseId, Function.identity()));
+        UserModel userFromToken = (UserModel)securityContext.getUserPrincipal();
+        ReceiptModel receipt = receiptDao.getById(receiptFlowModel.getReceiptId());
+        WarehouseCardModel cardModel = new WarehouseCardModel();
+        cardModel.setWarehouseId(receipt.getWarehouseId());
+        cardModel.setSuppliesId(receiptFlowModel.getSuppliesId());
+        try {
+            cardModel.setDateCreated(CommonUtils.convertStringToDateBasic(CommonUtils.convertDateToString(receipt.getDateWarehousing())));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            WarehouseCardModel warehouseCardModel = getByCodeInsert(cardModel);
+            if (warehouseCardModel == null) {
+                WarehouseCardModel suppliesTop1 = getSuppliesIdTop1(receipt.getWarehouseId(), receiptFlowModel.getSuppliesId());
+
+                WarehouseCardModel cardModelAdd = new WarehouseCardModel();
+                cardModelAdd.setDateCreated(CommonUtils.convertStringToDateBasic(CommonUtils.convertDateToString(receipt.getDateWarehousing())));
+                cardModelAdd.setCode(String.format("TK-%s-%s-%s",CommonUtils.convertDateToString(receipt.getDateWarehousing()), mapW.get(receipt.getWarehouseId()).getCode(), mapS.get(receiptFlowModel.getSuppliesId()).getCode()));
+                cardModelAdd.setName(String.format("Thẻ kho: %s - %s", mapW.get(receipt.getWarehouseId()).getName(), mapS.get(receiptFlowModel.getSuppliesId()).getName()));
+                cardModelAdd.setSuppliesId(receiptFlowModel.getSuppliesId());
+                cardModelAdd.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
+                cardModelAdd.setWarehouseCardId(warehouseCardDao.getSequence());
+                cardModelAdd.setWarehouseId(receipt.getWarehouseId());
+                cardModelAdd.setInventory(suppliesTop1.getInventory() + receiptFlowModel.getAmount());
+                warehouseCardDao.beginTransaction();
+                warehouseCardDao.saveOrUpdate(cardModelAdd);
+                warehouseCardDao.commitTransaction();
+                WarehouseCardFlowModel warehouseCardFlowModel = new WarehouseCardFlowModel();
+                warehouseCardFlowModel.setWarehouseCardId(cardModelAdd.getWarehouseCardId());
+                warehouseCardFlowModel.setType(1L);
+                warehouseCardFlowModel.setCreateAt(new Date());
+                warehouseCardFlowModel.setReceiptId(receipt.getReceiptId());
+                warehouseCardFlowModel.setAmount(receiptFlowModel.getAmount());
+                warehouseCardFlowDao.beginTransaction();
+                warehouseCardFlowDao.saveOrUpdate(warehouseCardFlowModel);
+                warehouseCardFlowDao.commitTransaction();
+                warehouseCardFlowController.updateRecepit(warehouseCardFlowModel);
+                SuppliesModel suppliesModel = mapS.get(receiptFlowModel.getSuppliesId());
+                suppliesModel.setInventory(suppliesModel.getInventory() + receiptFlowModel.getAmount());
+                suppliesDao.beginTransaction();
+                suppliesDao.save(suppliesModel);
+                suppliesDao.commitTransaction();
+            } else {
+                SuppliesModel suppliesModel = mapS.get(receiptFlowModel.getSuppliesId());
+                suppliesModel.setInventory(suppliesModel.getInventory() + receiptFlowModel.getAmount());
+                suppliesDao.beginTransaction();
+                suppliesDao.save(suppliesModel);
+                suppliesDao.commitTransaction();
+                warehouseCardModel.setInventory(warehouseCardModel.getInventory() + receiptFlowModel.getAmount());
+                WarehouseCardFlowModel warehouseCardFlowModel = new WarehouseCardFlowModel();
+                warehouseCardFlowModel.setWarehouseCardId(warehouseCardModel.getWarehouseCardId());
+                warehouseCardFlowModel.setType(1L);
+                warehouseCardFlowModel.setCreateAt(new Date());
+                warehouseCardFlowModel.setReceiptId(receipt.getReceiptId());
+                warehouseCardFlowModel.setAmount(receiptFlowModel.getAmount());
+                warehouseCardFlowDao.beginTransaction();
+                warehouseCardFlowDao.saveOrUpdate(warehouseCardFlowModel);
+                warehouseCardFlowDao.commitTransaction();
+                warehouseCardFlowController.updateRecepit(warehouseCardFlowModel);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void createWarehouseCardByDeliveryBillId(DeliveryBillFlowModel deliveryBillFlow) {
+        Criteria criteriaS = suppliesDao.createCriteria(SuppliesModel.class);
+        criteriaS.setProjection(null);
+        List<SuppliesModel> suppliesList = criteriaS.list();
+        Map<Long, SuppliesModel> mapS = suppliesList.stream().collect(Collectors.toMap(SuppliesModel::getSuppliesId, Function.identity()));
+
+        Criteria criteriaW = warehouseDao.createCriteria(WarehouseModel.class);
+        criteriaW.setProjection(null);
+        List<WarehouseModel> warehouseModels = criteriaW.list();
+        Map<Long, WarehouseModel> mapW = warehouseModels.stream().collect(Collectors.toMap(WarehouseModel::getWarehouseId, Function.identity()));
+        UserModel userFromToken = (UserModel)securityContext.getUserPrincipal();
+        DeliveryBillModel deliveryBill = deliveryBillDao.getById(deliveryBillFlow.getDeliveryBillId());
+        WarehouseCardModel cardModel = new WarehouseCardModel();
+        cardModel.setWarehouseId(deliveryBill.getWarehouseId());
+        cardModel.setSuppliesId(deliveryBillFlow.getSuppliesId());
+        try {
+            cardModel.setDateCreated(CommonUtils.convertStringToDateBasic(CommonUtils.convertDateToString(deliveryBill.getDateDeliveryBill())));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            WarehouseCardModel warehouseCardModel = getByCodeInsert(cardModel);
+            if (warehouseCardModel == null) {
+
+                WarehouseCardModel suppliesTop1 = getSuppliesIdTop1(deliveryBill.getWarehouseId(), deliveryBillFlow.getSuppliesId());
+                WarehouseCardModel cardModelAdd = new WarehouseCardModel();
+                cardModelAdd.setDateCreated(CommonUtils.convertStringToDateBasic(CommonUtils.convertDateToString(deliveryBill.getDateDeliveryBill())));
+                cardModelAdd.setCode(String.format("TK-%s-%s-%s",CommonUtils.convertDateToString(deliveryBill.getDateDeliveryBill()), mapW.get(deliveryBill.getWarehouseId()).getCode(), mapS.get(deliveryBillFlow.getSuppliesId()).getCode()));
+                cardModelAdd.setName(String.format("Thẻ kho: %s - %s", mapW.get(deliveryBill.getWarehouseId()).getName(), mapS.get(deliveryBillFlow.getSuppliesId()).getName()));
+                cardModelAdd.setSuppliesId(deliveryBillFlow.getSuppliesId());
+                cardModelAdd.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
+                cardModelAdd.setWarehouseCardId(warehouseCardDao.getSequence());
+                cardModelAdd.setWarehouseId(deliveryBill.getWarehouseId());
+                cardModelAdd.setInventory(suppliesTop1.getInventory() - deliveryBillFlow.getAmount());
+                warehouseCardDao.beginTransaction();
+                warehouseCardDao.saveOrUpdate(cardModelAdd);
+                warehouseCardDao.commitTransaction();
+                WarehouseCardFlowModel warehouseCardFlowModel = new WarehouseCardFlowModel();
+                warehouseCardFlowModel.setWarehouseCardId(cardModelAdd.getWarehouseCardId());
+                warehouseCardFlowModel.setType(1L);
+                warehouseCardFlowModel.setCreateAt(new Date());
+                warehouseCardFlowModel.setDeliveryBillId(deliveryBill.getDeliveryBillId());
+                warehouseCardFlowModel.setAmount(deliveryBillFlow.getAmount());
+                warehouseCardFlowDao.beginTransaction();
+                warehouseCardFlowDao.saveOrUpdate(warehouseCardFlowModel);
+                warehouseCardFlowDao.commitTransaction();
+                warehouseCardFlowController.updateRecepit(warehouseCardFlowModel);
+                SuppliesModel suppliesModel = mapS.get(deliveryBillFlow.getSuppliesId());
+                suppliesModel.setInventory(suppliesModel.getInventory() - deliveryBillFlow.getAmount());
+                suppliesDao.beginTransaction();
+                suppliesDao.save(suppliesModel);
+                suppliesDao.commitTransaction();
+            } else {
+                SuppliesModel suppliesModel = mapS.get(deliveryBillFlow.getSuppliesId());
+                suppliesModel.setInventory(suppliesModel.getInventory() - deliveryBillFlow.getAmount());
+                suppliesDao.beginTransaction();
+                suppliesDao.save(suppliesModel);
+                suppliesDao.commitTransaction();
+                warehouseCardModel.setInventory(warehouseCardModel.getInventory() - deliveryBillFlow.getAmount());
+                WarehouseCardFlowModel warehouseCardFlowModel = new WarehouseCardFlowModel();
+                warehouseCardFlowModel.setWarehouseCardId(warehouseCardModel.getWarehouseCardId());
+                warehouseCardFlowModel.setType(1L);
+                warehouseCardFlowModel.setCreateAt(new Date());
+                warehouseCardFlowModel.setDeliveryBillId(deliveryBill.getDeliveryBillId());
+                warehouseCardFlowModel.setAmount(deliveryBillFlow.getAmount());
+                warehouseCardFlowDao.beginTransaction();
+                warehouseCardFlowDao.saveOrUpdate(warehouseCardFlowModel);
+                warehouseCardFlowDao.commitTransaction();
+                warehouseCardFlowController.updateRecepit(warehouseCardFlowModel);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void updateWarehouseCardByReceiptId(ReceiptFlowModel receiptFlowModel, Long amountOld) throws Exception {
+        ReceiptModel receipt = receiptDao.getById(receiptFlowModel.getReceiptId());
+        WarehouseCardModel cardModel = new WarehouseCardModel();
+        cardModel.setWarehouseId(receipt.getWarehouseId());
+        cardModel.setSuppliesId(receiptFlowModel.getSuppliesId());
+        cardModel.setDateCreated(receipt.getDateWarehousing());
+        WarehouseCardModel warehouseCardModel = getByCodeInsert(cardModel);
+        warehouseCardModel.setInventory(warehouseCardModel.getInventory() + receiptFlowModel.getAmount() - amountOld);
+        WarehouseCardFlowModel warehouseCardFlowModel = warehouseCardFlowDao.getByReceiptId(warehouseCardModel.getWarehouseCardId(), receiptFlowModel.getReceiptId());
+        warehouseCardFlowModel.setAmount(receiptFlowModel.getAmount());
+        warehouseCardFlowDao.beginTransaction();
+        warehouseCardFlowDao.saveOrUpdate(warehouseCardFlowModel);
+        warehouseCardFlowDao.commitTransaction();
+        warehouseCardFlowController.updateRecepit(warehouseCardFlowModel, amountOld);
+        warehouseCardDao.beginTransaction();
+        warehouseCardDao.saveOrUpdate(warehouseCardModel);
+        warehouseCardDao.commitTransaction();
+        SuppliesModel suppliesModel = suppliesDao.getById(receiptFlowModel.getSuppliesId());
+        suppliesModel.setInventory(suppliesModel.getInventory() + receiptFlowModel.getAmount() - amountOld);
+        suppliesDao.beginTransaction();
+        suppliesDao.save(suppliesModel);
+        suppliesDao.commitTransaction();
+    }
+
+    public void updateWarehouseCardByDeliveryBillId(DeliveryBillFlowModel deliveryBillFlowModel, Long amountOld) throws Exception {
+        DeliveryBillModel deliveryBill = deliveryBillDao.getById(deliveryBillFlowModel.getDeliveryBillId());
+        WarehouseCardModel cardModel = new WarehouseCardModel();
+        cardModel.setWarehouseId(deliveryBill.getWarehouseId());
+        cardModel.setSuppliesId(deliveryBillFlowModel.getSuppliesId());
+        cardModel.setDateCreated(deliveryBill.getDateDeliveryBill());
+        WarehouseCardModel warehouseCardModel = getByCodeInsert(cardModel);
+        warehouseCardModel.setInventory(warehouseCardModel.getInventory() - deliveryBillFlowModel.getAmount() + amountOld);
+        WarehouseCardFlowModel warehouseCardFlowModel = warehouseCardFlowDao.getByDeliveryBillId(warehouseCardModel.getWarehouseCardId(), deliveryBillFlowModel.getDeliveryBillId());
+        warehouseCardFlowModel.setAmount(deliveryBillFlowModel.getAmount());
+        warehouseCardFlowDao.beginTransaction();
+        warehouseCardFlowDao.saveOrUpdate(warehouseCardFlowModel);
+        warehouseCardFlowDao.commitTransaction();
+        warehouseCardDao.beginTransaction();
+        warehouseCardDao.saveOrUpdate(warehouseCardModel);
+        warehouseCardDao.commitTransaction();
+        SuppliesModel suppliesModel = suppliesDao.getById(deliveryBillFlowModel.getSuppliesId());
+        suppliesModel.setInventory(suppliesModel.getInventory() - deliveryBillFlowModel.getAmount() + amountOld);
+        suppliesDao.beginTransaction();
+        suppliesDao.save(suppliesModel);
+        suppliesDao.commitTransaction();
     }
 
     @POST
@@ -359,11 +605,10 @@ public class WarehouseCardController extends BaseController {
         //lay ra user dang dang nhap -> employeeId -> department
         WarehouseCardModel warehouseCardModel = warehouseCardDao.getById(warehouseCardId);
         EmployeeModel employeeModel = employeeDao.getById(Long.valueOf(warehouseCardModel.getEmployeeId()));
-        DepartmentModel departmentModel = departmentDao.getById(employeeModel.getDepartmentId());
 
 
         SuppliesModel suppliesModel = suppliesDao.getById(warehouseCardModel.getSuppliesId());
-        UnitModel unitModel = unitDao.getById(suppliesModel.getUnitId());
+        CategoryModel category = categoryDao.getByCode(suppliesModel.getUnitId());
         List<WarehouseCardFlowModel> models = warehouseCardFlowDao.getByWarehouseCardId(warehouseCardId);
         Date date = new Date();
         String strDate = CommonUtils.convertDateToString(date);
@@ -372,14 +617,12 @@ public class WarehouseCardController extends BaseController {
         String prefixOutPutFile = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "_";
 
         Map<String, String> map = new HashMap<>();
-        map.put("departmentName", departmentModel == null ? " " : departmentModel.getName());
-        map.put("departmentAddress", departmentModel == null ? " " : departmentModel.getAddress());
         map.put("day", arrDate[0]);
         map.put("month", arrDate[1]);
         map.put("year", arrDate[2]);
         map.put("strDate", CommonUtils.convertDateToString(warehouseCardModel.getDateCreated()));
         map.put("supplies", suppliesModel.getCode() + " - " + suppliesModel.getName());
-        map.put("unitName", unitModel == null ? " " : unitModel.getName());
+        map.put("unitName", category == null ? " " : category.getName());
         map.put("warehouseCardCode", warehouseCardModel.getCode());
 
         try (InputStream is = new FileInputStream(fileDocx);

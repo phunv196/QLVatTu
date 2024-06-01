@@ -7,12 +7,10 @@ import com.app.dao.base.ImportFileExcell;
 import com.app.dao.base.converter.DynamicExport;
 import com.app.model.BaseResponse;
 import com.app.model.ExportModel;
-import com.app.model.species.SpeciesModel;
+import com.app.model.category.CategoryModel;
 import com.app.model.supplier.SupplierModel;
 import com.app.model.supplies.SuppliesModel;
 import com.app.model.supplies.SuppliesModel.SuppliesResponse;
-import com.app.model.quality.QualityModel;
-import com.app.model.unit.UnitModel;
 import com.app.util.Constants;
 import com.app.util.TemplateResouces;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,10 +45,8 @@ import static com.app.util.Constants.COMMON.FOLDER_IMPORT;
 public class SuppliesController extends BaseController {
 
     SuppliesDao suppliesDao = new SuppliesDao();
-    SpeciesDao speciesDao = new SpeciesDao();
-    QualityDao qualityDao = new QualityDao();
+    CategoryDao categoryDao = new CategoryDao();
     SupplierDao supplierDao = new SupplierDao();
-    UnitDao unitDao = new UnitDao();
 
     @GET
     @Path("{suppliesId}")
@@ -77,11 +73,11 @@ public class SuppliesController extends BaseController {
             @Parameter(description = "Order Id") @QueryParam("searchCode") String searchCode,
             @Parameter(description = "Order Id") @QueryParam("searchName") String searchName,
             @Parameter(description = "Order Id") @QueryParam("searchSupplier") Long searchSupplier,
-            @Parameter(description = "Order Id") @QueryParam("searchSpecies") Long searchSpecies,
+            @Parameter(description = "Order Id") @QueryParam("searchSpecies") String searchSpecies,
             @Parameter(description = "Order Id") @QueryParam("searchFormPrice") Long searchFormPrice,
             @Parameter(description = "Order Id") @QueryParam("searchToPrice") Long searchToPrice,
-            @Parameter(description = "Order Id") @QueryParam("searchQuality") Long searchQuality,
-            @Parameter(description = "Order Id") @QueryParam("searchUnit") Long searchUnit,
+            @Parameter(description = "Order Id") @QueryParam("searchQuality") String searchQuality,
+            @Parameter(description = "Order Id") @QueryParam("searchUnit") String searchUnit,
             @Parameter(description = "Page No, Starts from 1 ", example = "1") @DefaultValue("1") @QueryParam("page") int page,
             @Parameter(description = "Items in each page", example = "20") @DefaultValue("10") @QueryParam("page-size") int pageSize
     ) {
@@ -93,20 +89,11 @@ public class SuppliesController extends BaseController {
         if (searchSupplier == null) {
             searchSupplier = 0l;
         }
-        if (searchSpecies == null) {
-            searchSpecies = 0l;
-        }
-        if (searchQuality == null) {
-            searchQuality = 0l;
-        }
         if (searchFormPrice == null) {
             searchFormPrice = 0l;
         }
         if (searchToPrice == null) {
             searchToPrice = 0l;
-        }
-        if (searchUnit == null) {
-            searchUnit = 0l;
         }
         List<SuppliesModel> modelList = suppliesDao.getList(page, pageSize, suppliesId, searchCode, searchName,
                 searchSupplier, searchSpecies, searchFormPrice, searchToPrice, searchQuality, searchUnit);
@@ -146,11 +133,12 @@ public class SuppliesController extends BaseController {
             responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = SuppliesResponse.class)))}
     )
     public Response getByWarehouseId(
-            @Parameter(description="warehouse Id", example="601") @PathParam("warehouseId") Long warehouseId
+            @Parameter(description="warehouse Id", example="601") @PathParam("warehouseId") Long warehouseId,
+            @Parameter(description = "Order Id") @QueryParam("suppliesId") Long suppliesId
     ) {
 //        Criteria criteria = suppliesDao.createCriteria(SuppliesModel.class);
 //        criteria.setProjection(null);
-        List<SuppliesModel> suppliesList = suppliesDao.getByWarehouseId(warehouseId);
+        List<SuppliesModel> suppliesList = suppliesDao.getByWarehouseId(warehouseId, suppliesId);
         SuppliesResponse resp = new SuppliesResponse();
         resp.setList(suppliesList);
         resp.setSuccessMessage("List of suppliess");
@@ -308,9 +296,9 @@ public class SuppliesController extends BaseController {
         String fileName = "BM_Nhap_Moi_Vat_Tu.xls";
         DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_IMPORT_EXCELL + fileName), 6, false);
         dynamicExport.setActiveSheet(1);
-        List<SpeciesModel> listSpeciesModel = speciesDao.getAll(SpeciesModel.class, "speciesId");
+        List<CategoryModel> listSpeciesModel = categoryDao.getByParentCode("TYPE");
         int rows = 2;
-        for (SpeciesModel model : listSpeciesModel) {
+        for (CategoryModel model : listSpeciesModel) {
             dynamicExport.setEntry(String.valueOf(rows-1), 0, rows);
             dynamicExport.setText(model.getCode(), 1, rows);
             dynamicExport.setText(model.getName(), 2, rows);
@@ -318,9 +306,9 @@ public class SuppliesController extends BaseController {
         }
         dynamicExport.setCellFormat(0, 0, rows-1, 2, DynamicExport.BORDER_FORMAT);
 
-        List<QualityModel> listQualityModel = qualityDao.getAll(QualityModel.class, "qualityId");
+        List<CategoryModel> listQualityModel = categoryDao.getByParentCode("QUALITY");
         rows = 2;
-        for (QualityModel model : listQualityModel) {
+        for (CategoryModel model : listQualityModel) {
             dynamicExport.setEntry(String.valueOf(rows-1), 4, rows);
             dynamicExport.setText(model.getCode(), 5, rows);
             dynamicExport.setText(model.getName(), 6, rows);
@@ -338,9 +326,9 @@ public class SuppliesController extends BaseController {
         }
         dynamicExport.setCellFormat(0, 8, rows-1, 10, DynamicExport.BORDER_FORMAT);
 
-        List<UnitModel> listUnitModel = unitDao.getAll(UnitModel.class, "unitId");
+        List<CategoryModel> listUnitModel = categoryDao.getByParentCode("UNIT");
         rows = 2;
-        for (UnitModel model : listUnitModel) {
+        for (CategoryModel model : listUnitModel) {
             dynamicExport.setEntry(String.valueOf(rows-1), 12, rows);
             dynamicExport.setText(model.getCode(), 13, rows);
             dynamicExport.setText(model.getName(), 14, rows);
@@ -377,20 +365,29 @@ public class SuppliesController extends BaseController {
         suppliesModelList.forEach(element -> {
             suppliesCodes.add(element.getCode());
         });
-        List<SpeciesModel> listSpeciesModel = speciesDao.getAll(SpeciesModel.class, "speciesId");
-        Map<String, Long> mapSpecies = new HashMap<>();
+        List<CategoryModel> listSpeciesModel = categoryDao.getByParentCode("TYPE");
+        Map<String, String> mapSpecies = new HashMap<>();
         listSpeciesModel.forEach(element -> {
             if(!CommonUtils.isNullOrEmpty(element.getCode())){
-                mapSpecies.put(element.getCode().toLowerCase(), element.getSpeciesId());
+                mapSpecies.put(element.getCode().toLowerCase(), element.getCode());
             }
         });
-        List<QualityModel> listQualityModel = qualityDao.getAll(QualityModel.class, "qualityId");
-        Map<String, Long> mapQuality = new HashMap<>();
+        List<CategoryModel> listQualityModel = categoryDao.getByParentCode("QUALITY");
+        Map<String, String> mapQuality = new HashMap<>();
         listQualityModel.forEach(element -> {
             if(!CommonUtils.isNullOrEmpty(element.getCode())){
-                mapQuality.put(element.getCode().toLowerCase(), element.getQualityId());
+                mapQuality.put(element.getCode().toLowerCase(), element.getCode());
             }
         });
+
+        List<CategoryModel> listUnitModel = categoryDao.getByParentCode("UNIT");
+        Map<String, String> mapUnit = new HashMap<>();
+        listUnitModel.forEach(element -> {
+            mapUnit.put(element.getCode().toLowerCase(), element.getCode());
+            if(!CommonUtils.isNullOrEmpty(element.getCode())){
+            }
+        });
+
         List<SupplierModel> listSupplierModel = supplierDao.getAll(SupplierModel.class, "supplierId");
         Map<String, Long> mapSupplier = new HashMap<>();
         listSupplierModel.forEach(element -> {
@@ -398,15 +395,6 @@ public class SuppliesController extends BaseController {
                 mapSupplier.put(element.getCode().toLowerCase(), element.getSupplierId());
             }
         });
-
-        List<UnitModel> listUnitModel = supplierDao.getAll(UnitModel.class, "unitId");
-        Map<String, Long> mapUnit = new HashMap<>();
-        listUnitModel.forEach(element -> {
-            mapUnit.put(element.getCode().toLowerCase(), element.getUnitId());
-            if(!CommonUtils.isNullOrEmpty(element.getCode())){
-            }
-        });
-
         List<ImportFileExcell.ImportErrorBean> errorList = new ArrayList<>();
         try {
             byte[] decodedBytes = Base64.getDecoder().decode(model.getData());

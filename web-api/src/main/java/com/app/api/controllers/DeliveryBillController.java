@@ -1,20 +1,21 @@
 package com.app.api.controllers;
 
 import com.app.api.BaseController;
+import com.app.dao.*;
 import com.app.dao.base.CommonUtils;
 import com.app.dao.base.converter.DynamicExport;
-import com.app.dao.DeliveryBillDao;
-import com.app.dao.DeliveryBillFlowDao;
-import com.app.dao.FactoryDao;
-import com.app.dao.WarehouseDao;
 import com.app.model.BaseResponse;
 import com.app.model.ExportModel;
 import com.app.model.delivery.DeliveryBillFlowModel;
 import com.app.model.delivery.DeliveryBillModel;
 import com.app.model.delivery.DeliveryBillModel.DeliveryBillResponse;
 import com.app.model.factory.FactoryModel;
+import com.app.model.receipt.ReceiptFlowModel;
+import com.app.model.supplies.SuppliesModel;
 import com.app.model.warehouse.WarehouseModel;
 import com.app.model.user.UserModel;
+import com.app.model.warehouseCard.WarehouseCardFlowModel;
+import com.app.model.warehouseCard.WarehouseCardModel;
 import com.app.util.TemplateResouces;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -38,6 +39,8 @@ import java.io.*;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.app.util.Constants.COMMON.*;
 
@@ -49,6 +52,12 @@ public class DeliveryBillController extends BaseController {
     DeliveryBillDao deliveryBillDao = new DeliveryBillDao();
     DeliveryBillFlowDao deliveryBillFlowDao = new DeliveryBillFlowDao();
     WarehouseDao warehouseDao = new WarehouseDao();
+
+    WarehouseCardController warehouseCardController = new WarehouseCardController();
+    WarehouseCardDao warehouseCardDao = new WarehouseCardDao();
+    WarehouseCardFlowController warehouseCardFlowController = new WarehouseCardFlowController();
+    WarehouseCardFlowDao warehouseCardFlowDao = new WarehouseCardFlowDao();
+    SuppliesDao suppliesDao = new SuppliesDao();
     FactoryDao factoryDao = new FactoryDao();
 
     @GET
@@ -138,14 +147,104 @@ public class DeliveryBillController extends BaseController {
         try {
             UserModel userFromToken = (UserModel)securityContext.getUserPrincipal();
             deliveryBill.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
+            deliveryBill.setCode(String.format("PX-%s-%s", CommonUtils.convertDateToString(deliveryBill.getDateDeliveryBill()), deliveryBillDao.getSequence().toString()));
             deliveryBillDao.beginTransaction();
             deliveryBillDao.save(deliveryBill);
+
+            Criteria criteriaS = suppliesDao.createCriteria(SuppliesModel.class);
+            criteriaS.setProjection(null);
+            List<SuppliesModel> suppliesList = criteriaS.list();
+            Map<Long, SuppliesModel> mapS = suppliesList.stream().collect(Collectors.toMap(SuppliesModel::getSuppliesId, Function.identity()));
+
+            Criteria criteriaW = warehouseDao.createCriteria(WarehouseModel.class);
+            criteriaW.setProjection(null);
+            List<WarehouseModel> warehouseModels = criteriaW.list();
+            Map<Long, WarehouseModel> mapW = warehouseModels.stream().collect(Collectors.toMap(WarehouseModel::getWarehouseId, Function.identity()));
+
+            List<DeliveryBillFlowModel> deliveryBillFlowModels = deliveryBillFlowDao.getByDeliveryBillId(deliveryBill.getDeliveryBillId());
+            List<WarehouseCardFlowModel> cardFlowModelList = new ArrayList<>();
+            List<WarehouseCardModel> cardModelList = new ArrayList<>();
+            List<SuppliesModel> suppliesListSave = new ArrayList<>();
+            Long warehouseCardId = warehouseCardDao.getSequence();
+            Long i = 0L;
+            for (DeliveryBillFlowModel deliveryBillFlowModel : deliveryBillFlowModels) {
+                WarehouseCardModel cardModel = new WarehouseCardModel();
+                cardModel.setWarehouseId(deliveryBill.getWarehouseId());
+                cardModel.setSuppliesId(deliveryBillFlowModel.getSuppliesId());
+                try {
+                    cardModel.setDateCreated(CommonUtils.convertStringToDateBasic(CommonUtils.convertDateToString(deliveryBill.getDateDeliveryBill())));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    WarehouseCardModel warehouseCardModel = warehouseCardController.getByCodeInsert(cardModel);
+                    if (warehouseCardModel == null) {
+                        WarehouseCardModel suppliesTop1 = warehouseCardController.getSuppliesIdTop1(deliveryBill.getWarehouseId(), deliveryBillFlowModel.getSuppliesId());
+
+                        WarehouseCardModel cardModelAdd = new WarehouseCardModel();
+                        cardModelAdd.setDateCreated(CommonUtils.convertStringToDateBasic(CommonUtils.convertDateToString(deliveryBill.getDateDeliveryBill())));
+                        cardModelAdd.setCode(String.format("TK-%s-%s-%s",CommonUtils.convertDateToString(deliveryBill.getDateDeliveryBill()), mapW.get(deliveryBill.getWarehouseId()).getCode(), mapS.get(deliveryBillFlowModel.getSuppliesId()).getCode()));
+                        cardModelAdd.setName(String.format("Thẻ kho: %s - %s",mapW.get(deliveryBill.getWarehouseId()).getName(), mapS.get(deliveryBillFlowModel.getSuppliesId()).getName()));
+                        cardModelAdd.setSuppliesId(deliveryBillFlowModel.getSuppliesId());
+                        cardModelAdd.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
+                        cardModelAdd.setWarehouseCardId(warehouseCardId + i++);
+                        cardModelAdd.setWarehouseId(deliveryBill.getWarehouseId());
+                        cardModelAdd.setInventory(suppliesTop1.getInventory() - deliveryBillFlowModel.getAmount());
+                        cardModelList.add(cardModelAdd);
+                        WarehouseCardFlowModel warehouseCardFlowModel = new WarehouseCardFlowModel();
+                        warehouseCardFlowModel.setWarehouseCardId(cardModelAdd.getWarehouseCardId());
+                        warehouseCardFlowModel.setType(1L);
+                        warehouseCardFlowModel.setCreateAt(new Date());
+                        warehouseCardFlowModel.setDeliveryBillId(deliveryBill.getDeliveryBillId());
+                        warehouseCardFlowModel.setAmount(deliveryBillFlowModel.getAmount());
+                        cardFlowModelList.add(warehouseCardFlowModel);
+                        SuppliesModel suppliesModel = mapS.get(deliveryBillFlowModel.getSuppliesId());
+                        suppliesModel.setInventory(suppliesModel.getInventory() != null ? suppliesModel.getInventory() - deliveryBillFlowModel.getAmount() : deliveryBillFlowModel.getAmount());
+                        suppliesListSave.add(suppliesModel);
+                    } else {
+                        warehouseCardModel.setInventory(warehouseCardModel.getInventory() - deliveryBillFlowModel.getAmount());
+                        SuppliesModel suppliesModel = mapS.get(deliveryBillFlowModel.getSuppliesId());
+                        suppliesModel.setInventory(suppliesModel.getInventory() != null ? suppliesModel.getInventory() - deliveryBillFlowModel.getAmount() : deliveryBillFlowModel.getAmount());
+                        suppliesListSave.add(suppliesModel);
+                        cardModelList.add(warehouseCardModel);
+                        WarehouseCardFlowModel warehouseCardFlowModel = new WarehouseCardFlowModel();
+                        warehouseCardFlowModel.setWarehouseCardId(warehouseCardModel.getWarehouseCardId());
+                        warehouseCardFlowModel.setType(1L);
+                        warehouseCardFlowModel.setCreateAt(new Date());
+                        warehouseCardFlowModel.setDeliveryBillId(deliveryBill.getDeliveryBillId());
+                        warehouseCardFlowModel.setAmount(deliveryBillFlowModel.getAmount());
+                        cardFlowModelList.add(warehouseCardFlowModel);
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+
+            };
+            deliveryBillDao.commitTransaction();
+            suppliesListSave.forEach(suppliesModel -> {
+                suppliesDao.beginTransaction();
+                suppliesDao.saveOrUpdate(suppliesModel);
+                suppliesDao.commitTransaction();
+            });
+            cardModelList.forEach(warehouseCardModel -> {
+                warehouseCardDao.beginTransaction();
+                warehouseCardDao.saveOrUpdate(warehouseCardModel);
+                warehouseCardDao.commitTransaction();
+            });
+            cardFlowModelList.forEach(warehouseCardFlowModel -> {
+                warehouseCardFlowDao.beginTransaction();
+                warehouseCardFlowDao.saveOrUpdate(warehouseCardFlowModel);
+                warehouseCardFlowDao.commitTransaction();
+            });
+
             deliveryBillDao.commitTransaction();
             resp.setSuccessMessage(String.format("DeliveryBill Added - New DeliveryBill ID : %s ", deliveryBill.getDeliveryBillId()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
             resp.setErrorMessage("Lỗi xảy ra - " + e.getMessage() + ", " + (e.getCause() != null ? e.getCause().getMessage() : ""));
             return Response.ok(resp).build();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -242,7 +341,7 @@ public class DeliveryBillController extends BaseController {
     @DELETE
     @Path("delete_by_id/{deliveryBillId}")
     @RolesAllowed({"ADMIN", "SUPPORT"})
-    public void deleteByRreceiptId(@Parameter(description = "Receipt Id", example = "601") @PathParam("deliveryBillId") Long deliveryBillId) {
+    public void deleteByRreceiptId(@Parameter(description = "DeliveryBill Id", example = "601") @PathParam("deliveryBillId") Long deliveryBillId) {
         deliveryBillId = deliveryBillId == null ? 0 : deliveryBillId;
         deliveryBillFlowDao.beginTransaction();
         deliveryBillFlowDao.deleteByDeliveryBillId(deliveryBillId);

@@ -49,7 +49,7 @@ public class BaseHibernateDAO {
 
     //<editor-fold defaultstate="collapsed" desc="Cac phuong thuc co ban">
     public Session getSession() throws HibernateException {
-        if (session == null) {
+        if (session == null || !session.isOpen()) {
             session = (Session) sessionFactory.openSession();
         }
         return session;

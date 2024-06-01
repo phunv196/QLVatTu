@@ -34,6 +34,7 @@ public class DeliveryBillFlowController extends BaseController {
 
     DeliveryBillFlowDao deliveryBillFlowDao = new DeliveryBillFlowDao();
     DeliveryBillDao deliveryBillDao = new DeliveryBillDao();
+    WarehouseCardController warehouseCardController = new WarehouseCardController();
 
     @GET
     @RolesAllowed({"ADMIN", "SUPPORT"})
@@ -77,6 +78,9 @@ public class DeliveryBillFlowController extends BaseController {
             deliveryBillFlowDao.beginTransaction();
             deliveryBillFlowDao.save(deliveryBillFlow);
             deliveryBillFlowDao.commitTransaction();
+            if(deliveryBillDao.getById(deliveryBillFlow.getDeliveryBillId()) != null) {
+                warehouseCardController.createWarehouseCardByDeliveryBillId(deliveryBillFlow);
+            }
             resp.setSuccessMessage(String.format("DeliveryBillFlow Added - New DeliveryBillFlow ID : %s ", deliveryBillFlow.getDeliveryBillFlowId()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
@@ -96,16 +100,21 @@ public class DeliveryBillFlowController extends BaseController {
         try {
             DeliveryBillFlowModel foundProd  = deliveryBillFlowDao.getById(deliveryBillFlow.getDeliveryBillFlowId());
             if (foundProd != null) {
+                DeliveryBillFlowModel model = new DeliveryBillFlowModel();
+                model.setAmount(foundProd.getAmount());
                 deliveryBillFlowDao.beginTransaction();
                 deliveryBillFlowDao.update(deliveryBillFlow);
                 deliveryBillFlowDao.commitTransaction();
+                if(deliveryBillDao.getById(deliveryBillFlow.getDeliveryBillId()) != null) {
+                    warehouseCardController.updateWarehouseCardByDeliveryBillId(deliveryBillFlow, model.getAmount());
+                }
                 resp.setSuccessMessage(String.format("DeliveryBillFlow Updated (getDeliveryBillFlowId:%s)", deliveryBillFlow.getDeliveryBillFlowId()));
                 return Response.ok(resp).build();
             } else {
                 resp.setErrorMessage(String.format("Sửa bản ghi thất bại (id:%s)", deliveryBillFlow.getDeliveryBillFlowId()));
                 return Response.ok(resp).build();
             }
-        } catch (HibernateException | ConstraintViolationException e) {
+        } catch (Exception e) {
             resp.setErrorMessage("Không thể sửa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }

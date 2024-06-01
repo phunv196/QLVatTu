@@ -2,7 +2,6 @@ package com.app.dao;
 
 import com.app.dao.base.BaseHibernateDAO;
 import com.app.model.receipt.ReceiptFlowModel;
-import com.app.model.unit.UnitModel;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -80,8 +79,8 @@ public class ReceiptFlowDao extends BaseHibernateDAO {
                 " from receipt_flow rf " +
                 " left join supplies s on s.supplies_id = rf.supplies_id" +
                 " left join supplier sr on sr.supplier_id = s.supplier_id" +
-                " left join unit u on u.unit_id = s.unit_id" +
-                " left join species sp on sp.species_id = s.species_id" +
+                " left join category u on u.code = s.unit_id" +
+                " left join category sp on sp.code = s.species_id" +
                 " where rf.receipt_id = :receiptId";
         finalSql = finalSql +" order by rf.receipt_flow_id "+ sqlLimit;
         SQLQuery q = createSQLQuery(finalSql);
@@ -111,8 +110,8 @@ public class ReceiptFlowDao extends BaseHibernateDAO {
                 " from receipt_flow rf " +
                 " left join supplies s on s.supplies_id = rf.supplies_id" +
                 " left join supplier sr on sr.supplier_id = s.supplier_id" +
-                " left join unit u on u.unit_id = s.unit_id" +
-                " left join species sp on sp.species_id = s.species_id" +
+                " left join category u on u.code = s.unit_id" +
+                " left join category sp on sp.code = s.species_id" +
                 " where rf.receipt_id = :receiptId";
         SQLQuery q = createSQLQuery(finalSql);
         q.setParameter("receiptId", receiptId);

@@ -18,7 +18,7 @@
       ></WarehouseCardDetails>
     </Sidebar>
     <h3>Quản lý thẻ kho</h3>
-    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1500px">
+    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1550px">
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
@@ -129,6 +129,7 @@
           placeholder="--Hãy chọn--"
         />
       </div>
+      <div style="width: 279px"></div>
     </div>
     <div
       class="p-d-flex p-flex-row p-mb-3 p-jc-center"
@@ -148,13 +149,13 @@
         @click="onSearchKeyup()"
         class="p-ml-1 p-button-sm"
       ></Button>
-      <Button
-        icon="pi pi-user"
-        iconPos="right"
-        label="ADD"
-        @click="onAddClick()"
-        class="p-ml-1 p-button-sm"
-      ></Button>
+<!--      <Button-->
+<!--        icon="pi pi-user"-->
+<!--        iconPos="right"-->
+<!--        label="ADD"-->
+<!--        @click="onAddClick()"-->
+<!--        class="p-ml-1 p-button-sm"-->
+<!--      ></Button>-->
     </div>
     <DataTable
       :value="list"
@@ -166,13 +167,13 @@
       stripedRows showGridlines
       @page="onPageChange($event)"
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4"
-      style="width: 1500px; line-height: 1.3rem; word-wrap: break-word;"
+      style="width: 1550px; line-height: 1.3rem; word-wrap: break-word;"
     >
-      <Column field="index" header="STT" headerStyle="width:70px;" bodyStyle="text-align-last: center;"></Column>
+      <Column field="index" header="STT" headerStyle="width:50px;" bodyStyle="text-align-last: center;"></Column>
       <Column
         field="code"
         header="Mã thẻ kho"
-        headerStyle="width:70px"
+        headerStyle="width:150px"
       ></Column>
       <Column
         field="name"
@@ -236,12 +237,12 @@
             @click="onEditClick(slotProps.data)"
             class="p-button-sm p-button-rounded p-button-secondary p-button-text"
           />
-          <Button
-            v-if="$store.getters.role === 'ADMIN'"
-            icon="pi pi-trash"
-            @click="onDeleteClick(slotProps.data)"
-            class="p-button-sm p-button-rounded p-button-danger p-button-text"
-          />
+<!--          <Button-->
+<!--            v-if="$store.getters.role === 'ADMIN'"-->
+<!--            icon="pi pi-trash"-->
+<!--            @click="onDeleteClick(slotProps.data)"-->
+<!--            class="p-button-sm p-button-rounded p-button-danger p-button-text"-->
+<!--          />-->
           <Button
             icon="pi pi-book"
             @click="onDownloadFileDocx(slotProps.data)"
@@ -288,9 +289,9 @@ export default defineComponent({
     let searchToDate = ref("");
     let searchName = ref("");
     let searchCode = ref("");
-    let searchEmployee = ref("");
-    let searchWarehouse = ref("");
-    let searchSupplies = ref("");
+    let searchEmployee = ref(null);
+    let searchWarehouse = ref(null);
+    let searchSupplies = ref(null);
 
     const getData = async (
       page: number,
@@ -304,9 +305,9 @@ export default defineComponent({
       searchToDate = "",
       searchSupplies = ""
     ) => {
-      searchEmployee = searchEmployee === "null" ? "0" : searchEmployee;
-      searchWarehouse = searchWarehouse === "null" ? "0" : searchWarehouse;
-      searchSupplies = searchSupplies === "null" ? "0" : searchSupplies;
+      searchEmployee = searchEmployee === "null" ? "" : searchEmployee;
+      searchWarehouse = searchWarehouse === "null" ? "" : searchWarehouse;
+      searchSupplies = searchSupplies === "null" ? "" : searchSupplies;
       try {
         const resp = await WarehouseCardApi.getWarehouseCards(
           page,

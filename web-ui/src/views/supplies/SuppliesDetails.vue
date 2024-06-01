@@ -45,7 +45,7 @@
           :filter="true"
           :showClear="true"
           optionLabel="name"
-          optionValue="speciesId"
+          optionValue="code"
           placeholder="--Hãy chọn--"
         />
         <label class="p-d-inline-block m-label-size-2 p-text-left p-mr-1 p-ml-5"
@@ -59,7 +59,7 @@
           :filter="true"
           :showClear="true"
           optionLabel="name"
-          optionValue="qualityId"
+          optionValue="code"
           placeholder="--Hãy chọn--"
         />
       </div>
@@ -89,7 +89,7 @@
           :filter="true"
           :showClear="true"
           optionLabel="name"
-          optionValue="unitId"
+          optionValue="code"
           placeholder="--Hãy chọn--"
         />
       </div>
@@ -148,9 +148,7 @@ import { defineComponent, ref, onMounted } from "vue";
 import SuppliesApi from "@/api/supplies-api";
 import { useToast } from "primevue/usetoast";
 import SupplierApi from "@/api/supplier-api";
-import QualityApi from "@/api/quality-api";
-import SpeciesApi from "@/api/species-api";
-import unitApi from "@/api/unit-api";
+import CategoryApi from "@/api/category-api";
 
 export default defineComponent({
   props: {
@@ -260,7 +258,7 @@ export default defineComponent({
     };
 
     const lstQuality = async () => {
-      const resp = await QualityApi.getAll();
+      const resp = await CategoryApi.getListByParentCode('QUALITY');
       let lstQualitys = [];
       if (resp.data) {
         lstQualitys = resp.data.list;
@@ -269,7 +267,7 @@ export default defineComponent({
     };
 
     const lstUnit = async () => {
-      const resp = await unitApi.getAll();
+      const resp = await CategoryApi.getListByParentCode('UNIT');
       let lstUnits = [];
       if (resp.data) {
         lstUnits = resp.data.list;
@@ -278,7 +276,7 @@ export default defineComponent({
     };
 
     const lstSpecies = async () => {
-      const resp = await SpeciesApi.getAll();
+      const resp = await CategoryApi.getListByParentCode('TYPE');
       let lstSpeciess = [];
       if (resp.data) {
         lstSpeciess = resp.data.list;

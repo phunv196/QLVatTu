@@ -34,8 +34,17 @@ public class FactoryModel {
     private String toSuccessDate;
     @Transient
     private String employeeName;
+    @Transient
+    private Date dateDeliveryBill;
 
-    //Getters and Setters
+    public Date getDateDeliveryBill() {
+        return dateDeliveryBill;
+    }
+
+    public void setDateDeliveryBill(Date dateDeliveryBill) {
+        this.dateDeliveryBill = dateDeliveryBill;
+    }
+//Getters and Setters
 
 
     public String getFormDate() {

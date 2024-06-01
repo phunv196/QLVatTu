@@ -81,24 +81,6 @@
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
           style="padding-top: 7px"
-          >Phòng ban
-        </label>
-        <Dropdown
-          class="p-inputtext-sm"
-          style="width: 200px"
-          v-model="searchDepartment"
-          :options="department"
-          :filter="true"
-          :showClear="true"
-          optionLabel="name"
-          optionValue="departmentId"
-          placeholder="--Hãy chọn--"
-        />
-      </div>
-      <div>
-        <label
-          class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
-          style="padding-top: 7px"
           >Chức vụ
         </label>
         <Dropdown
@@ -109,7 +91,7 @@
           :filter="true"
           :showClear="true"
           optionLabel="name"
-          optionValue="positionId"
+          optionValue="code"
           placeholder="--Hãy chọn--"
         />
       </div>
@@ -182,11 +164,6 @@
       <Column field="phone" header="Điện thoại" headerStyle="width:150px;" bodyStyle="text-align-last: center;"></Column>
       <Column field="email" header="EMAIL" headerStyle="width:210px"></Column>
       <Column
-        field="departmentName"
-        header="Phòng ban"
-        headerStyle="width:160px"
-      ></Column>
-      <Column
         field="positionName"
         header="Chức vụ"
         headerStyle="width:160px"
@@ -223,9 +200,8 @@ import EmployeeApi from "@/api/employee-api"; // eslint-disable-line import/no-c
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import { debounce, exportFile } from "@/shared/utils";
-import positionApi from "@/api/position-api";
-import departmentApi from "@/api/department-api";
 import employeeApi from "@/api/employee-api";
+import CategoryApi from "@/api/category-api";
 
 export default defineComponent({
   setup(): unknown {
@@ -243,13 +219,11 @@ export default defineComponent({
     const toast = useToast();
     let currentPage = 1;
     const position = ref([]);
-    const department = ref([]);
     const searchName = ref("");
     const searchCode = ref("");
     const searchEmail = ref("");
     const searchPhone = ref("");
-    const searchDepartment = ref("");
-    const searchPosition = ref("");
+    const searchPosition = ref(null);
 
     const getData = async (
       page: number,
@@ -259,12 +233,10 @@ export default defineComponent({
       searchName = "",
       searchEmail = "",
       searchPhone = "",
-      searchDepartment = "",
       searchPosition = ""
     ) => {
       // isLoading.value = true;
-      searchDepartment = searchDepartment === "null" ? "0" : searchDepartment;
-      searchPosition = searchPosition === "null" ? "0" : searchPosition;
+      searchPosition = searchPosition === "null" ? "" : searchPosition;
       try {
         const resp = await EmployeeApi.getEmployees(
           page,
@@ -274,7 +246,6 @@ export default defineComponent({
           searchName,
           searchEmail,
           searchPhone,
-          searchDepartment,
           searchPosition
         );
         let i = 1;
@@ -362,7 +333,6 @@ export default defineComponent({
           `${searchName.value}`,
           `${searchEmail.value}`,
           `${searchPhone.value}`,
-          `${searchDepartment.value}`,
           `${searchPosition.value}`
         );
       }
@@ -378,7 +348,6 @@ export default defineComponent({
           `${searchName.value}`,
           `${searchEmail.value}`,
           `${searchPhone.value}`,
-          `${searchDepartment.value}`,
           `${searchPosition.value}`
         ),
       400
@@ -402,25 +371,15 @@ export default defineComponent({
     onMounted(async () => {
       getData(1, pageSize.value);
       await lstPosition();
-      await lstDepartment();
     });
 
     const lstPosition = async () => {
-      const resp = await positionApi.getAll();
+      const resp = await CategoryApi.getListByParentCode('POSITION');
       let lstPositions = [];
       if (resp.data) {
         lstPositions = resp.data.list;
       }
       position.value = lstPositions;
-    };
-
-    const lstDepartment = async () => {
-      const resp = await departmentApi.getAll();
-      let lstDepartments = [];
-      if (resp.data) {
-        lstDepartments = resp.data.list;
-      }
-      department.value = lstDepartments;
     };
 
     const exportExcell = async () => {
@@ -430,7 +389,6 @@ export default defineComponent({
           `${searchName.value}`,
           `${searchEmail.value}`,
           `${searchPhone.value}`,
-          `${searchDepartment.value}`,
           `${searchPosition.value}`
         )
         .then((res) => {
@@ -461,12 +419,10 @@ export default defineComponent({
       onPageChange,
       getData,
       position,
-      department,
       searchName,
       searchCode,
       searchEmail,
       searchPhone,
-      searchDepartment,
       searchPosition,
       exportExcell,
       showImport,

@@ -21,6 +21,15 @@ public class WarehouseCardModel {
     @Column(name = "supplies_id")      private Long  suppliesId;
     @Column(name = "description")       private String  description;
     @Column(name = "employee_id")       private Long  employeeId;
+    @Column(name = "inventory")       private Long  inventory;
+
+    public Long getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(Long inventory) {
+        this.inventory = inventory;
+    }
 
     //Getters and Setters
     @Transient

@@ -41,6 +41,7 @@
           class="p-inputtext-sm"
           style="width: 40%"
         />
+        {{maxAmount}}
       </div>
       <div class="p-mt-3 p-d-flex p-ai-center">
         <label class="p-d-inline-block m-label-size-3 p-text-left p-mr-1">
@@ -70,7 +71,7 @@
           @click="$emit('cancel')"
           class="p-button-sm p-button-outlined p-mr-1"
         ></Button>
-        <Button
+        <Button v-if="!isShowDetailTemp"
           icon="pi pi-check"
           iconPos="left"
           label="APPLY CHANGES"
@@ -95,6 +96,7 @@ export default defineComponent({
       required: true,
     },
     arrSupplies: [],
+    isShowDetail: {},
   },
 
   setup(props, { emit }): unknown {
@@ -102,6 +104,7 @@ export default defineComponent({
     const showMessage = ref(false);
     const userMessage = ref("");
     const changesApplied = ref(false);
+    const isShowDetailTemp = JSON.parse(JSON.stringify(props.isShowDetail)).isShowDetail;
     const recData = ref(JSON.parse(JSON.stringify(props.rec))); // do not create direct refs to props to avoid making changes to props, instead use a cloned value of prop
     const maxAmount = ref("");
     const onApplyChanges = async () => {
@@ -125,8 +128,8 @@ export default defineComponent({
       } else {
         const check = await DeliveryBillFlowApi.getCheckDeliveryBillFlow(
           rawDeliveryBillFlowObj.deliveryBillId,
-          rawDeliveryBillFlowObj.suppliesId,
-          rawDeliveryBillFlowObj.deliveryBillFlowId
+          rawDeliveryBillFlowObj.deliveryBillFlowId,
+          rawDeliveryBillFlowObj.suppliesId
         );
         if (check.data) {
           userMessage.value = "Danh sách vật tư nhập không được trùng!";
@@ -203,6 +206,7 @@ export default defineComponent({
 
     return {
       showMessage,
+      isShowDetailTemp,
       userMessage,
       changesApplied,
       recData,

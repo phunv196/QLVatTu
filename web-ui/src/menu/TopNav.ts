@@ -16,34 +16,8 @@ export default {
     {
       id: '1',
       label:'Quản lý danh mục',
-      to: 'home',
+      to: 'category',
       icon:'pi pi-book',
-      items:[
-        {
-          id: '2',
-          label:'Quản lý chất lượng',
-          to: '/home/quality',
-          icon:'pi pi-check-square',
-        },
-        {
-          id: '2',
-          label:'Quản lý danh mục',
-          to: '/home/category',
-          icon:'pi pi-check-square',
-        },
-        {
-          id: '2',
-          label:'Chủng loại',
-          to: '/home/species',
-          icon:'pi pi-tags',
-        },
-        {
-          id: '2',
-          label:'Đơn vị tính',
-          to: '/home/unit',
-          icon:'pi pi-calendar-plus',
-        },
-      ]
     },
     {
       id: '1',
@@ -61,18 +35,6 @@ export default {
           label:'Quản lý nhân viên',
           to: '/home/employees',
           icon:'pi pi-id-card',
-        },
-        {
-          id: '2',
-          label:'Quản lý chức vụ',
-          to: '/home/position',
-          icon:'pi pi-sitemap',
-        },
-        {
-          id: '2',
-          label:'Quản lý phòng ban',
-          to: '/home/department',
-          icon:'pi pi-th-large',
         }
       ]
     },

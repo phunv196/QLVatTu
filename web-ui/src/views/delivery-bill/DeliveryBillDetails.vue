@@ -15,13 +15,14 @@
     <div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-4 p-text-right p-mr-1"
-          >Mã phiếu xuất <strong class="p-error">*</strong>
+          >Mã phiếu xuất
         </label>
         <InputText
           type="text"
           v-model="recData.code"
           class="p-inputtext-sm"
           style="width: 30%"
+          disabled
         />
         <label class="p-d-inline-block m-label-size-4 p-text-right p-mr-1"
           >Tên phiếu xuất <strong class="p-error">*</strong>
@@ -46,7 +47,7 @@
         <Datepicker
           class="p-inputtext-sm"
           style="width: 320px"
-          v-model="recData.dateDeliveryBill"
+          v-model="dateDeliveryBill"
           inputFormat="dd/MM/yyy"
         />
       </div>
@@ -99,6 +100,7 @@
       <DeliveryBillFlow
         :requence="recData.deliveryBillId"
         :warehouseId="recData.warehouseId"
+	      :isShowDetail="isShowDetailTemp"
       ></DeliveryBillFlow>
     </div>
     <!--button-->
@@ -122,6 +124,7 @@
           label="APPLY CHANGES"
           @click="onApplyChanges()"
           class="p-button-sm"
+          v-if="!isShowDetailTemp"
         ></Button>
       </template>
     </div>
@@ -130,10 +133,11 @@
 
 <!--suppress TypeScriptCheckImport -->
 <script lang='ts'>
-import { defineComponent, ref } from "vue";
+import {defineComponent, onMounted, ref, watch} from "vue";
 import DeliveryBillApi from "@/api/delivery-bill-api";
 import { useToast } from "primevue/usetoast";
 import DeliveryBillFlow from "@/views/delivery-bill-flow/DeliveryBillFlow.vue";
+import FactoryApi from "@/api/factory-api";
 
 export default defineComponent({
   props: {
@@ -142,24 +146,28 @@ export default defineComponent({
       required: true,
     },
     arrWarehouse: [],
-    arrFactory: [],
+    isShowDetail: {},
   },
 
   setup(props, { emit }): unknown {
     const toast = useToast();
     const showMessage = ref(false);
     const userMessage = ref("");
+    const dateDeliveryBill = ref(new Date());
     const changesApplied = ref(false);
+    const arrFactory = ref([]);
+    const isShowDetailTemp = JSON.parse(JSON.stringify(props.isShowDetail)).isShowDetail;
     const recData = ref(JSON.parse(JSON.stringify(props.rec))); // do not create direct refs to props to avoid making changes to props, instead use a cloned value of prop
     const onApplyChanges = async () => {
       const rawDeliveryBillObj = JSON.parse(JSON.stringify(recData.value));
       delete rawDeliveryBillObj.index;
       delete rawDeliveryBillObj.strDateDeliveryBill;
+      rawDeliveryBillObj.dateDeliveryBill = dateDeliveryBill.value;
       let msg: any[];
       msg = [];
-      if (!rawDeliveryBillObj.code) {
-        msg.push("mã phiếu xuất");
-      }
+      // if (!rawDeliveryBillObj.code) {
+      //   msg.push("mã phiếu xuất");
+      // }
       if (!rawDeliveryBillObj.name) {
         msg.push("tên phiếu xuất");
       }
@@ -180,16 +188,16 @@ export default defineComponent({
           return (showMessage.value = false);
         }, 2000);
       } else {
-        const check = await DeliveryBillApi.getDeliveryBillByCode(
-          rawDeliveryBillObj
-        );
-        if (check.data) {
-          userMessage.value = "Mã phiếu xuất bị trùng. Vui lòng nhập lại!";
-          showMessage.value = true;
-          setTimeout(() => {
-            return (showMessage.value = false);
-          }, 2000);
-        } else {
+        // const check = await DeliveryBillApi.getDeliveryBillByCode(
+        //   rawDeliveryBillObj
+        // );
+        // if (check.data) {
+        //   userMessage.value = "Mã phiếu xuất bị trùng. Vui lòng nhập lại!";
+        //   showMessage.value = true;
+        //   setTimeout(() => {
+        //     return (showMessage.value = false);
+        //   }, 2000);
+        // } else {
           let resp;
           const checkId = await DeliveryBillApi.checkId(
             rawDeliveryBillObj.deliveryBillId
@@ -223,7 +231,7 @@ export default defineComponent({
               detail: resp.data.msg,
             });
           }
-        }
+      // }
       }
     };
 
@@ -234,20 +242,46 @@ export default defineComponent({
     checkWarehouse.value = recData.value.warehouseId != null ? true : false;
     const change = async () => {
       checkWarehouse.value = false;
-      setTimeout(() => {
-        return (checkWarehouse.value = true);
-      }, 1);
+      if (recData.value.warehouseId) {
+        setTimeout(() => {
+          return (checkWarehouse.value = true);
+        }, 1);
+      }
     };
+
+    onMounted(() => {
+        changeDeliveryBillDate();
+    });
+
+    const changeDeliveryBillDate = async () => {
+      const data = {dateDeliveryBill: dateDeliveryBill.value}
+      const rawDeliveryBillObj = JSON.parse(JSON.stringify(recData.value));
+      const res = !rawDeliveryBillObj.deliveryBillId || !isShowDetailTemp ? await FactoryApi.getByDate(data) : await FactoryApi.getAll();
+      let factoryItem: any;
+      if (res.data.list) {
+        factoryItem = res.data.list;
+      }
+      arrFactory.value = factoryItem;
+    }
+
+    watch(dateDeliveryBill, (newValue, oldValue) => {
+      console.log(newValue);
+    });
+
+
 
     return {
       showMessage,
+      isShowDetailTemp,
       userMessage,
       changesApplied,
       recData,
       onApplyChanges,
+      dateDeliveryBill,
+      arrFactory,
       onCancel,
       change,
-      checkWarehouse,
+      checkWarehouse
     };
   },
   components: {

@@ -29,6 +29,10 @@ export default {
     return api.get(`/categorys/all`);
   },
 
+  async getListByParentCode(parentCode: string): Promise<AxiosResponse> {
+    return api.get(`/categorys/getListByParentCode/${parentCode}`);
+  },
+
   async getListIsNotParentCode(categoryObj?: Record<string, string | number>): Promise<AxiosResponse> {
     return api.get(`/categorys/getListIsNotParentCode`, {params: categoryObj});
   },

@@ -13,12 +13,12 @@
         @cancel="showSlideOut = false; getData()"
         @changed="getData()"
         :arrWarehouse="arrWarehouse"
-        :arrFactory="arrFactory"
+        :isShowDetail="isShowDetail"
         :isNew="isNewRec"
       ></DeliveryBillDetails>
     </Sidebar>
     <h3>Quản lý phiếu xuất kho</h3>
-    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1350px">
+    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1380px">
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
@@ -82,7 +82,7 @@
         />
       </div>
     </div>
-    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1350px">
+    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1380px">
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
@@ -141,7 +141,7 @@
     </div>
     <div
       class="p-d-flex p-flex-row p-mb-3 p-jc-center"
-      style="width: 1350px; margin: 20px 0"
+      style="width: 1380px; margin: 20px 0"
     >
       <Button
         icon="pi pi-download"
@@ -176,23 +176,23 @@
       stripedRows showGridlines
       @page="onPageChange($event)"
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4"
-      style="width: 1350px; line-height: 1.3rem; word-wrap: break-word;"
+      style="width: 1380px; line-height: 1.3rem; word-wrap: break-word;"
     >
       <Column
         field="index"
         header="STT"
-        headerStyle="width:90px;"
+        headerStyle="width:50px;"
         bodyStyle="text-align-last: center;"
       ></Column>
       <Column
         field="code"
         header="Mã phiếu xuất"
-        headerStyle="width:90px"
+        headerStyle="width:140px"
       ></Column>
       <Column
         field="name"
         header="Tên phiếu xuất"
-        headerStyle="width:160px"
+        headerStyle="width:180px"
       ></Column>
       <Column
         field="strDateDeliveryBill"
@@ -220,9 +220,9 @@
         header="Tổng giao dịch"
         headerStyle="width:160px"
       ></Column>
-      <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px; text-align: center;">
+      <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px; text-align: center;" >
         <template #body="slotProps">
-          <template  v-if="$store.getters.role === 'ADMIN'">
+          <template  v-if="$store.getters.role === 'ADMIN' && checkShowAction(slotProps.data)">
             <Button
               icon="pi pi-pencil"
               @click="onEditClick(slotProps.data)"
@@ -239,7 +239,7 @@
           <template v-else>
             <Button
               icon="pi pi-eye"
-              @click="onEditClick(slotProps.data)"
+              @click="onEditClick(slotProps.data, true)"
               class="p-button-sm p-button-rounded p-button-secondary p-button-text"/>
           </template>
           <Button
@@ -277,7 +277,7 @@ export default defineComponent({
     const isCustomer = ref(false);
     const list = ref([]);
     const arrWarehouse = ref([]);
-    const arrFactory = ref([]);
+    const isShowDetail = ref({});
     const confirm = useConfirm();
     const toast = useToast();
     let currentPage = 1;
@@ -288,9 +288,9 @@ export default defineComponent({
     let searchToDate = ref("");
     let searchCode = ref("");
     let searchName = ref("");
-    let searchEmployee = ref("");
-    let searchWarehouse = ref("");
-    let searchFactory = ref("");
+    let searchEmployee = ref(null);
+    let searchWarehouse = ref(null);
+    let searchFactory = ref(null);
     const getData = async (
       page: number,
       requestedPageSize: number,
@@ -303,9 +303,9 @@ export default defineComponent({
       searchToDate = "",
       searchFactory = ""
     ) => {
-      searchEmployee = searchEmployee === "null" ? "0" : searchEmployee;
-      searchWarehouse = searchWarehouse === "null" ? "0" : searchWarehouse;
-      searchFactory = searchFactory === "null" ? "0" : searchFactory;
+      searchEmployee = searchEmployee === "null" ? "" : searchEmployee;
+      searchWarehouse = searchWarehouse === "null" ? "" : searchWarehouse;
+      searchFactory = searchFactory === "null" ? "" : searchFactory;
       try {
         const resp = await DeliveryBillApi.getDeliveryBills(
           page,
@@ -443,12 +443,6 @@ export default defineComponent({
 
     const onAddClick = async () => {
       const today = new Date().getTime();
-      const res = await FactoryApi.getAll();
-      let factoryItem: any;
-      if (res.data.list) {
-        factoryItem = res.data.list;
-      }
-      arrFactory.value = factoryItem;
       const resp = await WarehouseApi.getByReceipt();
       let warehouseItem: any;
       if (resp.data.list) {
@@ -466,6 +460,7 @@ export default defineComponent({
         deliveryBillId: sequenceId,
         dateDeliveryBill: today,
       };
+      isShowDetail.value = {isShowDetail: false};
       showSlideOut.value = true;
     };
 
@@ -473,20 +468,14 @@ export default defineComponent({
       confirmDialog(rec);
     };
 
-    const onEditClick = async (rec: Record<string, unknown>) => {
-      const res = await FactoryApi.getAll();
-      let factoryItem: any;
-      if (res.data.list) {
-        factoryItem = res.data.list;
-      }
-      arrFactory.value = factoryItem;
+    const onEditClick = async (rec: Record<string, unknown>, isShow = false) => {
       const resp = await WarehouseApi.getByReceipt();
       let warehouseItem: any;
       if (resp.data.list) {
         warehouseItem = resp.data.list;
       }
       arrWarehouse.value = warehouseItem;
-
+      isShowDetail.value = {isShowDetail: isShow};
       showSlideOut.value = true;
       selectedRec.value = rec;
     };
@@ -532,10 +521,15 @@ export default defineComponent({
       factory.value = lstfactorys;
     };
 
+    const checkShowAction = (data: any) => {
+      data = JSON.parse(JSON.stringify(data));
+      return data.dateDeliveryBill == new Date(new Date().toDateString()).getTime();
+    }
+
     return {
       list,
       arrWarehouse,
-      arrFactory,
+      isShowDetail,
       isLoading,
       showSlideOut,
       pageSize,
@@ -548,6 +542,7 @@ export default defineComponent({
       onDeleteClick,
       onEditClick,
       onPageChange,
+      checkShowAction,
       getData,
       emp,
       factory,

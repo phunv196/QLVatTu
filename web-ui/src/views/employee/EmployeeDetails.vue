@@ -96,21 +96,7 @@
           :filter="true"
           :showClear="true"
           optionLabel="name"
-          optionValue="positionId"
-          placeholder="--Hãy chọn--"
-        />
-        <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1"
-          >Phòng ban <strong class="p-error">*</strong>
-        </label>
-        <Dropdown
-          style="width: 33.3333%"
-          class="p-inputtext-sm"
-          v-model="recData.departmentId"
-          :options="department"
-          :filter="true"
-          :showClear="true"
-          optionLabel="name"
-          optionValue="departmentId"
+          optionValue="code"
           placeholder="--Hãy chọn--"
         />
       </div>
@@ -156,8 +142,7 @@
 import { defineComponent, onMounted, ref } from "vue";
 import EmployeeApi from "@/api/employee-api";
 import { useToast } from "primevue/usetoast";
-import positionApi from "@/api/position-api";
-import departmentApi from "@/api/department-api";
+import CategoryApi from "@/api/category-api";
 
 export default defineComponent({
   props: {
@@ -168,7 +153,6 @@ export default defineComponent({
   setup(props, { emit }): unknown {
     const toast = useToast();
     const position = ref([]);
-    const department = ref([]);
     const showMessage = ref(false);
     const userMessage = ref("");
     const changesApplied = ref(false);
@@ -200,9 +184,6 @@ export default defineComponent({
       }
       if (!rawEmpObj.positionId) {
         msg.push("chức vụ");
-      }
-      if (!rawEmpObj.departmentId) {
-        msg.push("phòng ban");
       }
       if (msg.length > 0) {
         userMessage.value =
@@ -261,25 +242,15 @@ export default defineComponent({
 
     onMounted(async () => {
       await lstPosition();
-      await lstDepartment();
     });
 
     const lstPosition = async () => {
-      const resp = await positionApi.getAll();
+      const resp = await CategoryApi.getListByParentCode('POSITION');
       let lstPositions = [];
       if (resp.data) {
         lstPositions = resp.data.list;
       }
       position.value = lstPositions;
-    };
-
-    const lstDepartment = async () => {
-      const resp = await departmentApi.getAll();
-      let lstDepartments = [];
-      if (resp.data) {
-        lstDepartments = resp.data.list;
-      }
-      department.value = lstDepartments;
     };
 
     return {
@@ -290,7 +261,6 @@ export default defineComponent({
       onApplyChanges,
       onCancel,
       position,
-      department,
     };
   },
 });

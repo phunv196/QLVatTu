@@ -11,16 +11,11 @@ import store from '@/store';
 //material management
 import DeliveryBill from '@/views/delivery-bill/DeliveryBill.vue';
 import Factory from '@/views/factory/Factory.vue';
-import Position from '@/views/position/Position.vue';
-import Quality from '@/views/quality/Quality.vue';
 import Receipt from '@/views/receipt/Receipt.vue';
-import Unit from '@/views/unit/Unit.vue';
-import Species from '@/views/species/Species.vue';
 import Supplier from '@/views/supplier/Supplier.vue';
 import Supplies from '@/views/supplies/Supplies.vue';
 import Warehouse from '@/views/warehouse/Warehouse.vue';
 import WarehouseCard from '@/views/warehouse-card/WarehouseCard.vue';
-import Department from '@/views/department/Department.vue';
 import Category from "@/views/category/Category.vue";
 
 const routes: Array<RouteRecordRaw> = [
@@ -41,20 +36,14 @@ const routes: Array<RouteRecordRaw> = [
       { path: 'dashboard', component: Dashboard },
       { path: 'users', component: Users },
       { path: 'employees', component: Employees },
-      //material-management
       { path: 'delivery-bill', component: DeliveryBill },
       { path: 'factory', component: Factory },
-      { path: 'position', component: Position },
       { path: 'category', component: Category },
-      { path: 'quality', component: Quality },
       { path: 'receipt', component: Receipt },
-      { path: 'unit', component: Unit },
-      { path: 'species', component: Species },
       { path: 'supplier', component: Supplier },
       { path: 'supplies', component: Supplies },
       { path: 'warehouse', component: Warehouse },
       { path: 'Warehouse-card', component: WarehouseCard },
-      { path: 'department', component: Department },
     ],
   },
   // the default route, when none of the above matches:

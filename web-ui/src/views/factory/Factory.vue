@@ -271,7 +271,7 @@ export default defineComponent({
     let searchName = ref("");
     let searchCode = ref("");
     let searchEmail = ref("");
-    let searchEmployee = ref("");
+    let searchEmployee = ref(null);
 
     const getData = async (
       page: number,
@@ -286,7 +286,7 @@ export default defineComponent({
       searchFormSuccessDate = "",
       searchToSuccessDate = ""
     ) => {
-      searchEmployee = searchEmployee === "null" ? "0" : searchEmployee;
+      searchEmployee = searchEmployee === "null" ? "" : searchEmployee;
       // isLoading.value = true;
       try {
         const resp = await FactoryApi.getFactorys(

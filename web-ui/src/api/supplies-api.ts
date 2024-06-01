@@ -19,7 +19,7 @@ export default {
     if (searchUnit) { qsParams.searchUnit = searchUnit; }
     return api.get('/supplies', { params: qsParams });
   },
-  
+
   async export(searchCode = "", searchName = "", searchSupplier = "", searchSpecies = "", searchFormPrice = "",
     searchToPrice = "", searchQuality = "", searchUnit = "",): Promise<AxiosResponse> {
     const qsParams: Record<string, number | string> = {};
@@ -54,8 +54,8 @@ export default {
     return api.get(`/supplies/all`);
   },
 
-  async getByWarehouseId(warehouseId: ""): Promise<AxiosResponse> {
-    return api.get(`/supplies/by-warehouse/${warehouseId}`);
+  async getByWarehouseId(warehouseId: "", suppliesId?: ''): Promise<AxiosResponse> {
+    return api.get(`/supplies/by-warehouse/${warehouseId}`, { params: {suppliesId: suppliesId} });
   },
 
   async getSuppliesByCode(suppliesObj: Record<string, string | number>): Promise<AxiosResponse> {

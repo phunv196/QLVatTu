@@ -1,19 +1,17 @@
 package com.app.api.controllers;
 
 import com.app.api.BaseController;
+import com.app.dao.CategoryDao;
 import com.app.dao.EmployeeDao;
 import com.app.dao.base.CommonUtils;
 import com.app.dao.base.ImportFileExcell;
 import com.app.dao.base.ImportFileExcell.ImportBean;
 import com.app.dao.base.ImportFileExcell.ImportErrorBean;
 import com.app.dao.base.converter.DynamicExport;
-import com.app.dao.DepartmentDao;
-import com.app.dao.PositionDao;
 import com.app.model.BaseResponse;
 import com.app.model.ExportModel;
 import com.app.model.ExportModel.ExportResponse;
-import com.app.model.department.DepartmentModel;
-import com.app.model.position.PositionModel;
+import com.app.model.category.CategoryModel;
 import com.app.model.employee.EmployeeModel;
 import com.app.model.employee.EmployeeModel.EmployeeResponse;
 import com.app.util.Constants;
@@ -48,8 +46,7 @@ import static com.app.util.Constants.COMMON.*;
 @Consumes(MediaType.APPLICATION_JSON)
 public class EmployeeController extends BaseController {
     EmployeeDao employeeDao = new EmployeeDao();
-    DepartmentDao departmentDao = new DepartmentDao();
-    PositionDao positionDao = new PositionDao();
+    CategoryDao categoryDao = new CategoryDao();
 
     @GET
     @RolesAllowed({"ADMIN", "SUPPORT"})
@@ -63,8 +60,7 @@ public class EmployeeController extends BaseController {
         @Parameter(description = "Order Id") @QueryParam("searchName") String searchName,
         @Parameter(description = "Order Id") @QueryParam("searchEmail") String searchEmail,
         @Parameter(description = "Order Id") @QueryParam("searchPhone") String searchPhone,
-        @Parameter(description = "Order Id") @QueryParam("searchDepartment") Long searchDepartment,
-        @Parameter(description = "Order Id") @QueryParam("searchPosition") Long searchPosition,
+        @Parameter(description = "Order Id") @QueryParam("searchPosition") String searchPosition,
         @Parameter(description="Search by name or email - Use % for wildcard like '%ra%'", example="%ra%") @QueryParam("search") String search,
         @Parameter(description="Page No, Starts from 1 ", example="1") @DefaultValue("1")  @QueryParam("page")  int page,
         @Parameter(description="Items in each page", example="20") @DefaultValue("20") @QueryParam("page-size") int pageSize
@@ -74,18 +70,10 @@ public class EmployeeController extends BaseController {
             employeeId = 0l;
         }
 
-        if (searchDepartment == null) {
-            searchDepartment = 0l;
-        }
-
-        if (searchPosition == null) {
-            searchPosition = 0l;
-        }
-
         List<EmployeeModel> employeeList = employeeDao.getList(page, pageSize, employeeId, searchCode,
-                searchName, searchEmail, searchPhone, searchDepartment, searchPosition);
+                searchName, searchEmail, searchPhone, searchPosition);
         BigInteger total = employeeDao.getEmployeeCount(employeeId, searchCode,
-                searchName, searchEmail, searchPhone, searchDepartment, searchPosition);
+                searchName, searchEmail, searchPhone, searchPosition);
         resp.setList(employeeList);
         resp.setTotal(total.intValue());
         resp.setPageStats(total.intValue(), pageSize, page, "");
@@ -199,24 +187,15 @@ public class EmployeeController extends BaseController {
         String fileName = "BM_Nhap_Moi_Nhan_Vien.xls";
         DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_IMPORT_EXCELL + fileName), 6, false);
         dynamicExport.setActiveSheet(1);
-        List<DepartmentModel> departmentList = departmentDao.getAll(DepartmentModel.class, "departmentId");
         int rows = 2;
-        for (DepartmentModel model : departmentList) {
+        List<CategoryModel> positionList = categoryDao.getByParentCode("POSITION");
+        for (CategoryModel model : positionList) {
             dynamicExport.setEntry(String.valueOf(rows-1), 0, rows);
             dynamicExport.setText(model.getCode(), 1, rows);
             dynamicExport.setText(model.getName(), 2, rows);
             rows++;
         }
         dynamicExport.setCellFormat(0, 0, rows-1, 2, DynamicExport.BORDER_FORMAT);
-        rows = 2;
-        List<PositionModel> positionList = positionDao.getAll(PositionModel.class, "positionId");
-        for (PositionModel model : positionList) {
-            dynamicExport.setEntry(String.valueOf(rows-1), 4, rows);
-            dynamicExport.setText(model.getCode(), 5, rows);
-            dynamicExport.setText(model.getName(), 6, rows);
-            rows++;
-        }
-        dynamicExport.setCellFormat(0, 4, rows-1, 6, DynamicExport.BORDER_FORMAT);
 
         String fileExport = FOLDER_EXPORT_TEMPLATE + "BM_Nhap_Moi_Nhan_Vien";
         String filePath = dynamicExport.exportFile(fileExport, req);
@@ -244,7 +223,7 @@ public class EmployeeController extends BaseController {
         String fileName = "danh_sach_nhan_vien.xls";
         DynamicExport dynamicExport = new DynamicExport(TemplateResouces.getReportFile(TEMPLATE_EXPORT_EXCELL + fileName), 6, false);
         List<EmployeeModel> models = employeeDao.getListExport(employee.getCode(), employee.getFullName(), employee.getEmail(),
-                employee.getPhone(), employee.getDepartmentId(), employee.getPositionId());
+                employee.getPhone(), employee.getPositionId());
         int stt = 1;
         if(models != null && !models.isEmpty()) {
             for (int i = 0 ; i < models.size() ; i++){
@@ -258,7 +237,6 @@ public class EmployeeController extends BaseController {
                 dynamicExport.setText(model.getSexString(), index++);
                 dynamicExport.setText(model.getPhone(), index++);
                 dynamicExport.setText(model.getEmail(), index++);
-                dynamicExport.setText(model.getDepartmentName(), index++);
                 dynamicExport.setText(model.getPositionName(), index++);
             }
         }
@@ -328,15 +306,10 @@ public class EmployeeController extends BaseController {
     public Response uploadFile(ExportModel model) throws Exception {
         ImportFileExcell importFileExcell = new ImportFileExcell();
         BaseResponse resp = new BaseResponse();
-        List<DepartmentModel> departmentList = departmentDao.getAll(DepartmentModel.class, "departmentId");
-        Map<String, Long> department = new HashMap<>();
-        departmentList.forEach(element ->{
-            department.put(element.getCode().toLowerCase(), element.getDepartmentId());
-        });
-        List<PositionModel> positionList = positionDao.getAll(PositionModel.class, "positionId");
-        Map<String, Long> position = new HashMap<>();
+        List<CategoryModel> positionList = categoryDao.getByParentCode("POSITION");
+        Map<String, CategoryModel> position = new HashMap<>();
         positionList.forEach(element ->{
-            position.put(element.getCode().toLowerCase(), element.getPositionId());
+            position.put(element.getCode().toLowerCase(), element);
         });
         List<EmployeeModel> listEmployeeModel = employeeDao.getAll(EmployeeModel.class, "employeeId");
         List<EmployeeModel> employeeModels = new ArrayList<>();
@@ -364,7 +337,6 @@ public class EmployeeController extends BaseController {
                 String sex = (String) objects[column++];
                 String email = (String) objects[column++];
                 String phone = (String) objects[column++];
-                String departmentCode = (String) objects[column++];
                 String positionCode = (String) objects[column++];
                 String address = (String) objects[column++];
                 column = 1;
@@ -427,17 +399,6 @@ public class EmployeeController extends BaseController {
                 } else {
                     employeeModel.setPhone(phone);
                 }
-
-                column++;
-                if (CommonUtils.isNullOrEmpty(departmentCode)) {
-                    errorList.add(new ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
-                } else {
-                    if(!department.containsKey(departmentCode.toLowerCase())) {
-                        errorList.add(new ImportErrorBean(importBean.getRows().get(row), column, "Mã phòng ban phải nhập theo dữ liệu cho trước!", (String) objects[column]));
-                    } else {
-                        employeeModel.setDepartmentId(department.get(departmentCode.toLowerCase()));
-                    }
-                }
                 column++;
                 if (CommonUtils.isNullOrEmpty(positionCode)) {
                     errorList.add(new ImportErrorBean(importBean.getRows().get(row), column, Constants.Error.NULL_OR_ENITY, (String) objects[column]));
@@ -445,7 +406,7 @@ public class EmployeeController extends BaseController {
                     if(!position.containsKey(positionCode.toLowerCase())) {
                         errorList.add(new ImportErrorBean(importBean.getRows().get(row), column, "Mã chức vụ phải nhập theo dữ liệu cho trước!", (String) objects[column]));
                     } else {
-                        employeeModel.setPositionId(position.get(positionCode.toLowerCase()));
+                        employeeModel.setPositionId(position.get(positionCode.toLowerCase()).getCode());
                     }
                 }
                 employeeModel.setFullName(firstName + " " + lastName);

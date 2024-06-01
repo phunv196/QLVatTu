@@ -80,7 +80,7 @@
           :filter="true"
           :showClear="true"
           optionLabel="name"
-          optionValue="speciesId"
+          optionValue="code"
           placeholder="--Hãy chọn--"
         />
       </div>
@@ -130,7 +130,7 @@
           :filter="true"
           :showClear="true"
           optionLabel="name"
-          optionValue="qualityId"
+          optionValue="code"
           placeholder="--Hãy chọn--"
         />
       </div>
@@ -148,7 +148,7 @@
           :filter="true"
           :showClear="true"
           optionLabel="name"
-          optionValue="unitId"
+          optionValue="code"
           placeholder="--Hãy chọn--"
         />
       </div>
@@ -269,10 +269,8 @@ import Import from "@/views/supplies/Import.vue";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import SupplierApi from "@/api/supplier-api";
-import QualityApi from "@/api/quality-api";
-import SpeciesApi from "@/api/species-api";
 import { debounce, exportFile } from "@/shared/utils";
-import unitApi from "@/api/unit-api";
+import CategoryApi from "@/api/category-api";
 
 export default defineComponent({
   setup(): unknown {
@@ -295,12 +293,12 @@ export default defineComponent({
     let supplier = ref([]);
     let searchName = ref("");
     let searchCode = ref("");
-    let searchSupplier = ref("");
-    let searchSpecies = ref("");
+    let searchSupplier = ref(null);
+    let searchSpecies = ref(null);
     let searchFormPrice = ref("");
     let searchToPrice = ref("");
-    let searchQuality = ref("");
-    let searchUnit = ref("");
+    let searchQuality = ref(null);
+    let searchUnit = ref(null);
 
     const getData = async (
       page: number,
@@ -315,12 +313,12 @@ export default defineComponent({
       searchQuality = "",
       searchUnit = ""
     ) => {
-      searchFormPrice = searchFormPrice === "null" ? "0" : searchFormPrice;
-      searchToPrice = searchToPrice === "null" ? "0" : searchToPrice;
-      searchSupplier = searchSupplier === "null" ? "0" : searchSupplier;
-      searchSpecies = searchSpecies === "null" ? "0" : searchSpecies;
-      searchQuality = searchQuality === "null" ? "0" : searchQuality;
-      searchUnit = searchUnit === "null" ? "0" : searchUnit;
+      searchFormPrice = searchFormPrice === "null" ? "" : searchFormPrice;
+      searchToPrice = searchToPrice === "null" ? "" : searchToPrice;
+      searchSupplier = searchSupplier === "null" ? "" : searchSupplier;
+      searchSpecies = searchSpecies === "null" ? "" : searchSpecies;
+      searchQuality = searchQuality === "null" ? "" : searchQuality;
+      searchUnit = searchUnit === "null" ? "" : searchUnit;
       try {
         const resp = await SuppliesApi.getSupplies(
           page,
@@ -466,7 +464,7 @@ export default defineComponent({
     };
 
     const lstUnit = async () => {
-      const resp = await unitApi.getAll();
+      const resp = await await CategoryApi.getListByParentCode('UNIT');
       let lstUnits = [];
       if (resp.data) {
         lstUnits = resp.data.list;
@@ -475,7 +473,7 @@ export default defineComponent({
     };
 
     const lstQuality = async () => {
-      const resp = await QualityApi.getAll();
+      const resp = await await CategoryApi.getListByParentCode('QUALITY');
       let lstQualitys = [];
       if (resp.data) {
         lstQualitys = resp.data.list;
@@ -484,7 +482,7 @@ export default defineComponent({
     };
 
     const lstSpecies = async () => {
-      const resp = await SpeciesApi.getAll();
+      const resp = await await CategoryApi.getListByParentCode('TYPE');
       let lstSpeciess = [];
       if (resp.data) {
         lstSpeciess = resp.data.list;

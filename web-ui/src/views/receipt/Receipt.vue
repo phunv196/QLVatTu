@@ -13,11 +13,12 @@
         @cancel="showSlideOut = false;"
         @changed="getData()"
         :arrWarehouse="arrWarehouse"
+        :isShowDetail="isShowDetail"
         :isNew="isNewRec"
       ></ReceiptDetails>
     </Sidebar>
     <h3>Quản lý nhập kho</h3>
-    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1350px">
+    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1380px">
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
@@ -63,7 +64,7 @@
         />
       </div>
     </div>
-    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1350px">
+    <div class="p-d-flex p-flex-row p-mb-3 p-jc-around" style="width: 1380px">
       <div>
         <label
           class="p-d-inline-block m-label-size-3 p-text-left p-mr-1"
@@ -148,18 +149,18 @@
       stripedRows showGridlines
       @page="onPageChange($event)"
       class="p-datatable-sm p-datatable-hoverable-rows m-border p-mb-4"
-      style="width: 1350px; line-height: 1.3rem; word-wrap: break-word;"
+      style="width: 1380px; line-height: 1.3rem; word-wrap: break-word;"
     >
-      <Column field="index" header="STT" headerStyle="width:90px;" bodyStyle="text-align-last: center;"></Column>
+      <Column field="index" header="STT" headerStyle="width:50px;" bodyStyle="text-align-last: center;"></Column>
       <Column
         field="code"
         header="Mã phiếu nhập"
-        headerStyle="width:90px"
+        headerStyle="width:140px"
       ></Column>
       <Column
         field="name"
         header="Tên phiếu nhập"
-        headerStyle="width:160px"
+        headerStyle="width:180px"
       ></Column>
       <Column
         field="strDateWarehousing"
@@ -183,7 +184,7 @@
       ></Column>
       <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px; text-align: center;">
         <template #body="slotProps">
-          <template v-if="$store.getters.role === 'ADMIN'">
+          <template v-if="$store.getters.role === 'ADMIN' && checkShowAction(slotProps.data) ">
             <Button
               icon="pi pi-pencil"
               @click="onEditClick(slotProps.data)"
@@ -200,7 +201,7 @@
           <template v-else>
             <Button
               icon="pi pi-eye"
-              @click="onEditClick(slotProps.data)"
+              @click="onEditClick(slotProps.data, true)"
               class="p-button-sm p-button-rounded p-button-secondary p-button-text"/>
           </template>
           <Button
@@ -237,6 +238,7 @@ export default defineComponent({
     const isCustomer = ref(false);
     const list = ref([]);
     const arrWarehouse = ref([]);
+    const isShowDetail = ref({});
     const confirm = useConfirm();
     const toast = useToast();
     let currentPage = 1;
@@ -246,8 +248,8 @@ export default defineComponent({
     let searchToDate = ref("");
     let searchName = ref("");
     let searchCode = ref("");
-    let searchEmployee = ref("");
-    let searchWarehouse = ref("");
+    let searchEmployee = ref(null);
+    let searchWarehouse = ref(null);
 
     const getData = async (
       page: number,
@@ -260,8 +262,8 @@ export default defineComponent({
       searchFormDate = "",
       searchToDate = ""
     ) => {
-      searchEmployee = searchEmployee === "null" ? "0" : searchEmployee;
-      searchWarehouse = searchWarehouse === "null" ? "0" : searchWarehouse;
+      searchEmployee = searchEmployee === "null" ? "" : searchEmployee;
+      searchWarehouse = searchWarehouse === "null" ? "" : searchWarehouse;
       // isLoading.value = true;
       try {
         const resp = await ReceiptApi.getReceipts(
@@ -378,6 +380,7 @@ export default defineComponent({
       }
       await ReceiptApi.deleteByReceiptsId(sequenceId);
       isNewRec.value = true;
+      isShowDetail.value = {isShowDetail: false};
       selectedRec.value = { receiptId: sequenceId, dateWarehousing: today };
       showSlideOut.value = true;
     };
@@ -386,13 +389,14 @@ export default defineComponent({
       confirmDialog(rec);
     };
 
-    const onEditClick = async (rec: Record<string, unknown>) => {
+    const onEditClick = async (rec: Record<string, unknown>, isShow = false) => {
       const resp = await WarehouseApi.getAll();
       let warehouseItem: any;
       if (resp.data.list) {
         warehouseItem = resp.data.list;
       }
       arrWarehouse.value = warehouseItem;
+      isShowDetail.value = {isShowDetail: isShow};
 
       showSlideOut.value = true;
       selectedRec.value = rec;
@@ -459,9 +463,15 @@ export default defineComponent({
       });
     };
 
+    const checkShowAction = (data: any) => {
+      data = JSON.parse(JSON.stringify(data));
+      return data.dateWarehousing == new Date(new Date().toDateString()).getTime();
+    }
+
     return {
       list,
       arrWarehouse,
+      isShowDetail,
       isLoading,
       showSlideOut,
       pageSize,
@@ -475,6 +485,7 @@ export default defineComponent({
       onEditClick,
       onPageChange,
       getData,
+      checkShowAction,
       emp,
       warehouse,
       searchCode,

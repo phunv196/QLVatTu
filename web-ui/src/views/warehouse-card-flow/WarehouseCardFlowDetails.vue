@@ -86,6 +86,7 @@
           class="p-inputtext-sm"
           style="width: 76.3%"
         />
+        {{maxAmount}}
       </div>
       <div class="p-mt-3 p-d-flex p-ai-center">
         <label class="p-d-inline-block m-label-size-2 p-text-right p-mr-1">

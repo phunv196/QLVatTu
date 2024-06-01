@@ -34,9 +34,9 @@ public class EmployeeDao extends BaseHibernateDAO {
     }
 
     public List<EmployeeModel> getList(int from, int limit,Long employeeId, String searchCode, String searchName,
-                                      String searchEmail,String searchPhone, Long searchDepartment,Long searchPosition)  throws HibernateException, ConstraintViolationException {
+                                      String searchEmail,String searchPhone, String searchPosition)  throws HibernateException, ConstraintViolationException {
         String sql = createSqlWhereString(employeeId, searchCode,
-                searchName, searchEmail, searchPhone, searchDepartment, searchPosition);
+                searchName, searchEmail, searchPhone, searchPosition);
         String sqlLimit = "";
         if ( limit <= 0 || limit > 1000 ){
             sqlLimit = " limit 1000 ";
@@ -63,14 +63,11 @@ public class EmployeeDao extends BaseHibernateDAO {
                 "   when e.sex = 2 then 'Nữ'" +
                 "   END) sexString ," +
                 " e.email email," +
-                " e.department_id departmentId, " +
-                " d.name departmentName, " +
                 " e.position_id positionId, " +
                 " p.name positionName, " +
                 " e.address address " +
                 " from employees e " +
-                " left join department d on e.department_id = d.department_id" +
-                " left join position p on e.position_id = p.position_id";
+                " left join category p on e.position_id = p.code";
         //String finalSql = "select factory_id from factory";
         finalSql = finalSql + sql + " order by e.employee_id " + sqlLimit;
 
@@ -80,8 +77,7 @@ public class EmployeeDao extends BaseHibernateDAO {
         if (searchName != null)    { q.setParameter("searchName", "%" + searchName.toLowerCase() + "%"); }
         if (searchEmail != null)    { q.setParameter("searchEmail", "%" + searchEmail.toLowerCase() + "%"); }
         if (searchPhone != null)    { q.setParameter("searchPhone", "%" + searchPhone.toLowerCase() + "%"); }
-        if (searchDepartment > 0)   { q.setParameter("searchDepartment", searchDepartment ); }
-        if (searchPosition > 0)   { q.setParameter("searchPosition", searchPosition ); }
+        if (searchPosition != null)   { q.setParameter("searchPosition", searchPosition ); }
         q.setResultTransformer(Transformers.aliasToBean(EmployeeModel.class));
         setResultTransformer(q, EmployeeModel.class);
 
@@ -90,9 +86,9 @@ public class EmployeeDao extends BaseHibernateDAO {
 
 
     public BigInteger getEmployeeCount(Long employeeId, String searchCode, String searchName,
-                                      String searchEmail,String searchPhone, Long searchDepartment,Long searchPosition) {
+                                      String searchEmail,String searchPhone,String searchPosition) {
         String sql = createSqlWhereString(employeeId, searchCode,
-                searchName, searchEmail, searchPhone, searchDepartment, searchPosition);
+                searchName, searchEmail, searchPhone, searchPosition);
         String countSql = "select count(*) from employees e " + sql ;
         SQLQuery q = createSQLQuery(countSql);
         if (employeeId >0)   { q.setParameter("id", employeeId); }
@@ -100,13 +96,12 @@ public class EmployeeDao extends BaseHibernateDAO {
         if (searchName != null)    { q.setParameter("searchName", "%" + searchName.toLowerCase() + "%"); }
         if (searchEmail != null)    { q.setParameter("searchEmail", "%" + searchEmail.toLowerCase() + "%"); }
         if (searchPhone != null)    { q.setParameter("searchPhone", "%" + searchPhone.toLowerCase() + "%"); }
-        if (searchDepartment > 0)   { q.setParameter("searchDepartment", searchDepartment ); }
-        if (searchPosition > 0)   { q.setParameter("searchPosition", searchPosition ); }
+        if (searchPosition != null)   { q.setParameter("searchPosition", searchPosition ); }
         return (BigInteger)q.uniqueResult();
     }
 
     private String createSqlWhereString(Long employeeId, String searchCode, String searchName,
-                                        String searchEmail,String searchPhone, Long searchDepartment,Long searchPosition){
+                                        String searchEmail,String searchPhone,String searchPosition){
         String sqlWhere = " where  1 = 1 ";
 
         if (employeeId > 0)   { sqlWhere = sqlWhere + " and e.employee_id = :employeeId "; }
@@ -114,13 +109,12 @@ public class EmployeeDao extends BaseHibernateDAO {
         if (searchName != null)   { sqlWhere = sqlWhere + " and LOWER(e.full_name) LIKE :searchName "; }
         if (searchEmail != null)   { sqlWhere = sqlWhere + " and LOWER(e.email) LIKE :searchEmail "; }
         if (searchPhone != null )   { sqlWhere = sqlWhere + " and LOWER(e.phone) LIKE :searchPhone "; }
-        if (searchDepartment > 0)   { sqlWhere = sqlWhere + " and e.department_id = :searchDepartment "; }
-        if (searchPosition > 0)   { sqlWhere = sqlWhere + " and e.position_id = :searchPosition "; }
+        if (searchPosition != null)   { sqlWhere = sqlWhere + " and e.position_id = :searchPosition "; }
 
         return sqlWhere;
     }
 
-    public List<EmployeeModel> getListExport(String code, String fullName, String email, String phone, Long departmentId, Long positionId) {
+    public List<EmployeeModel> getListExport(String code, String fullName, String email, String phone, String positionId) {
         StringBuilder querySelect = new StringBuilder(
                 "select e.employee_id employeeId," +
                 " e.code code," +
@@ -135,14 +129,11 @@ public class EmployeeDao extends BaseHibernateDAO {
                 "   when e.sex = 2 then 'Nam'" +
                 "   END) sexString," +
                 " e.email email," +
-                " e.department_id departmentId, " +
-                " d.name departmentName, " +
                 " e.position_id positionId, " +
                 " p.name positionName, " +
                 " e.address address " +
                 " from employees e " +
-                " left join department d on e.department_id = d.department_id" +
-                " left join position p on e.position_id = p.position_id");
+                " left join category p on e.position_id = p.code");
 
         List<Object> paramList = new ArrayList<>();
         StringBuilder strCondition = new StringBuilder(" WHERE 1 = 1");
@@ -150,7 +141,6 @@ public class EmployeeDao extends BaseHibernateDAO {
         CommonUtils.filter(fullName, strCondition, paramList, "e.full_name");
         CommonUtils.filter(email, strCondition, paramList, "e.email");
         CommonUtils.filter(phone, strCondition, paramList, "e.phone");
-        CommonUtils.filter(departmentId, strCondition, paramList, "e.deparment_id");
         CommonUtils.filter(positionId, strCondition, paramList, "e.position_id");
         querySelect.append(strCondition);
         querySelect.append(" ORDER BY e.employee_id ");

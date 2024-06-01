@@ -15,14 +15,14 @@
     <div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
-          >Mã thẻ kho <strong class="p-error">*</strong>
+          >Mã thẻ kho
         </label>
         <InputText
           type="text"
           v-model="recData.code"
           class="p-inputtext-sm p-mr-1"
           style="width: 30%"
-          v-bind:disabled="isDisabled"
+          disabled
         />
         <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
           >Tên thẻ kho <strong class="p-error">*</strong>
@@ -180,9 +180,9 @@ export default defineComponent({
       delete rawWarehouseCardObj.index;
       let msg: any[];
       msg = [];
-      if (!rawWarehouseCardObj.code) {
-        msg.push("mã thẻ kho");
-      }
+      // if (!rawWarehouseCardObj.code) {
+      //   msg.push("mã thẻ kho");
+      // }
       if (!rawWarehouseCardObj.name) {
         msg.push("tên thẻ kho");
       }

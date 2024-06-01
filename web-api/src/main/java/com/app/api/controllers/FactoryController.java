@@ -228,6 +228,31 @@ public class FactoryController extends BaseController {
     }
 
     @POST
+    @Path("getByDate")
+    @RolesAllowed({"ADMIN", "SUPPORT"})
+    @Operation(
+            responses = { @ApiResponse(content = @Content(schema = @Schema(implementation = BaseResponse.class)))}
+    )
+    public Response getByDate(
+            FactoryModel model
+    ) {
+        Criteria criteria = factoryDao.createCriteria(FactoryModel.class);
+        if (model.getFactoryId() != null){
+            criteria.add(Restrictions.ne("factoryId", model.getFactoryId()));
+        }
+        if (model.getDateDeliveryBill() != null){
+            criteria.add(Restrictions.le("dateConstruction", model.getDateDeliveryBill()));
+            criteria.add(Restrictions.ge("dateFinish", model.getDateDeliveryBill()));
+        }
+        // Execute the Total-Count Query first ( if main query is executed first, it results in error for count-query)
+        List<FactoryModel> factoryList = criteria.list();
+        FactoryResponse resp = new FactoryResponse();
+        resp.setList(factoryList);
+        resp.setSuccessMessage("List of factorys");
+        return Response.ok(resp).build();
+    }
+
+    @POST
     @Path("export")
     @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(

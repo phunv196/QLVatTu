@@ -32,7 +32,7 @@ public class Constants {
     public interface COMMON {
         //Dinh dang ngay
         String DATE_FORMAT = "MMM dd yyyy";
-        String DATE_FORMAT_BASIC = "dd-MM-yyyy";
+        String DATE_FORMAT_BASIC = "dd/MM/yyyy";
         String SQLDATE_FORMAT = "yyyy-MM-dd";
         String DATE_TIME_FORMAT = "dd/MM/yyyy HH:mm:ss";
 

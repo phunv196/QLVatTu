@@ -1,22 +1,20 @@
 package com.app.api.controllers;
 
 import com.app.api.BaseController;
-import com.app.dao.EmployeeDao;
+import com.app.dao.*;
 import com.app.dao.base.CommonUtils;
 import com.app.dao.base.converter.DynamicExport;
-import com.app.dao.DepartmentDao;
-import com.app.dao.ReceiptDao;
-import com.app.dao.ReceiptFlowDao;
-import com.app.dao.WarehouseDao;
 import com.app.model.BaseResponse;
 import com.app.model.ExportModel;
 import com.app.model.receipt.ReceiptFlowModel;
 import com.app.model.receipt.ReceiptModel;
 import com.app.model.receipt.ReceiptModel.ReceiptResponse;
-import com.app.model.department.DepartmentModel;
 import com.app.model.employee.EmployeeModel;
+import com.app.model.supplies.SuppliesModel;
 import com.app.model.user.UserModel;
 import com.app.model.warehouse.WarehouseModel;
+import com.app.model.warehouseCard.WarehouseCardFlowModel;
+import com.app.model.warehouseCard.WarehouseCardModel;
 import com.app.util.TemplateResouces;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -40,6 +38,8 @@ import java.io.*;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.app.util.Constants.COMMON.*;
 import static com.app.util.Constants.COMMON.FOLDER_EXPORT_DOCX;
@@ -49,11 +49,16 @@ import static com.app.util.Constants.COMMON.FOLDER_EXPORT_DOCX;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class ReceiptController extends BaseController {
+
+    WarehouseCardController warehouseCardController = new WarehouseCardController();
+    WarehouseCardDao warehouseCardDao = new WarehouseCardDao();
+    WarehouseCardFlowController warehouseCardFlowController = new WarehouseCardFlowController();
+    WarehouseCardFlowDao warehouseCardFlowDao = new WarehouseCardFlowDao();
+    SuppliesDao suppliesDao = new SuppliesDao();
     ReceiptDao receiptDao = new ReceiptDao();
     ReceiptFlowDao receiptFlowDao = new ReceiptFlowDao();
     WarehouseDao warehouseDao = new WarehouseDao();
     EmployeeDao employeeDao = new EmployeeDao();
-    DepartmentDao departmentDao = new DepartmentDao();
 
     @GET
     @RolesAllowed({"ADMIN", "SUPPORT"})
@@ -122,16 +127,108 @@ public class ReceiptController extends BaseController {
     public Response addReceipt(ReceiptModel receipt) {
         BaseResponse resp = new BaseResponse();
         try {
+
             UserModel userFromToken = (UserModel)securityContext.getUserPrincipal();
             receipt.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
+            receipt.setCode(String.format("PN-%s-%s", CommonUtils.convertDateToString(receipt.getDateWarehousing()), receiptDao.getSequence().toString()));
             receiptDao.beginTransaction();
             receiptDao.save(receipt);
+
+            Criteria criteriaS = suppliesDao.createCriteria(SuppliesModel.class);
+            criteriaS.setProjection(null);
+            List<SuppliesModel> suppliesList = criteriaS.list();
+            Map<Long, SuppliesModel> mapS = suppliesList.stream().collect(Collectors.toMap(SuppliesModel::getSuppliesId, Function.identity()));
+
+            Criteria criteriaW = warehouseDao.createCriteria(WarehouseModel.class);
+            criteriaW.setProjection(null);
+            List<WarehouseModel> warehouseModels = criteriaW.list();
+            Map<Long, WarehouseModel> mapW = warehouseModels.stream().collect(Collectors.toMap(WarehouseModel::getWarehouseId, Function.identity()));
+
+            List<ReceiptFlowModel> receiptFlowModels = receiptFlowDao.getByReceiptId(receipt.getReceiptId());
+            List<WarehouseCardFlowModel> cardFlowModelList = new ArrayList<>();
+            List<WarehouseCardModel> cardModelList = new ArrayList<>();
+            List<SuppliesModel> suppliesListSave = new ArrayList<>();
+            Long warehouseCardId = warehouseCardDao.getSequence();
+            Long i = 0L;
+            for (ReceiptFlowModel receiptFlowModel : receiptFlowModels) {
+                WarehouseCardModel cardModel = new WarehouseCardModel();
+                cardModel.setWarehouseId(receipt.getWarehouseId());
+                cardModel.setSuppliesId(receiptFlowModel.getSuppliesId());
+                try {
+                    cardModel.setDateCreated(CommonUtils.convertStringToDateBasic(CommonUtils.convertDateToString(receipt.getDateWarehousing())));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    WarehouseCardModel warehouseCardModel = warehouseCardController.getByCodeInsert(cardModel);
+                    if (warehouseCardModel == null) {
+                        WarehouseCardModel suppliesTop1 = warehouseCardController.getSuppliesIdTop1(receipt.getWarehouseId(), receiptFlowModel.getSuppliesId());
+
+                        WarehouseCardModel cardModelAdd = new WarehouseCardModel();
+                        cardModelAdd.setDateCreated(CommonUtils.convertStringToDateBasic(CommonUtils.convertDateToString(receipt.getDateWarehousing())));
+                        cardModelAdd.setCode(String.format("TK-%s-%s-%s",CommonUtils.convertDateToString(receipt.getDateWarehousing()), mapW.get(receipt.getWarehouseId()).getCode(), mapS.get(receiptFlowModel.getSuppliesId()).getCode()));
+                        cardModelAdd.setName(String.format("Thẻ kho: %s - %s",mapW.get(receipt.getWarehouseId()).getName(), mapS.get(receiptFlowModel.getSuppliesId()).getName()));
+                        cardModelAdd.setSuppliesId(receiptFlowModel.getSuppliesId());
+                        cardModelAdd.setEmployeeId(Long.valueOf(userFromToken.getEmployeeId()));
+                        cardModelAdd.setWarehouseCardId(warehouseCardId + i++);
+                        cardModelAdd.setWarehouseId(receipt.getWarehouseId());
+                        cardModelAdd.setInventory(suppliesTop1.getInventory() - receiptFlowModel.getAmount());
+                        cardModelList.add(cardModelAdd);
+                        WarehouseCardFlowModel warehouseCardFlowModel = new WarehouseCardFlowModel();
+                        warehouseCardFlowModel.setWarehouseCardId(cardModelAdd.getWarehouseCardId());
+                        warehouseCardFlowModel.setType(1L);
+                        warehouseCardFlowModel.setCreateAt(new Date());
+                        warehouseCardFlowModel.setReceiptId(receipt.getReceiptId());
+                        warehouseCardFlowModel.setAmount(receiptFlowModel.getAmount());
+                        cardFlowModelList.add(warehouseCardFlowModel);
+                        SuppliesModel suppliesModel = mapS.get(receiptFlowModel.getSuppliesId());
+                        suppliesModel.setInventory(suppliesModel.getInventory() != null ? suppliesModel.getInventory() + receiptFlowModel.getAmount() : receiptFlowModel.getAmount());
+                        suppliesListSave.add(suppliesModel);
+                    } else {
+                        SuppliesModel suppliesModel = mapS.get(receiptFlowModel.getSuppliesId());
+                        suppliesModel.setInventory(suppliesModel.getInventory() != null ? suppliesModel.getInventory() + receiptFlowModel.getAmount() : receiptFlowModel.getAmount());
+                        suppliesListSave.add(suppliesModel);
+                        warehouseCardModel.setInventory(warehouseCardModel.getInventory() + receiptFlowModel.getAmount());
+                        cardModelList.add(warehouseCardModel);
+                        WarehouseCardFlowModel warehouseCardFlowModel = new WarehouseCardFlowModel();
+                        warehouseCardFlowModel.setWarehouseCardId(warehouseCardModel.getWarehouseCardId());
+                        warehouseCardFlowModel.setType(1L);
+                        warehouseCardFlowModel.setCreateAt(new Date());
+                        warehouseCardFlowModel.setReceiptId(receipt.getReceiptId());
+                        warehouseCardFlowModel.setAmount(receiptFlowModel.getAmount());
+                        cardFlowModelList.add(warehouseCardFlowModel);
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+
+            };
             receiptDao.commitTransaction();
+            suppliesListSave.forEach(suppliesModel -> {
+                suppliesDao.beginTransaction();
+                suppliesDao.save(suppliesModel);
+                suppliesDao.commitTransaction();
+            });
+            cardModelList.forEach(warehouseCardModel -> {
+                warehouseCardDao.beginTransaction();
+                warehouseCardDao.save(warehouseCardModel);
+                warehouseCardDao.commitTransaction();
+            });
+            cardFlowModelList.forEach(warehouseCardFlowModel -> {
+                warehouseCardFlowDao.beginTransaction();
+                warehouseCardFlowDao.save(warehouseCardFlowModel);
+                warehouseCardFlowDao.commitTransaction();
+            });
+            cardFlowModelList.forEach(warehouseCardFlowModel -> {
+                warehouseCardFlowController.updateRecepit(warehouseCardFlowModel);
+            });
             resp.setSuccessMessage(String.format("Thêm mới bản ghi thành công code: %s ", receipt.getCode()));
             return Response.ok(resp).build();
         } catch (HibernateException | ConstraintViolationException e) {
             resp.setErrorMessage("Không thể thêm mới bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -338,7 +435,6 @@ public class ReceiptController extends BaseController {
         List<ReceiptFlowModel> models = receiptFlowDao.getByReceiptId(receiptId);
         ReceiptModel receiptModel = receiptDao.getById(receiptId);
         EmployeeModel employeeModel = employeeDao.getById(receiptModel.getEmployeeId());
-        DepartmentModel departmentModel = departmentDao.getById(employeeModel.getDepartmentId());
         WarehouseModel warehouseModel = warehouseDao.getById(receiptModel.getWarehouseId());
         Date date = new Date();
         String strDate = CommonUtils.convertDateToString(date);
@@ -346,7 +442,6 @@ public class ReceiptController extends BaseController {
         File fileDocx = new File(TEMPLATE_EXPORT_DOCX + "BM_Phieu_Nhap_Kho.docx");
         String prefixOutPutFile = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "_";
         Map<String, String> map = new HashMap<>();
-        map.put("departmentName", departmentModel == null ? " " : departmentModel.getName());
         map.put("day", arrDate[0]);
         map.put("month", arrDate[1]);
         map.put("year", arrDate[2]);

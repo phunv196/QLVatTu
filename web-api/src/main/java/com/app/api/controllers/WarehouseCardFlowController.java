@@ -101,6 +101,15 @@ public class WarehouseCardFlowController extends BaseController {
         receiptFlowDao.commitTransaction();
     }
 
+    public void updateRecepit(WarehouseCardFlowModel warehouseCardFlow, Long amountOld) {
+        WarehouseCardModel cardModel = warehouseCardDao.getById(warehouseCardFlow.getWarehouseCardId());
+        ReceiptFlowModel model = receiptFlowDao.getModel(warehouseCardFlow.getReceiptId(), cardModel.getSuppliesId());
+        model.setReceived(model.getReceived() == null ? warehouseCardFlow.getAmount() : model.getReceived() + warehouseCardFlow.getAmount() - amountOld);
+        receiptFlowDao.beginTransaction();
+        receiptFlowDao.saveOrUpdate(model);
+        receiptFlowDao.commitTransaction();
+    }
+
     @PUT
     @RolesAllowed({"ADMIN", "SUPPORT"})
     @Operation(

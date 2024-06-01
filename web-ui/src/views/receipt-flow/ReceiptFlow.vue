@@ -3,12 +3,12 @@
     <Toast/>
     <Sidebar v-model:visible="showSlideOut" position="right" style="width:700px">
       <ReceiptFlowDetails :rec="selectedRec" @cancel="showSlideOut = false" @changed="getData()"
-                   :arrSupplies="arrSupplies" :isNew="isNewRec"></ReceiptFlowDetails>
+                   :arrSupplies="arrSupplies" :isNew="isNewRec" :isShowDetail="isShowDetail"></ReceiptFlowDetails>
     </Sidebar>
     <h3> Danh sách vật tư nhập </h3>
     <div class="p-d-flex p-flex-row p-mb-1" style="width:1180px" v-if="$store.getters.role === 'ADMIN'">
       <div style="display:inline-block; flex:1"></div>
-      <Button icon="pi pi-user" iconPos="right" label="ADD" @click="onAddClick()"
+      <Button v-if="!isShowDetailTemp" icon="pi pi-user" iconPos="right" label="ADD" @click="onAddClick()"
               class="p-ml-1 p-button-sm"></Button>
     </div>
     <DataTable
@@ -34,7 +34,7 @@
       <Column field="calculatePrice" header="Thành tiền" headerStyle="width:90px"></Column>
       <Column header="ACTION" headerStyle="width:95px" bodyStyle="padding:3px; text-align: center;">
         <template #body="slotProps">
-          <template v-if="$store.getters.role === 'ADMIN'">
+          <template v-if="$store.getters.role === 'ADMIN' && !isShowDetailTemp">
             <Button icon="pi pi-pencil" @click="onEditClick(slotProps.data)"
                     class="p-button-sm p-button-rounded p-button-secondary p-button-text"/>
             <Button icon="pi pi-trash" @click="onDeleteClick(slotProps.data)"
@@ -46,7 +46,7 @@
               @click="onEditClick(slotProps.data)"
               class="p-button-sm p-button-rounded p-button-secondary p-button-text"/>
           </template>
-            
+
         </template>
       </Column>
     </DataTable>
@@ -65,6 +65,7 @@ import SuppliesApi from '@/api/supplies-api';
 export default defineComponent({
   props: {
     requence: {},
+    isShowDetail: {},
   },
   setup(props): unknown {
     const isLoading = ref(false);
@@ -73,6 +74,7 @@ export default defineComponent({
     const totalPages = ref(0);
     const totalRecs = ref(0);
     const selectedRec = ref({});
+    const isShowDetail = ref({});
     const isNewRec = ref(false);
     const isCustomer = ref(false);
     const list = ref([]);
@@ -80,6 +82,7 @@ export default defineComponent({
     const confirm = useConfirm();
     const toast = useToast();
     let currentPage = 1;
+    const isShowDetailTemp = JSON.parse(JSON.stringify(props.isShowDetail)).isShowDetail;
     const receiptId = ref(JSON.parse(JSON.stringify(props.requence)));
     const getData = async (page: number, requestedPageSize: number, receiptFlowId = '') => {
       // isLoading.value = true;
@@ -178,7 +181,7 @@ export default defineComponent({
         itemSupplies = supp.data.list;
       }
       arrSupplies.value = itemSupplies;
-
+      isShowDetail.value = {isShowDetail: isShowDetailTemp};
       showSlideOut.value = true;
       selectedRec.value = rec;
     };
@@ -190,6 +193,8 @@ export default defineComponent({
     return {
       list,
       arrSupplies,
+      isShowDetailTemp,
+      isShowDetail,
       isLoading,
       showSlideOut,
       pageSize,

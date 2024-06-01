@@ -15,13 +15,14 @@
     <div>
       <div class="p-mt-3">
         <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
-          >Mã phiếu nhập <strong class="p-error">*</strong>
+          >Mã phiếu nhập
         </label>
         <InputText
           type="text"
           v-model="recData.code"
           class="p-inputtext-sm p-mr-1"
           style="width: 35%"
+          disabled
         />
         <label class="p-d-inline-block m-label-size-3 p-text-right p-mr-1"
           >Tên phiếu nhập <strong class="p-error">*</strong>
@@ -76,7 +77,7 @@
         />
       </div>
     </div>
-    <ReceiptFlow :requence="recData.receiptId"></ReceiptFlow>
+    <ReceiptFlow :requence="recData.receiptId" :isShowDetail="isShowDetailTemp"></ReceiptFlow>
 
     <!--button-->
     <div class="p-mt-2 p-d-flex p-flex-row p-jc-end" style="width: 100%">
@@ -95,6 +96,7 @@
           label="APPLY CHANGES"
           @click="onApplyChanges()"
           class="p-button-sm"
+          v-if="!isShowDetailTemp"
         ></Button>
       </template>
     </div>
@@ -113,6 +115,7 @@ export default defineComponent({
       required: true,
     },
     arrWarehouse: [],
+    isShowDetail: {},
   },
 
   setup(props, { emit }): unknown {
@@ -120,6 +123,7 @@ export default defineComponent({
     const showMessage = ref(false);
     const userMessage = ref("");
     const changesApplied = ref(false);
+    const isShowDetailTemp = JSON.parse(JSON.stringify(props.isShowDetail)).isShowDetail;
     const recData = ref(JSON.parse(JSON.stringify(props.rec))); // do not create direct refs to props to avoid making changes to props, instead use a cloned value of prop
 
     const onApplyChanges = async () => {
@@ -127,9 +131,9 @@ export default defineComponent({
       const checkId = await ReceiptApi.checkId(rawReceiptObj.receiptId);
       let msg: any[];
       msg = [];
-      if (!rawReceiptObj.code) {
-        msg.push("mã phiếu nhập");
-      }
+      // if (!rawReceiptObj.code) {
+      //   msg.push("mã phiếu nhập");
+      // }
       if (!rawReceiptObj.name) {
         msg.push("tên phiếu nhập");
       }
@@ -149,14 +153,14 @@ export default defineComponent({
       } else {
         delete rawReceiptObj.index;
         delete rawReceiptObj.strDateWarehousing;
-        const check = await ReceiptApi.getReceiptByCode(rawReceiptObj);
-        if (check.data) {
-          userMessage.value = "Mã phiếu nhập bị trùng. Vui lòng nhập lại!";
-          showMessage.value = true;
-          setTimeout(() => {
-            return (showMessage.value = false);
-          }, 2000);
-        } else {
+        // const check = await ReceiptApi.getReceiptByCode(rawReceiptObj);
+        // if (check.data) {
+        //   userMessage.value = "Mã phiếu nhập bị trùng. Vui lòng nhập lại!";
+        //   showMessage.value = true;
+        //   setTimeout(() => {
+        //     return (showMessage.value = false);
+        //   }, 2000);
+        // } else {
           let resp;
           if (checkId.data) {
             resp = await ReceiptApi.updateReceipt(rawReceiptObj);
@@ -187,7 +191,7 @@ export default defineComponent({
               detail: resp.data.msg,
             });
           }
-        }
+        // }
       }
     };
 
@@ -198,6 +202,7 @@ export default defineComponent({
 
     return {
       showMessage,
+      isShowDetailTemp,
       userMessage,
       changesApplied,
       recData,

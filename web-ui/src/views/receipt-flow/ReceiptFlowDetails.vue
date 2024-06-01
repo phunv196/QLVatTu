@@ -69,7 +69,7 @@
           @click="$emit('cancel')"
           class="p-button-sm p-button-outlined p-mr-1"
         ></Button>
-        <Button
+        <Button v-if="!isShowDetailTemp"
           icon="pi pi-check"
           iconPos="left"
           label="APPLY CHANGES"
@@ -93,6 +93,7 @@ export default defineComponent({
       required: true,
     },
     arrSupplies: [],
+    isShowDetail: {},
   },
 
   setup(props, { emit }): unknown {
@@ -100,6 +101,7 @@ export default defineComponent({
     const showMessage = ref(false);
     const userMessage = ref("");
     const changesApplied = ref(false);
+    const isShowDetailTemp = JSON.parse(JSON.stringify(props.isShowDetail)).isShowDetail;
     const recData = ref(JSON.parse(JSON.stringify(props.rec))); // do not create direct refs to props to avoid making changes to props, instead use a cloned value of prop
 
     const onApplyChanges = async () => {
@@ -172,6 +174,7 @@ export default defineComponent({
 
     return {
       showMessage,
+      isShowDetailTemp,
       userMessage,
       changesApplied,
       recData,

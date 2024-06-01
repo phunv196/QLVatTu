@@ -1628,9 +1628,9 @@ public class CommonUtils {
      */
     public static Date getFirstDayOfMonth(int month, int year) throws Exception {
         if (month > 9) {
-            return CommonUtils.convertStringToDateBasic("01-" + month + "-" + year);
+            return CommonUtils.convertStringToDateBasic("01/" + month + "/" + year);
         } else {
-            return CommonUtils.convertStringToDateBasic("01-0" + month + "-" + year);
+            return CommonUtils.convertStringToDateBasic("01/0" + month + "/" + year);
         }
     }
 
@@ -1643,9 +1643,9 @@ public class CommonUtils {
      */
     public static Date getLastDayOfMonth(int month, int year) throws Exception {
         if (month > 9) {
-            return CommonUtils.convertStringToDateBasic(getDaysOfMonth(month, year) + "-" + month + "-" + year);
+            return CommonUtils.convertStringToDateBasic(getDaysOfMonth(month, year) + "/" + month + "/" + year);
         } else {
-            return CommonUtils.convertStringToDateBasic(getDaysOfMonth(month, year) + "-0" + month + "-" + year);
+            return CommonUtils.convertStringToDateBasic(getDaysOfMonth(month, year) + "/0" + month + "/" + year);
         }
     }
 
@@ -1865,6 +1865,21 @@ public class CommonUtils {
     public static void filter(Long n, StringBuilder queryString, List<Object> paramList, String field) {
         if ((n != null) && (n > 0L)) {
             queryString.append(" AND ").append(field).append(" = ? ");
+            paramList.add(n);
+        }
+    }
+
+    /**
+     * kiem tra 1 so rong hay null khong
+     *
+     * @param n           So
+     * @param queryString
+     * @param paramList
+     * @param field
+     */
+    public static void filterNe(Long n, StringBuilder queryString, List<Object> paramList, String field) {
+        if ((n != null) && (n > 0L)) {
+            queryString.append(" OR ").append(field).append(" = ? ");
             paramList.add(n);
         }
     }

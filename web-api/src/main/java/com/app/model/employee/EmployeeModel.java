@@ -20,15 +20,11 @@ public class EmployeeModel {
     @Column(name = "address") private String  address;
     @Column(name = "sex") private Long  sex;
     @Column(name = "birth") private Date birth;
-    @Column(name = "position_id") private Long positionId;
-    @Column(name = "department_id") private Long  departmentId;
+    @Column(name = "position_id") private String positionId;
 
 
     @Transient
     private String positionName;
-
-    @Transient
-    private String departmentName;
 
     @Transient
     private String sexString;
@@ -37,7 +33,7 @@ public class EmployeeModel {
 
     public EmployeeModel(Long employeeId, String code, String lastName, String firstName, String fullName,
                          String email, String phone, String address, Long sex, Date birth,
-                         Long positionId, Long departmentId, String positionName, String departmentName) {
+                         String positionId, String positionName) {
         this.employeeId = employeeId;
         this.code = code;
         this.lastName = lastName;
@@ -49,9 +45,7 @@ public class EmployeeModel {
         this.sex = sex;
         this.birth = birth;
         this.positionId = positionId;
-        this.departmentId = departmentId;
         this.positionName = positionName;
-        this.departmentName = departmentName;
     }
 
 // Getter and Setters
@@ -115,20 +109,12 @@ public class EmployeeModel {
         this.employeeId = employeeId;
     }
 
-    public Long getPositionId() {
+    public String getPositionId() {
         return positionId;
     }
 
-    public void setPositionId(Long positionId) {
+    public void setPositionId(String positionId) {
         this.positionId = positionId;
-    }
-
-    public Long getDepartmentId() {
-        return departmentId;
-    }
-
-    public void setDepartmentId(Long departmentId) {
-        this.departmentId = departmentId;
     }
 
     public String getPositionName() {
@@ -137,14 +123,6 @@ public class EmployeeModel {
 
     public void setPositionName(String positionName) {
         this.positionName = positionName;
-    }
-
-    public String getDepartmentName() {
-        return departmentName;
-    }
-
-    public void setDepartmentName(String departmentName) {
-        this.departmentName = departmentName;
     }
 
     public static class EmployeeResponse extends PageResponse {

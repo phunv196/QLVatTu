@@ -235,17 +235,7 @@ export default defineComponent({
               pointHitRadius: 10,
               pointHoverRadius: 3,
               pointHoverBorderWidth: 0,
-            },
-            {
-              label: "Tồn",
-              data: sumInventory,
-              borderWidth: 0,
-              backgroundColor: "#A5BE00",
-              pointRadius: 0,
-              pointHitRadius: 10,
-              pointHoverRadius: 3,
-              pointHoverBorderWidth: 0,
-            },
+            }
           ],
         };
       } catch (err:any) {
