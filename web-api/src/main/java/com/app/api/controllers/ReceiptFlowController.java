@@ -128,13 +128,16 @@ public class ReceiptFlowController extends BaseController {
                 resp.setErrorMessage(String.format("Bản ghi không tồn tại (id:%s)", receiptFlowId));
                 return Response.ok(resp).build();
             } else {
+                if(receiptDao.getById(foundProd.getReceiptId()) != null) {
+                    warehouseCardController.deleteWarehouseCardByReceiptId(foundProd);
+                }
                 receiptFlowDao.beginTransaction();
                 receiptFlowDao.delete(receiptFlowId);
                 receiptFlowDao.commitTransaction();
                 resp.setSuccessMessage(String.format("Xóa bản ghi thành công (id:%s)", receiptFlowId));
                 return Response.ok(resp).build();
             }
-        } catch (HibernateException | ConstraintViolationException e) {
+        } catch (Exception e) {
             resp.setErrorMessage("Không thể xóa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }

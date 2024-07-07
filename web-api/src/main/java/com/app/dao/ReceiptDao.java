@@ -75,7 +75,7 @@ public class ReceiptDao extends BaseHibernateDAO {
                 " from receipt r " +
                 " left join warehouse w on w.warehouse_id = r.warehouse_id" +
                 " left join employees e on e.employee_id = r.employee_id";
-        finalSql = finalSql + sql + " order by r.receipt_id " + sqlLimit;
+        finalSql = finalSql + sql + " order by r.receipt_id desc " + sqlLimit;
 
         SQLQuery q = createSQLQuery(finalSql);
         if (receiptId > 0) {
@@ -224,7 +224,7 @@ public class ReceiptDao extends BaseHibernateDAO {
         CommonUtils.filterBetweenDate(CommonUtils.convertStringToDateOther(formDate),CommonUtils.convertStringToDateOther(toDate)
                 , strCondition, paramList, "r.date_warehousing","r.date_warehousing");
         querySelect.append(strCondition);
-        querySelect.append(" ORDER BY r.receipt_id ");
+        querySelect.append(" ORDER BY r.receipt_id desc ");
         SQLQuery q = createSQLQuery(querySelect.toString());
         for (int i = 0; i < paramList.size(); i++) {
             q.setParameter(i, paramList.get(i));

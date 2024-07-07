@@ -80,7 +80,7 @@ public class DeliveryBillDao extends BaseHibernateDAO {
                 " left join factory f on f.factory_id = db.factory_id" +
                 " left join employees e on e.employee_id = db.employee_id" +
                 " left join warehouse w on w.warehouse_id = db.warehouse_id";
-        finalSql = finalSql + sql + " order by db.delivery_bill_id " + sqlLimit;
+        finalSql = finalSql + sql + " order by db.delivery_bill_id desc" + sqlLimit;
 
         SQLQuery q = createSQLQuery(finalSql);
         if (deliveryBillId > 0) {
@@ -212,7 +212,7 @@ public class DeliveryBillDao extends BaseHibernateDAO {
                 , strCondition, paramList, "db.date_delivery_bill","db.date_delivery_bill");
         querySelect.append(strCondition);
         CommonUtils.filter(factoryId, strCondition, paramList, "db.factory_id");
-        querySelect.append(" ORDER BY db.delivery_bill_id ");
+        querySelect.append(" ORDER BY db.delivery_bill_id desc ");
         SQLQuery q = createSQLQuery(querySelect.toString());
         for (int i = 0; i < paramList.size(); i++) {
             q.setParameter(i, paramList.get(i));

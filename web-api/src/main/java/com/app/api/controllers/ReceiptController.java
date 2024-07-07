@@ -57,6 +57,7 @@ public class ReceiptController extends BaseController {
     SuppliesDao suppliesDao = new SuppliesDao();
     ReceiptDao receiptDao = new ReceiptDao();
     ReceiptFlowDao receiptFlowDao = new ReceiptFlowDao();
+    ReceiptFlowController receiptFlowController = new ReceiptFlowController();
     WarehouseDao warehouseDao = new WarehouseDao();
     EmployeeDao employeeDao = new EmployeeDao();
 
@@ -275,6 +276,10 @@ public class ReceiptController extends BaseController {
                 resp.setErrorMessage(String.format("Bản ghi không tồn tại (id:%s)", receiptId));
                 return Response.ok(resp).build();
             } else {
+                List<ReceiptFlowModel> receiptFlowModels = receiptFlowDao.getByReceiptId(receiptId);
+                receiptFlowModels.forEach(receiptFlowModel -> {
+                    receiptFlowController.deleteReceiptFlow(receiptFlowModel.getReceiptFlowId());
+                });
                 receiptDao.beginTransaction();
                 receiptDao.delete(receiptId);
                 receiptDao.commitTransaction();

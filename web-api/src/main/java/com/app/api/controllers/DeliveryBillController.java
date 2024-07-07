@@ -57,6 +57,7 @@ public class DeliveryBillController extends BaseController {
     WarehouseCardDao warehouseCardDao = new WarehouseCardDao();
     WarehouseCardFlowController warehouseCardFlowController = new WarehouseCardFlowController();
     WarehouseCardFlowDao warehouseCardFlowDao = new WarehouseCardFlowDao();
+    DeliveryBillFlowController deliveryBillFlowController = new DeliveryBillFlowController();
     SuppliesDao suppliesDao = new SuppliesDao();
     FactoryDao factoryDao = new FactoryDao();
 
@@ -291,6 +292,10 @@ public class DeliveryBillController extends BaseController {
                 resp.setErrorMessage(String.format("Bản ghi không tồn tại: (id:%s)", deliveryBillId));
                 return Response.ok(resp).build();
             } else {
+                List<DeliveryBillFlowModel> deliveryBillFlowModels = deliveryBillFlowDao.getByDeliveryBillId(deliveryBillId);
+                deliveryBillFlowModels.forEach(billFlowModel -> {
+                    deliveryBillFlowController.deleteDeliveryBillFlow(billFlowModel.getDeliveryBillFlowId());
+                });
                 deliveryBillDao.beginTransaction();
                 deliveryBillDao.delete(deliveryBillId);
                 deliveryBillDao.commitTransaction();

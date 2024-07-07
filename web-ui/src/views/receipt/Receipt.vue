@@ -465,7 +465,7 @@ export default defineComponent({
 
     const checkShowAction = (data: any) => {
       data = JSON.parse(JSON.stringify(data));
-      return data.dateWarehousing == new Date(new Date().toDateString()).getTime();
+      return data.dateWarehousing == new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).getTime();
     }
 
     return {

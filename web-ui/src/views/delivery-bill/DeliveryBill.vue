@@ -523,7 +523,7 @@ export default defineComponent({
 
     const checkShowAction = (data: any) => {
       data = JSON.parse(JSON.stringify(data));
-      return data.dateDeliveryBill == new Date(new Date().toDateString()).getTime();
+      return data.dateDeliveryBill == new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).getTime();
     }
 
     return {

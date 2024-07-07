@@ -519,6 +519,28 @@ public class WarehouseCardController extends BaseController {
         suppliesDao.commitTransaction();
     }
 
+    public void deleteWarehouseCardByReceiptId(ReceiptFlowModel receiptFlowModel) throws Exception {
+        ReceiptModel receipt = receiptDao.getById(receiptFlowModel.getReceiptId());
+        WarehouseCardModel cardModel = new WarehouseCardModel();
+        cardModel.setWarehouseId(receipt.getWarehouseId());
+        cardModel.setSuppliesId(receiptFlowModel.getSuppliesId());
+        cardModel.setDateCreated(receipt.getDateWarehousing());
+        WarehouseCardModel warehouseCardModel = getByCodeInsert(cardModel);
+        warehouseCardModel.setInventory(warehouseCardModel.getInventory() - receiptFlowModel.getAmount());
+        WarehouseCardFlowModel warehouseCardFlowModel = warehouseCardFlowDao.getByReceiptId(warehouseCardModel.getWarehouseCardId(), receiptFlowModel.getReceiptId());
+        warehouseCardFlowDao.beginTransaction();
+        warehouseCardFlowDao.delete(warehouseCardFlowModel.getWarehouseCardFlowId());
+        warehouseCardFlowDao.commitTransaction();
+        warehouseCardDao.beginTransaction();
+        warehouseCardDao.saveOrUpdate(warehouseCardModel);
+        warehouseCardDao.commitTransaction();
+        SuppliesModel suppliesModel = suppliesDao.getById(receiptFlowModel.getSuppliesId());
+        suppliesModel.setInventory(suppliesModel.getInventory() - receiptFlowModel.getAmount());
+        suppliesDao.beginTransaction();
+        suppliesDao.saveOrUpdate(suppliesModel);
+        suppliesDao.commitTransaction();
+    }
+
     public void updateWarehouseCardByDeliveryBillId(DeliveryBillFlowModel deliveryBillFlowModel, Long amountOld) throws Exception {
         DeliveryBillModel deliveryBill = deliveryBillDao.getById(deliveryBillFlowModel.getDeliveryBillId());
         WarehouseCardModel cardModel = new WarehouseCardModel();
@@ -537,6 +559,28 @@ public class WarehouseCardController extends BaseController {
         warehouseCardDao.commitTransaction();
         SuppliesModel suppliesModel = suppliesDao.getById(deliveryBillFlowModel.getSuppliesId());
         suppliesModel.setInventory(suppliesModel.getInventory() - deliveryBillFlowModel.getAmount() + amountOld);
+        suppliesDao.beginTransaction();
+        suppliesDao.saveOrUpdate(suppliesModel);
+        suppliesDao.commitTransaction();
+    }
+
+    public void deleteWarehouseCardByDeliveryBillId(DeliveryBillFlowModel deliveryBillFlowModel) throws Exception {
+        DeliveryBillModel deliveryBill = deliveryBillDao.getById(deliveryBillFlowModel.getDeliveryBillId());
+        WarehouseCardModel cardModel = new WarehouseCardModel();
+        cardModel.setWarehouseId(deliveryBill.getWarehouseId());
+        cardModel.setSuppliesId(deliveryBillFlowModel.getSuppliesId());
+        cardModel.setDateCreated(deliveryBill.getDateDeliveryBill());
+        WarehouseCardModel warehouseCardModel = getByCodeInsert(cardModel);
+        warehouseCardModel.setInventory(warehouseCardModel.getInventory() + deliveryBillFlowModel.getAmount());
+        WarehouseCardFlowModel warehouseCardFlowModel = warehouseCardFlowDao.getByDeliveryBillId(warehouseCardModel.getWarehouseCardId(), deliveryBillFlowModel.getDeliveryBillId());
+        warehouseCardFlowDao.beginTransaction();
+        warehouseCardFlowDao.delete(warehouseCardFlowModel.getWarehouseCardFlowId());
+        warehouseCardFlowDao.commitTransaction();
+        warehouseCardDao.beginTransaction();
+        warehouseCardDao.saveOrUpdate(warehouseCardModel);
+        warehouseCardDao.commitTransaction();
+        SuppliesModel suppliesModel = suppliesDao.getById(deliveryBillFlowModel.getSuppliesId());
+        suppliesModel.setInventory(suppliesModel.getInventory() + deliveryBillFlowModel.getAmount());
         suppliesDao.beginTransaction();
         suppliesDao.saveOrUpdate(suppliesModel);
         suppliesDao.commitTransaction();

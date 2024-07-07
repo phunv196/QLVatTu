@@ -88,7 +88,7 @@ public class WarehouseCardDao extends BaseHibernateDAO {
                 " left join supplies s on s.supplies_id = wc.supplies_id" +
                 " left join employees e on e.employee_id = wc.employee_id" +
                 " left join warehouse w on w.warehouse_id = wc.warehouse_id";
-        finalSql = finalSql + sql + " order by wc.warehouse_card_id " + sqlLimit;
+        finalSql = finalSql + sql + " order by wc.warehouse_card_id desc " + sqlLimit;
 
         SQLQuery q = createSQLQuery(finalSql);
         if (searchCode != null) {
@@ -226,7 +226,7 @@ public class WarehouseCardDao extends BaseHibernateDAO {
         CommonUtils.filterBetweenDate(CommonUtils.convertStringToDateOther(formDate),CommonUtils.convertStringToDateOther(toDate)
                 , strCondition, paramList, "wc.date_created","wc.date_created");
         querySelect.append(strCondition);
-        querySelect.append(" ORDER BY wc.warehouse_card_id ");
+        querySelect.append(" ORDER BY wc.warehouse_card_id desc ");
         SQLQuery q = createSQLQuery(querySelect.toString());
         for (int i = 0; i < paramList.size(); i++) {
             q.setParameter(i, paramList.get(i));

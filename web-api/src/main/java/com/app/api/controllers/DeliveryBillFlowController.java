@@ -135,13 +135,16 @@ public class DeliveryBillFlowController extends BaseController {
                 resp.setErrorMessage(String.format("Bản ghi không tồn tại (id:%s)", deliveryBillFlowId));
                 return Response.ok(resp).build();
             } else {
+                if(deliveryBillDao.getById(foundProd.getDeliveryBillId()) != null) {
+                    warehouseCardController.deleteWarehouseCardByDeliveryBillId(foundProd);
+                }
                 deliveryBillFlowDao.beginTransaction();
                 deliveryBillFlowDao.delete(deliveryBillFlowId);
                 deliveryBillFlowDao.commitTransaction();
                 resp.setSuccessMessage(String.format("Xóa bản ghi thành công (id:%s)", deliveryBillFlowId));
                 return Response.ok(resp).build();
             }
-        } catch (HibernateException | ConstraintViolationException e) {
+        } catch (Exception e) {
             resp.setErrorMessage("Không thể xóa bản ghi - " + e.getMessage() + ", " + (e.getCause()!=null? e.getCause().getMessage():""));
             return Response.ok(resp).build();
         }
