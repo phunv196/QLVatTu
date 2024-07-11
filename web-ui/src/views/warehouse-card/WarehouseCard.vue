@@ -152,7 +152,7 @@
 <!--      <Button-->
 <!--        icon="pi pi-user"-->
 <!--        iconPos="right"-->
-<!--        label="ADD"-->
+<!--        label="Thêm mới"-->
 <!--        @click="onAddClick()"-->
 <!--        class="p-ml-1 p-button-sm"-->
 <!--      ></Button>-->
@@ -230,7 +230,7 @@
         header="Số lượng tồn"
         headerStyle="width:90px"
       ></Column>
-      <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px; text-align: center;">
+      <Column header="Thao tác" headerStyle="width:100px" bodyStyle="padding:3px; text-align: center;">
         <template #body="slotProps">
           <Button
             icon="pi pi-pencil"
@@ -398,8 +398,8 @@ export default defineComponent({
         getData(
           currentPage,
           pageSize.value,
-          `${searchName.value}`,
           `${searchCode.value}`,
+          `${searchName.value}`,
           `${searchEmployee.value}`,
           `${searchWarehouse.value}`,
           `${searchFormDate.value.toString()}`,
@@ -451,8 +451,8 @@ export default defineComponent({
           1,
           pageSize.value,
           "",
-          `${searchName.value}`,
           `${searchCode.value}`,
+          `${searchName.value}`,
           `${searchEmployee.value}`,
           `${searchWarehouse.value}`,
           `${searchFormDate.value.toString()}`,
@@ -464,8 +464,8 @@ export default defineComponent({
 
     const exportExcell = async () => {
       await WarehouseCardApi.export(
-        `${searchName.value}`,
           `${searchCode.value}`,
+          `${searchName.value}`,
           `${searchEmployee.value}`,
           `${searchWarehouse.value}`,
           `${searchFormDate.value.toString()}`,

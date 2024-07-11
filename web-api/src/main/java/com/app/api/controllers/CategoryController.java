@@ -221,11 +221,11 @@ public class CategoryController extends BaseController {
                 return Response.ok(resp).build();
             } else {
                 Criteria criteria = categoryDao.createCriteria(CategoryModel.class);
-                criteria.add(Restrictions.eq("parentCode", foundProd.getParentCode()));
+                criteria.add(Restrictions.eq("parentCode", foundProd.getCode()));
                 // Execute the Main Query
                 criteria.setProjection(null);
                 List<CategoryModel> categoryList = criteria.list();
-                if (categoryList != null) {
+                if (categoryList.size() > 0) {
                     resp.setErrorMessage(String.format("Bản ghi đã được sử dụng không thể xóa (id:%s)", categoryId));
                     return Response.ok(resp).build();
                 }

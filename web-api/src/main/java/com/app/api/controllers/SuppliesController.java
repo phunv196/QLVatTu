@@ -473,6 +473,7 @@ public class SuppliesController extends BaseController {
                         suppliesModel.setPrice(CommonUtils.convertStringToLong(price));
                     }
                 }
+                suppliesModel.setInventory(0L);
                 suppliesModel.setDescription(description);
                 suppliesModels.add(suppliesModel);
             }

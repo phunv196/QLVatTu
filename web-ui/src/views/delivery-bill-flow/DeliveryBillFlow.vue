@@ -8,7 +8,7 @@
     <h3> Danh sách vật tư xuất </h3>
     <div class="p-d-flex p-flex-row p-mb-3" style="width:1000px" v-if="$store.getters.role === 'ADMIN'">
       <div style="display:inline-block; flex:1"></div>
-      <Button v-if="!isShowDetailTemp" icon="pi pi-user" iconPos="right" label="ADD" @click="onAddClick()"
+      <Button v-if="!isShowDetailTemp" icon="pi pi-user" iconPos="right" label="Thêm mới" @click="onAddClick()"
               class="p-ml-1 p-button-sm"></Button>
     </div>
     <DataTable
@@ -29,7 +29,7 @@
       <Column field="suppliesUnit" header="Đơn vị tính" headerStyle="width:90px"></Column>
       <Column field="suppliesPrice" header="Giá" headerStyle="width:90px"></Column>
       <Column field="calculatePrice" header="Thành tiền" headerStyle="width:90px"></Column>
-      <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px;text-align: center;">
+      <Column header="Thao tác" headerStyle="width:100px" bodyStyle="padding:3px;text-align: center;">
         <template #body="slotProps">
           <template v-if="$store.getters.role === 'ADMIN' && !isShowDetailTemp">
             <Button icon="pi pi-pencil" @click="onEditClick(slotProps.data)"

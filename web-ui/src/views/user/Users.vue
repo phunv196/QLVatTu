@@ -143,7 +143,7 @@
         v-if="$store.getters.role === 'ADMIN'"
         icon="pi pi-user"
         iconPos="right"
-        label="ADD"
+        label="Thêm mới"
         @click="onAddClick()"
         class="p-ml-1 p-button-sm"
       ></Button>
@@ -198,7 +198,7 @@
         bodyStyle="min-width:110px;"
       ></Column>
       <Column
-        header="ACTION"
+        header="Thao tác"
         headerStyle="min-width:100px"
         bodyStyle="padding:3px; min-width:100px; text-align: center;"
       >

@@ -58,21 +58,21 @@
     <div class="p-mt-2 p-d-flex p-flex-row p-jc-end" style="width: 100%">
       <template v-if="changesApplied || $store.getters.role !== 'ADMIN'">
         <Button
-          label="CLOSE"
+          label="Hủy"
           @click="$emit('cancel')"
           class="p-button-sm"
         ></Button>
       </template>
       <template v-else>
         <Button
-          label="CANCEL"
+          label="Hủy"
           @click="$emit('cancel')"
           class="p-button-sm p-button-outlined p-mr-1"
         ></Button>
         <Button v-if="!isShowDetailTemp"
           icon="pi pi-check"
           iconPos="left"
-          label="APPLY CHANGES"
+          label="Lưu"
           @click="onApplyChanges()"
           class="p-button-sm"
         ></Button>

@@ -164,7 +164,7 @@
       <Button
         icon="pi pi-user"
         iconPos="right"
-        label="ADD"
+        label="Thêm mới"
         @click="onAddClick()"
         class="p-ml-1 p-button-sm"
       ></Button>
@@ -215,7 +215,7 @@
         header="Ngày hoàn thành"
         headerStyle="width:160px"
       ></Column>
-      <Column header="ACTION" headerStyle="width:100px" bodyStyle="padding:3px; text-align: center;">
+      <Column header="Thao tác" headerStyle="width:100px" bodyStyle="padding:3px; text-align: center;">
         <template #body="slotProps">
           <Button
             icon="pi pi-pencil"

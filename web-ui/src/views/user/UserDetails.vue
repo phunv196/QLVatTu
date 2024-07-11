@@ -89,7 +89,7 @@
       </template>
       <template v-else>
         <Button
-          label="CANCEL"
+          label="Hủy"
           @click="$emit('cancel')"
           class="p-button-sm p-button-outlined p-mr-1"
         ></Button>
@@ -97,7 +97,7 @@
           v-if="$store.getters.role === 'ADMIN'"
           icon="pi pi-check"
           iconPos="left"
-          label="APPLY CHANGES"
+          label="Lưu"
           @click="onApplyChanges()"
           class="p-button-sm"
         ></Button>

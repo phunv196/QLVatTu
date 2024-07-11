@@ -30,7 +30,7 @@
         class="p-button-sm p-ml-2"
       ></Button>
       <Button
-        label="CANCEL"
+        label="Hủy"
         @click="$emit('cancel')"
         class="p-button-sm p-button-outlined p-ml-2"
       ></Button>
